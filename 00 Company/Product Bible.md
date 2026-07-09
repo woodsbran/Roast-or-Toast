@@ -1,85 +1,102 @@
-Roast or Toast Product Bible (Version 1.0)
+# 🔥 Roast or Toast
+
+# Product Bible
+
+> The foundational vision and guiding principles for Roast or Toast.
+
+---
+
+| Document Information | |
+|----------------------|--------------------------------|
+| **Version** | 1.0 |
+| **Status** | Draft |
+| **Owner** | Branden Woods |
+| **Last Updated** | July 2026 |
+
+---
+
+# Table of Contents
 
 1. Mission
+2. Vision
+3. The Problem
+4. Our Solution
+5. Product Principles
+6. Target Audience
+7. Brand Personality
+8. Core Gameplay
+9. Community Philosophy
+10. Success Metrics
+11. Long-Term Vision
+12. North Star
+
+---
+
+# 1. Mission
 
 Create the funniest place on the internet to settle everyday debates.
 
 Roast or Toast transforms relatable, everyday moments into quick, social experiences where people vote, laugh, and compare opinions with others around the world.
 
-The goal isn't to judge people—it's to celebrate humor through shared experiences.
+The goal isn't to judge people—it is to celebrate humor through shared experiences.
 
-2. Vision
+---
 
-Roast or Toast will become the go-to destination whenever someone wants to answer the question:
+# 2. Vision
 
-"Is this a Roast or a Toast?"
+Roast or Toast will become the go-to destination whenever someone asks:
 
-Whether you're waiting in line, hanging out with friends, or hosting a game night, Roast or Toast should be the first app people think of when they want a laugh or want to settle a debate.
+> **🔥 Roast or ❤️ Toast?**
 
-Long-term, Roast or Toast expands beyond a mobile app into live party games, creator content, and community-driven experiences.
+Whether someone is waiting in line, relaxing at home, hanging out with friends, or hosting a game night, Roast or Toast should be the first app they think of when they want to laugh or settle a debate.
 
-3. The Core Experience
+The long-term vision extends beyond a mobile app into party games, creator content, live events, and community-driven experiences.
 
-Every interaction should be:
+---
 
-Fast
-Funny
-Opinionated
-Shareable
-Repeatable
+# 3. The Problem
 
-A player should understand how to play within five seconds.
+People love sharing opinions.
 
-The ideal session lasts anywhere from 30 seconds to 10 minutes, with every scenario encouraging the player to keep going "just one more."
+Every day, millions of conversations begin with questions like:
 
-4. Brand Personality
+- Was that rude?
+- Is this weird?
+- Am I overreacting?
+- Would you do this?
+- Is this actually acceptable?
 
-If Roast or Toast were a person, it would be:
+Today these conversations happen across group chats, Reddit, TikTok comments, Instagram polls, and Twitter threads.
 
-Witty
-Clever
-Playful
-Inclusive
-Confident
-Self-aware
+There is no dedicated platform designed specifically to settle these everyday debates in a fun, fast, and entertaining way.
 
-Never mean.
+---
 
-Never hateful.
+# 4. Our Solution
 
-Never political as a primary focus.
+Roast or Toast turns everyday situations into interactive social games.
 
-Never bullying.
+Players read a scenario.
 
-The humor should come from situations, habits, awkward moments, and relatable behaviors—not attacking people or groups.
+They choose one of two options:
 
-5. Target Audience
-Primary
-Ages 13–35
-Students
-Young professionals
-Social media users
-Casual gamers
-Secondary
-Families
-Parents
-Adults looking for quick entertainment
-Friend groups
-Couples
+🔥 Roast
 
-6. Product Pillars
+❤️ Toast
 
-Everything we build should support at least one of these pillars.
+Immediately after voting, they discover how everyone else voted and enjoy the funniest community comments.
 
-1. Humor
+The experience is simple enough to understand in seconds while remaining endlessly replayable.
 
-If it isn't funny, it doesn't belong.
+---
 
-2. Simplicity
+# 5. Product Principles
 
-No complicated menus.
+Every decision made throughout development should support these principles.
 
-No tutorials.
+## Simplicity
+
+Players should understand the game in under five seconds.
 
 Open.
 
@@ -89,99 +106,208 @@ Laugh.
 
 Repeat.
 
-3. Community
+---
 
-Players shouldn't just consume content.
+## Humor
 
-They should create it.
+Humor is the product.
 
-Vote.
+Every feature should contribute to making someone smile or laugh.
+
+---
+
+## Community
+
+The community creates the experience.
+
+Players don't just consume content.
+
+They vote.
 
 Comment.
 
-Submit scenarios.
+Create scenarios.
 
 Share results.
 
 Challenge friends.
 
-4. Replayability
+---
 
-Fresh content should make the app feel different every day.
+## Replayability
 
-5. Shareability
+Fresh scenarios should encourage players to return every day.
 
-Every feature should answer:
+---
 
-Would someone send this to a friend?
+## Shareability
 
-If yes, it's valuable.
+Every scenario should feel worth sending to a friend.
 
-7. What Makes Roast or Toast Different?
+If people naturally screenshot or share their results, the product is succeeding.
 
-Roast or Toast is not another trivia game.
+---
 
-It is not a social network.
+# 6. Target Audience
 
-It is not a meme page.
+## Primary Audience
 
-It combines:
+- Ages 13–35
+- Students
+- College students
+- Young professionals
+- Casual gamers
+- Heavy social media users
 
-Social voting
-Community humor
-Daily content
-Friendly competition
-Shareable moments
+## Secondary Audience
 
-into one simple experience.
+- Families
+- Couples
+- Parents
+- Friends
+- Party groups
 
-8. Product Principles
+---
 
-When making product decisions:
+# 7. Brand Personality
 
-Keep it simple.
-Keep it funny.
-Respect the community.
-Reward participation.
-Make every interaction feel satisfying.
-Prioritize quality over quantity.
-Build features that encourage people to return—not features that make the app more complicated.
+If Roast or Toast were a person, it would be:
 
-9. Community Standards
+- Funny
+- Clever
+- Playful
+- Confident
+- Inclusive
+- Self-aware
 
-We roast behaviors—not people.
+It is never:
 
-✅ "Reheating fish in the office microwave."
+- Mean
+- Cruel
+- Political
+- Offensive
+- Bullying
 
-❌ "Roast this person's appearance."
+The humor should focus on situations—not people.
 
-We laugh together.
+---
 
-We don't bully.
+# 8. Core Gameplay
 
-Moderation should support humor while protecting users from harassment, hate speech, discrimination, and targeted abuse.
+The core gameplay loop is intentionally simple.
 
-10. Success Metrics
+```
+Open App
 
-Roast or Toast succeeds when players:
+↓
 
-Open the app every day.
-Laugh while playing.
-Share scenarios with friends.
-Submit their own scenarios.
-Invite others to join.
-Feel like they're part of the community.
+Read Scenario
 
-11. Long-Term Vision
+↓
 
-Roast or Toast becomes:
+Vote
 
-The most recognizable social voting game.
-A party game played on TVs and phones.
-A creator platform for funny scenarios.
-A brand people associate with everyday debates.
-A community where people come to laugh together.
+↓
 
-12. North Star
+Reveal Community Results
 
-Every vote should spark a laugh, a conversation, or a share.
+↓
+
+Read Comments
+
+↓
+
+Next Scenario
+```
+
+A typical interaction should last approximately 15–30 seconds.
+
+The goal is to encourage players to keep saying:
+
+> "Just one more."
+
+---
+
+# 9. Community Philosophy
+
+Roast or Toast exists to roast behaviors—not individuals.
+
+### ✅ Acceptable
+
+- Reheating fish in the office microwave
+- Replying all to an email
+- Wearing socks with sandals
+- Clapping when the plane lands
+
+### ❌ Not Acceptable
+
+- Attacking someone's appearance
+- Hate speech
+- Harassment
+- Bullying
+- Personal attacks
+- Protected characteristics
+
+Community moderation should encourage humor while protecting players.
+
+---
+
+# 10. Success Metrics
+
+The product succeeds when players:
+
+- Return every day.
+- Laugh while playing.
+- Share scenarios with friends.
+- Submit their own scenarios.
+- Invite others to join.
+- Feel connected to the community.
+
+Business success will be measured by:
+
+- Daily Active Users (DAU)
+- Monthly Active Users (MAU)
+- 7-Day Retention
+- 30-Day Retention
+- Average Session Length
+- Shares per User
+- Scenarios Submitted
+- Comments Posted
+
+---
+
+# 11. Long-Term Vision
+
+Roast or Toast grows into more than a mobile app.
+
+Potential expansions include:
+
+- Party Mode
+- TV Mode
+- Friend Challenges
+- Live Events
+- Seasonal Content
+- Creator Scenario Packs
+- Physical Card Game
+- Merchandise
+- Brand Partnerships
+
+The goal is to become the most recognizable social voting game in the world.
+
+---
+
+# 12. North Star
+
+> **Every vote should spark a laugh, a conversation, or a share.**
+
+Every feature, design decision, and product improvement should support this objective.
+
+If a feature does not make Roast or Toast more fun, more social, or more shareable, it should be reconsidered.
+
+---
+
+# Revision History
+
+| Version | Date | Changes |
+|----------|------------|-------------------------|
+| 1.0 | July 2026 | Initial Product Bible |
