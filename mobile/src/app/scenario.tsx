@@ -4,62 +4,58 @@
 // Screen: Scenario
 //
 // Purpose:
-// Displays a shuffled deck of Roast or Toast Moments,
-// allows the player to vote, reveals results, and moves
-// through the deck without immediate repeats.
+// Controls the main Roast or Toast gameplay experience.
 //
-// Current Features:
-// • Randomized Moment order for every session
-// • No repeats until the full deck is completed
-// • Automatic reshuffle after the deck is completed
-// • Category-based visual styling
-// • Changing Roast and Toast phrases
-// • Animated results reveal
-// • Temporary community percentages and top comments
+// Responsibilities:
+// • Creates a shuffled, no-repeat Moment deck
+// • Tracks the current Moment
+// • Records the player's temporary vote
+// • Controls vote and results animations
+// • Shows an intermission after every five Moments
 //
-// Later:
-// • Store real votes
-// • Load live results and comments from Supabase
-// • Save session progress
+// UI responsibilities are separated into reusable
+// components so this file remains easier to maintain.
 //
 // Project: Roast or Toast
 // =====================================================
 
 import { router } from "expo-router";
 import { useRef, useState } from "react";
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Animated, StyleSheet, Text, View } from "react-native";
+
+import IntermissionCard from "../components/IntermissionCard";
+import ResultsCard from "../components/ResultsCard";
+import ScenarioCard from "../components/ScenarioCard";
+import ScenarioHeader from "../components/ScenarioHeader";
+import VoteButtons, {
+  VoteChoice,
+} from "../components/VoteButtons";
 
 import { scenarios } from "../data/scenarios";
 import type { Moment } from "../data/types";
+
 import {
   CategoryName,
   CategoryThemes,
   Colors,
-  Radius,
   Spacing,
 } from "../theme";
 
-// The player can choose Roast, Toast, or nothing yet.
-type VoteChoice = "roast" | "toast" | null;
+// Number of regular Moments completed before showing
+// a short gameplay break.
+const INTERMISSION_FREQUENCY = 5;
 
 // =====================================================
 // Shuffle Helper
 // =====================================================
 
-// Creates a new shuffled copy of the Moment list.
+// Creates a shuffled copy of the supplied Moment list.
 //
-// The original scenarios array is never modified.
+// The original scenarios array is never changed.
 function shuffleMoments(moments: Moment[]): Moment[] {
   const shuffledMoments = [...moments];
 
-  // Fisher-Yates shuffle gives every Moment a fair
-  // chance of appearing anywhere in the deck.
+  // Fisher-Yates shuffle prevents predictable ordering.
   for (
     let currentIndex = shuffledMoments.length - 1;
     currentIndex > 0;
@@ -82,33 +78,40 @@ function shuffleMoments(moments: Moment[]): Moment[] {
 }
 
 export default function ScenarioScreen() {
-  // Creates a shuffled deck only when the screen first loads.
+  // Creates one randomized deck when this screen opens.
   const [momentDeck, setMomentDeck] = useState<Moment[]>(() =>
     shuffleMoments(scenarios),
   );
 
-  // Tracks the player's position within the shuffled deck.
+  // Tracks the current position within the shuffled deck.
   const [momentIndex, setMomentIndex] = useState(0);
 
-  // Stores the player's vote for the current Moment.
+  // Stores the player's choice for the current Moment.
   const [selectedVote, setSelectedVote] =
     useState<VoteChoice>(null);
 
-  // Controls the bounce effect for each voting button.
+  // Counts how many Moments were completed this session.
+  const [completedMoments, setCompletedMoments] = useState(0);
+
+  // Controls whether the break screen is being shown.
+  const [showIntermission, setShowIntermission] =
+    useState(false);
+
+  // Controls the bounce effect for each vote button.
   const roastScale = useRef(new Animated.Value(1)).current;
   const toastScale = useRef(new Animated.Value(1)).current;
 
-  // Controls the fade-and-rise animation for results.
+  // Controls the results fade-and-rise animation.
   const resultsOpacity = useRef(new Animated.Value(0)).current;
   const resultsPosition = useRef(new Animated.Value(18)).current;
 
   // Gets the current Moment from the shuffled deck.
   const currentMoment = momentDeck[momentIndex];
 
-  // Gets the correct visual theme for the current category.
+  // Gets the visual theme associated with the Moment's
+  // category.
   //
-  // Everyday Life is used as a fallback if a category
-  // does not yet have a custom theme.
+  // Everyday Life is used as a safe fallback.
   const categoryTheme =
     CategoryThemes[currentMoment.category as CategoryName] ??
     CategoryThemes["Everyday Life"];
@@ -117,7 +120,7 @@ export default function ScenarioScreen() {
   // Animation Helpers
   // =====================================================
 
-  // Gives the selected voting button a small bounce.
+  // Gives the selected vote button a small bounce.
   const animateVoteButton = (animation: Animated.Value) => {
     Animated.sequence([
       Animated.spring(animation, {
@@ -136,7 +139,7 @@ export default function ScenarioScreen() {
     ]).start();
   };
 
-  // Reveals the results with a short fade-and-rise effect.
+  // Fades the results in and gently moves them upward.
   const revealResults = () => {
     resultsOpacity.setValue(0);
     resultsPosition.setValue(18);
@@ -161,9 +164,9 @@ export default function ScenarioScreen() {
   // Voting
   // =====================================================
 
-  // Records a Roast vote.
+  // Saves a Roast vote and reveals the results.
   const handleRoastVote = () => {
-    // Prevents the player from changing their vote.
+    // The player cannot change their vote after selecting.
     if (selectedVote) {
       return;
     }
@@ -173,9 +176,9 @@ export default function ScenarioScreen() {
     revealResults();
   };
 
-  // Records a Toast vote.
+  // Saves a Toast vote and reveals the results.
   const handleToastVote = () => {
-    // Prevents the player from changing their vote.
+    // The player cannot change their vote after selecting.
     if (selectedVote) {
       return;
     }
@@ -189,23 +192,26 @@ export default function ScenarioScreen() {
   // Deck Navigation
   // =====================================================
 
-  // Moves to the next Moment in the shuffled deck.
+  // Performs the actual movement to the next Moment.
   //
-  // After the final Moment, a new deck is shuffled.
-  const handleNextMoment = () => {
+  // If the deck is finished, a new deck is shuffled.
+  const moveToNextMoment = () => {
     const reachedEndOfDeck =
       momentIndex === momentDeck.length - 1;
 
     if (reachedEndOfDeck) {
       let newDeck = shuffleMoments(scenarios);
 
-      // Prevents the first Moment of the new deck from
-      // matching the Moment the player just completed.
+      // Prevents the new deck from starting with the
+      // exact same Moment the player just completed.
       if (
         newDeck.length > 1 &&
         newDeck[0].id === currentMoment.id
       ) {
-        [newDeck[0], newDeck[1]] = [newDeck[1], newDeck[0]];
+        [newDeck[0], newDeck[1]] = [
+          newDeck[1],
+          newDeck[0],
+        ];
       }
 
       setMomentDeck(newDeck);
@@ -214,12 +220,35 @@ export default function ScenarioScreen() {
       setMomentIndex((currentIndex) => currentIndex + 1);
     }
 
-    // Clears the previous vote for the new Moment.
+    // Clears the old vote and resets results animation.
     setSelectedVote(null);
-
-    // Resets the results animation.
     resultsOpacity.setValue(0);
     resultsPosition.setValue(18);
+  };
+
+  // Runs when the player presses Next after viewing
+  // results.
+  const handleNextMoment = () => {
+    const newCompletedTotal = completedMoments + 1;
+
+    setCompletedMoments(newCompletedTotal);
+
+    // Pause after every set number of completed Moments.
+    if (
+      newCompletedTotal % INTERMISSION_FREQUENCY ===
+      0
+    ) {
+      setShowIntermission(true);
+      return;
+    }
+
+    moveToNextMoment();
+  };
+
+  // Closes the break screen and loads the next Moment.
+  const handleContinueAfterIntermission = () => {
+    setShowIntermission(false);
+    moveToNextMoment();
   };
 
   // Returns the player to the Home screen.
@@ -227,16 +256,28 @@ export default function ScenarioScreen() {
     router.back();
   };
 
+  // =====================================================
+  // Intermission
+  // =====================================================
+
+  // The intermission temporarily replaces the standard
+  // Scenario screen after every five completed Moments.
+  if (showIntermission) {
+    return (
+      <IntermissionCard
+        completedMoments={completedMoments}
+        onContinue={handleContinueAfterIntermission}
+      />
+    );
+  }
+
+  // =====================================================
+  // Standard Scenario Screen
+  // =====================================================
+
   return (
     <View style={styles.container}>
-      {/* =================================================
-          Category Background
-
-          These decorations change automatically based
-          on the category of the current Moment.
-      ================================================= */}
-
-      {/* Large faded category name */}
+      {/* Category-colored backdrop word */}
       <View style={styles.categoryBackdrop}>
         <Text
           style={[
@@ -248,15 +289,17 @@ export default function ScenarioScreen() {
         </Text>
       </View>
 
-      {/* Soft category-colored circle */}
+      {/* Soft category decoration */}
       <View
         style={[
           styles.categoryCircle,
-          { backgroundColor: categoryTheme.soft },
+          {
+            backgroundColor: categoryTheme.soft,
+          },
         ]}
       />
 
-      {/* Main Roast or Toast brand decorations */}
+      {/* Roast or Toast brand decorations */}
       <View style={styles.roastBackdrop}>
         <Text style={styles.roastBackdropText}>ROAST</Text>
       </View>
@@ -265,268 +308,43 @@ export default function ScenarioScreen() {
         <Text style={styles.toastBackdropText}>TOAST</Text>
       </View>
 
-      {/* =================================================
-          Top Navigation
-      ================================================= */}
+      {/* Top navigation area */}
+      <ScenarioHeader
+        categoryAccent={categoryTheme.accent}
+        onBackPress={handleBackPress}
+      />
 
-      <View style={styles.topBar}>
-        {/* Back button */}
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Return to Home"
-          onPress={handleBackPress}
-          style={({ pressed }) => [
-            styles.backButton,
-            pressed && styles.buttonPressed,
-          ]}
-        >
-          <Text style={styles.backArrow}>←</Text>
-        </Pressable>
-
-        {/* App name and changing category dot */}
-        <View style={styles.smallLogoContainer}>
-          <View
-            style={[
-              styles.categoryDot,
-              { backgroundColor: categoryTheme.accent },
-            ]}
-          />
-
-          <Text style={styles.smallLogo}>Roast or Toast</Text>
-        </View>
-
-        {/* Keeps the logo centered */}
-        <View style={styles.topBarSpacer} />
-      </View>
-
-      {/* =================================================
-          Main Content
-      ================================================= */}
-
+      {/* Main gameplay content */}
       <View style={styles.content}>
-        {/* Category badge */}
-        <View
-          style={[
-            styles.categoryBadge,
-            {
-              backgroundColor: categoryTheme.soft,
-              borderColor: categoryTheme.accent,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.categoryBadgeText,
-              { color: categoryTheme.accent },
-            ]}
-          >
-            {categoryTheme.label}
-          </Text>
-        </View>
+        <ScenarioCard
+          categoryLabel={categoryTheme.label}
+          categoryAccent={categoryTheme.accent}
+          categorySoft={categoryTheme.soft}
+          question={currentMoment.question}
+        />
 
-        {/* Main Moment text */}
-        <Text style={styles.scenarioText}>
-          {currentMoment.question}
-        </Text>
-
-        {/* Voting options shown before the player votes */}
+        {/* Vote choices appear before the player votes */}
         {!selectedVote && (
-          <>
-            <Text style={styles.votePrompt}>Let&apos;s get real...</Text>
-
-            <View style={styles.buttonContainer}>
-              {/* Roast option */}
-              <Animated.View
-                style={{
-                  transform: [{ scale: roastScale }],
-                }}
-              >
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Vote Roast"
-                  onPress={handleRoastVote}
-                  style={({ pressed }) => [
-                    styles.voteButton,
-                    styles.voteButtonIdle,
-                    pressed && styles.buttonPressed,
-                  ]}
-                >
-                  <View style={styles.voteButtonContent}>
-                    <Text style={styles.roastIcon}>🔥</Text>
-
-                    <View style={styles.voteTextContainer}>
-                      <Text style={styles.voteButtonText}>
-                        Roast
-                      </Text>
-
-                      <Text style={styles.voteButtonSubtext}>
-                        {currentMoment.roastPhrase}
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
-              </Animated.View>
-
-              {/* Toast option */}
-              <Animated.View
-                style={{
-                  transform: [{ scale: toastScale }],
-                }}
-              >
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Vote Toast"
-                  onPress={handleToastVote}
-                  style={({ pressed }) => [
-                    styles.voteButton,
-                    styles.voteButtonIdle,
-                    pressed && styles.buttonPressed,
-                  ]}
-                >
-                  <View style={styles.voteButtonContent}>
-                    <Text style={styles.toastIcon}>♥</Text>
-
-                    <View style={styles.voteTextContainer}>
-                      <Text style={styles.voteButtonText}>
-                        Toast
-                      </Text>
-
-                      <Text style={styles.voteButtonSubtext}>
-                        {currentMoment.toastPhrase}
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
-              </Animated.View>
-            </View>
-          </>
+          <VoteButtons
+            roastPhrase={currentMoment.roastPhrase}
+            toastPhrase={currentMoment.toastPhrase}
+            roastScale={roastScale}
+            toastScale={toastScale}
+            onRoastPress={handleRoastVote}
+            onToastPress={handleToastVote}
+          />
         )}
 
-        {/* =================================================
-            Results
-
-            Results fade and rise into view after voting.
-        ================================================= */}
-
+        {/* Results replace the buttons after voting */}
         {selectedVote && (
-          <Animated.View
-            style={[
-              styles.resultsContainer,
-              {
-                opacity: resultsOpacity,
-                transform: [
-                  {
-                    translateY: resultsPosition,
-                  },
-                ],
-              },
-            ]}
-          >
-            <Text style={styles.resultsHeading}>
-              The People Have Spoken
-            </Text>
-
-            {/* Confirms the player's choice */}
-            <Text style={styles.yourVoteText}>
-              You chose{" "}
-              <Text
-                style={
-                  selectedVote === "roast"
-                    ? styles.roastText
-                    : styles.toastText
-                }
-              >
-                {selectedVote === "roast"
-                  ? "Roast"
-                  : "Toast"}
-              </Text>
-            </Text>
-
-            {/* Roast result */}
-            <View style={styles.resultSection}>
-              <View style={styles.resultLabelRow}>
-                <Text style={styles.resultLabel}>
-                  🔥 Roast
-                </Text>
-
-                <Text style={styles.resultPercentage}>
-                  {currentMoment.roastPercentage}%
-                </Text>
-              </View>
-
-              <View style={styles.resultBarBackground}>
-                <View
-                  style={[
-                    styles.resultBarFill,
-                    styles.roastResultBar,
-                    {
-                      width: `${currentMoment.roastPercentage}%`,
-                    },
-                  ]}
-                />
-              </View>
-            </View>
-
-            {/* Toast result */}
-            <View style={styles.resultSection}>
-              <View style={styles.resultLabelRow}>
-                <Text style={styles.resultLabel}>♥ Toast</Text>
-
-                <Text style={styles.resultPercentage}>
-                  {currentMoment.toastPercentage}%
-                </Text>
-              </View>
-
-              <View style={styles.resultBarBackground}>
-                <View
-                  style={[
-                    styles.resultBarFill,
-                    styles.toastResultBar,
-                    {
-                      width: `${currentMoment.toastPercentage}%`,
-                    },
-                  ]}
-                />
-              </View>
-            </View>
-
-            {/* Temporary top community comment */}
-            <View
-              style={[
-                styles.commentCard,
-                {
-                  borderLeftColor: categoryTheme.accent,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.commentLabel,
-                  { color: categoryTheme.accent },
-                ]}
-              >
-                TOP COMMENT
-              </Text>
-
-              <Text style={styles.commentText}>
-                “{currentMoment.topComment}”
-              </Text>
-            </View>
-
-            {/* Moves to the next shuffled Moment */}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Show next moment"
-              onPress={handleNextMoment}
-              style={({ pressed }) => [
-                styles.nextButton,
-                pressed && styles.buttonPressed,
-              ]}
-            >
-              <Text style={styles.nextButtonText}>Next</Text>
-              <Text style={styles.nextButtonArrow}>→</Text>
-            </Pressable>
-          </Animated.View>
+          <ResultsCard
+            moment={currentMoment}
+            selectedVote={selectedVote}
+            categoryAccent={categoryTheme.accent}
+            opacity={resultsOpacity}
+            translateY={resultsPosition}
+            onNextPress={handleNextMoment}
+          />
         )}
       </View>
     </View>
@@ -544,63 +362,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
-  // =====================================================
-  // Top Navigation
-  // =====================================================
-
-  topBar: {
-    paddingTop: 68,
-    paddingHorizontal: Spacing.lg,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    zIndex: 3,
-  },
-
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: Radius.pill,
-    backgroundColor: Colors.surface,
-    borderColor: Colors.border,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  backArrow: {
-    color: Colors.textPrimary,
-    fontSize: 25,
-    fontWeight: "600",
-  },
-
-  smallLogoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  categoryDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 7,
-  },
-
-  smallLogo: {
-    color: Colors.textPrimary,
-    fontSize: 18,
-    fontWeight: "900",
-    letterSpacing: -0.6,
-  },
-
-  topBarSpacer: {
-    width: 44,
-  },
-
-  // =====================================================
-  // Main Content
-  // =====================================================
-
   content: {
     flex: 1,
     justifyContent: "center",
@@ -609,225 +370,8 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
 
-  categoryBadge: {
-    alignSelf: "flex-start",
-    borderWidth: 1.5,
-    borderRadius: Radius.pill,
-    paddingVertical: 7,
-    paddingHorizontal: 15,
-    marginBottom: 25,
-    transform: [{ rotate: "-2deg" }],
-  },
-
-  categoryBadgeText: {
-    fontSize: 11,
-    fontWeight: "900",
-    letterSpacing: 1.7,
-  },
-
-  scenarioText: {
-    color: Colors.textPrimary,
-    fontSize: 37,
-    fontWeight: "900",
-    letterSpacing: -1.6,
-    lineHeight: 47,
-    marginBottom: 30,
-  },
-
-  votePrompt: {
-    color: Colors.textSecondary,
-    fontSize: 18,
-    fontWeight: "800",
-    marginBottom: Spacing.md,
-  },
-
   // =====================================================
-  // Voting Buttons
-  // =====================================================
-
-  buttonContainer: {
-    gap: 14,
-  },
-
-  voteButton: {
-    minHeight: 86,
-    borderRadius: Radius.lg,
-    borderWidth: 1.5,
-    paddingVertical: 16,
-    paddingHorizontal: 19,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  voteButtonIdle: {
-    backgroundColor: Colors.surface,
-    borderColor: Colors.border,
-  },
-
-  buttonPressed: {
-    opacity: 0.76,
-  },
-
-  voteButtonContent: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  voteTextContainer: {
-    flexShrink: 1,
-  },
-
-  roastIcon: {
-    fontSize: 28,
-    marginRight: 15,
-  },
-
-  toastIcon: {
-    color: Colors.toast,
-    fontSize: 31,
-    fontWeight: "900",
-    marginRight: 15,
-  },
-
-  voteButtonText: {
-    color: Colors.textPrimary,
-    fontSize: 20,
-    fontWeight: "900",
-  },
-
-  voteButtonSubtext: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "600",
-    marginTop: 3,
-  },
-
-  // =====================================================
-  // Results
-  // =====================================================
-
-  resultsContainer: {
-    marginTop: -5,
-  },
-
-  resultsHeading: {
-    color: Colors.textPrimary,
-    fontSize: 26,
-    fontWeight: "900",
-    marginBottom: 5,
-  },
-
-  yourVoteText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 23,
-  },
-
-  roastText: {
-    color: Colors.roast,
-    fontWeight: "900",
-  },
-
-  toastText: {
-    color: Colors.toast,
-    fontWeight: "900",
-  },
-
-  resultSection: {
-    marginBottom: 17,
-  },
-
-  resultLabelRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-
-  resultLabel: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "800",
-  },
-
-  resultPercentage: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "900",
-  },
-
-  resultBarBackground: {
-    height: 12,
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: Radius.pill,
-    overflow: "hidden",
-  },
-
-  resultBarFill: {
-    height: "100%",
-    borderRadius: Radius.pill,
-  },
-
-  roastResultBar: {
-    backgroundColor: Colors.roast,
-  },
-
-  toastResultBar: {
-    backgroundColor: Colors.toast,
-  },
-
-  // =====================================================
-  // Comment and Next Button
-  // =====================================================
-
-  commentCard: {
-    backgroundColor: Colors.surface,
-    borderColor: Colors.border,
-    borderWidth: 1,
-    borderLeftWidth: 5,
-    borderRadius: Radius.lg,
-    padding: 18,
-    marginTop: 8,
-    marginBottom: 20,
-  },
-
-  commentLabel: {
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 1.5,
-    marginBottom: 8,
-  },
-
-  commentText: {
-    color: Colors.textPrimary,
-    fontSize: 17,
-    fontWeight: "700",
-    lineHeight: 24,
-  },
-
-  nextButton: {
-    backgroundColor: Colors.textPrimary,
-    borderRadius: Radius.pill,
-    paddingVertical: 16,
-    paddingHorizontal: 25,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
-  nextButtonText: {
-    color: Colors.white,
-    fontSize: 18,
-    fontWeight: "900",
-  },
-
-  nextButtonArrow: {
-    color: Colors.white,
-    fontSize: 23,
-  },
-
-  // =====================================================
-  // Category Background Decorations
+  // Category Decorations
   // =====================================================
 
   categoryBackdrop: {
