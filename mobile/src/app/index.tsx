@@ -27,6 +27,7 @@ import {
 
 import { Colors, Radius, Spacing } from "../theme";
 
+
 export default function HomeScreen() {
   // Controls the small animation when the Ready button is pressed.
   const buttonScale = useRef(new Animated.Value(1)).current;

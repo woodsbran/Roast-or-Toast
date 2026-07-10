@@ -1,0 +1,133 @@
+// =====================================================
+// File: everydayLife.ts
+//
+// Purpose:
+// Stores Everyday Life category moments.
+//
+// Project: Roast or Toast
+// =====================================================
+
+import type { Moment } from "../types";
+
+export const everydayLifeMoments: Moment[] = [
+  {
+    id: "everyday-001",
+    category: "Everyday Life",
+    question: "Someone leaves one sip of juice in the refrigerator.",
+    roastPhrase: "Finish it or replace it.",
+    toastPhrase: "At least they left some.",
+    roastPercentage: 89,
+    toastPercentage: 11,
+    topComment: "That final sip was left as an emotional burden.",
+  },
+  {
+    id: "everyday-002",
+    category: "Everyday Life",
+    question: "Someone does not replace the empty toilet paper roll.",
+    roastPhrase: "Unacceptable behavior.",
+    toastPhrase: "Maybe they forgot.",
+    roastPercentage: 95,
+    toastPercentage: 5,
+    topComment: "The new roll was within arm's reach.",
+  },
+  {
+    id: "everyday-003",
+    category: "Everyday Life",
+    question: "Someone returns a shopping cart that was not theirs.",
+    roastPhrase: "That is the employee's job.",
+    toastPhrase: "That was thoughtful.",
+    roastPercentage: 6,
+    toastPercentage: 94,
+    topComment: "Shopping-cart integrity is real.",
+  },
+  {
+    id: "everyday-004",
+    category: "Everyday Life",
+    question: "Someone talks on speakerphone in a quiet public place.",
+    roastPhrase: "Nobody asked to join.",
+    toastPhrase: "Maybe they cannot hear well.",
+    roastPercentage: 86,
+    toastPercentage: 14,
+    topComment: "The entire room is now part of the call.",
+  },
+  {
+    id: "everyday-005",
+    category: "Everyday Life",
+    question: "Someone checks the restaurant menu before agreeing to go.",
+    roastPhrase: "Live a little.",
+    toastPhrase: "Preparation matters.",
+    roastPercentage: 27,
+    toastPercentage: 73,
+    topComment: "I need to know my order before I leave home.",
+  },
+  {
+    id: "everyday-006",
+    category: "Everyday Life",
+    question: "Someone holds the elevator while you are still far away.",
+    roastPhrase: "They delayed everyone.",
+    toastPhrase: "That was kind.",
+    roastPercentage: 14,
+    toastPercentage: 86,
+    topComment: "That awkward elevator jog was worth it.",
+  },
+  {
+    id: "everyday-007",
+    category: "Everyday Life",
+    question: "Someone leaves cabinet doors open around the kitchen.",
+    roastPhrase: "Close what you opened.",
+    toastPhrase: "They will come back to it.",
+    roastPercentage: 84,
+    toastPercentage: 16,
+    topComment: "The kitchen looks surprised.",
+  },
+  {
+    id: "everyday-008",
+    category: "Everyday Life",
+    question: "Someone says they are five minutes away before leaving home.",
+    roastPhrase: "A complete lie.",
+    toastPhrase: "It motivates them to leave.",
+    roastPercentage: 87,
+    toastPercentage: 13,
+    topComment: "Five minutes away spiritually.",
+  },
+  {
+    id: "everyday-009",
+    category: "Everyday Life",
+    question: "Someone compliments a stranger's outfit.",
+    roastPhrase: "Keep it moving.",
+    toastPhrase: "That may make their day.",
+    roastPercentage: 5,
+    toastPercentage: 95,
+    topComment: "Free compliments are good for the economy.",
+  },
+  {
+    id: "everyday-010",
+    category: "Everyday Life",
+    question: "Someone walks slowly in the middle of a crowded aisle.",
+    roastPhrase: "Pick a side.",
+    toastPhrase: "They are taking their time.",
+    roastPercentage: 83,
+    toastPercentage: 17,
+    topComment: "This aisle has become a one-person parade.",
+  },
+  {
+    id: "everyday-011",
+    category: "Everyday Life",
+    question: "Someone leaves dishes in the sink overnight.",
+    roastPhrase: "Wash them now.",
+    toastPhrase: "Morning is fine.",
+    roastPercentage: 61,
+    toastPercentage: 39,
+    topComment: "Tomorrow's problem is already soaking.",
+  },
+  {
+    id: "everyday-012",
+    category: "Everyday Life",
+    question: "Someone picks up litter they did not drop.",
+    roastPhrase: "That is not their job.",
+    toastPhrase: "That is community care.",
+    roastPercentage: 3,
+    toastPercentage: 97,
+    topComment: "A tiny action that makes the whole place better.",
+  },
+];

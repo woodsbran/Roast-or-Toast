@@ -4,19 +4,23 @@
 // Screen: Scenario
 //
 // Purpose:
-// Displays one Roast or Toast scenario and allows the
-// player to choose a side.
+// Displays a shuffled deck of Roast or Toast Moments,
+// allows the player to vote, reveals results, and moves
+// through the deck without immediate repeats.
 //
-// Current Version:
-// • Uses the same visual identity as the Home screen
-// • Displays one temporary hard-coded scenario
-// • Adds animated vote buttons
-// • Highlights the selected answer
+// Current Features:
+// • Randomized Moment order for every session
+// • No repeats until the full deck is completed
+// • Automatic reshuffle after the deck is completed
+// • Category-based visual styling
+// • Changing Roast and Toast phrases
+// • Animated results reveal
+// • Temporary community percentages and top comments
 //
-// Next:
-// • Reveal community voting percentages
-// • Display funny community comments
-// • Add multiple scenarios and a Next button
+// Later:
+// • Store real votes
+// • Load live results and comments from Supabase
+// • Save session progress
 //
 // Project: Roast or Toast
 // =====================================================
@@ -31,22 +35,89 @@ import {
   View,
 } from "react-native";
 
-import { Colors, Radius, Spacing } from "../theme";
+import { scenarios } from "../data/scenarios";
+import type { Moment } from "../data/types";
+import {
+  CategoryName,
+  CategoryThemes,
+  Colors,
+  Radius,
+  Spacing,
+} from "../theme";
 
-// The two choices available for a scenario.
+// The player can choose Roast, Toast, or nothing yet.
 type VoteChoice = "roast" | "toast" | null;
 
+// =====================================================
+// Shuffle Helper
+// =====================================================
+
+// Creates a new shuffled copy of the Moment list.
+//
+// The original scenarios array is never modified.
+function shuffleMoments(moments: Moment[]): Moment[] {
+  const shuffledMoments = [...moments];
+
+  // Fisher-Yates shuffle gives every Moment a fair
+  // chance of appearing anywhere in the deck.
+  for (
+    let currentIndex = shuffledMoments.length - 1;
+    currentIndex > 0;
+    currentIndex -= 1
+  ) {
+    const randomIndex = Math.floor(
+      Math.random() * (currentIndex + 1),
+    );
+
+    [
+      shuffledMoments[currentIndex],
+      shuffledMoments[randomIndex],
+    ] = [
+      shuffledMoments[randomIndex],
+      shuffledMoments[currentIndex],
+    ];
+  }
+
+  return shuffledMoments;
+}
+
 export default function ScenarioScreen() {
-  // Stores the player's current vote.
-  const [selectedVote, setSelectedVote] = useState<VoteChoice>(null);
+  // Creates a shuffled deck only when the screen first loads.
+  const [momentDeck, setMomentDeck] = useState<Moment[]>(() =>
+    shuffleMoments(scenarios),
+  );
 
-  // Controls the small bounce effect on the Roast button.
+  // Tracks the player's position within the shuffled deck.
+  const [momentIndex, setMomentIndex] = useState(0);
+
+  // Stores the player's vote for the current Moment.
+  const [selectedVote, setSelectedVote] =
+    useState<VoteChoice>(null);
+
+  // Controls the bounce effect for each voting button.
   const roastScale = useRef(new Animated.Value(1)).current;
-
-  // Controls the small bounce effect on the Toast button.
   const toastScale = useRef(new Animated.Value(1)).current;
 
-  // Runs a quick scale animation when a vote is selected.
+  // Controls the fade-and-rise animation for results.
+  const resultsOpacity = useRef(new Animated.Value(0)).current;
+  const resultsPosition = useRef(new Animated.Value(18)).current;
+
+  // Gets the current Moment from the shuffled deck.
+  const currentMoment = momentDeck[momentIndex];
+
+  // Gets the correct visual theme for the current category.
+  //
+  // Everyday Life is used as a fallback if a category
+  // does not yet have a custom theme.
+  const categoryTheme =
+    CategoryThemes[currentMoment.category as CategoryName] ??
+    CategoryThemes["Everyday Life"];
+
+  // =====================================================
+  // Animation Helpers
+  // =====================================================
+
+  // Gives the selected voting button a small bounce.
   const animateVoteButton = (animation: Animated.Value) => {
     Animated.sequence([
       Animated.spring(animation, {
@@ -65,16 +136,90 @@ export default function ScenarioScreen() {
     ]).start();
   };
 
-  // Saves the Roast vote and animates the Roast button.
-  const handleRoastVote = () => {
-    setSelectedVote("roast");
-    animateVoteButton(roastScale);
+  // Reveals the results with a short fade-and-rise effect.
+  const revealResults = () => {
+    resultsOpacity.setValue(0);
+    resultsPosition.setValue(18);
+
+    Animated.parallel([
+      Animated.timing(resultsOpacity, {
+        toValue: 1,
+        duration: 280,
+        useNativeDriver: true,
+      }),
+
+      Animated.spring(resultsPosition, {
+        toValue: 0,
+        useNativeDriver: true,
+        speed: 18,
+        bounciness: 4,
+      }),
+    ]).start();
   };
 
-  // Saves the Toast vote and animates the Toast button.
+  // =====================================================
+  // Voting
+  // =====================================================
+
+  // Records a Roast vote.
+  const handleRoastVote = () => {
+    // Prevents the player from changing their vote.
+    if (selectedVote) {
+      return;
+    }
+
+    setSelectedVote("roast");
+    animateVoteButton(roastScale);
+    revealResults();
+  };
+
+  // Records a Toast vote.
   const handleToastVote = () => {
+    // Prevents the player from changing their vote.
+    if (selectedVote) {
+      return;
+    }
+
     setSelectedVote("toast");
     animateVoteButton(toastScale);
+    revealResults();
+  };
+
+  // =====================================================
+  // Deck Navigation
+  // =====================================================
+
+  // Moves to the next Moment in the shuffled deck.
+  //
+  // After the final Moment, a new deck is shuffled.
+  const handleNextMoment = () => {
+    const reachedEndOfDeck =
+      momentIndex === momentDeck.length - 1;
+
+    if (reachedEndOfDeck) {
+      let newDeck = shuffleMoments(scenarios);
+
+      // Prevents the first Moment of the new deck from
+      // matching the Moment the player just completed.
+      if (
+        newDeck.length > 1 &&
+        newDeck[0].id === currentMoment.id
+      ) {
+        [newDeck[0], newDeck[1]] = [newDeck[1], newDeck[0]];
+      }
+
+      setMomentDeck(newDeck);
+      setMomentIndex(0);
+    } else {
+      setMomentIndex((currentIndex) => currentIndex + 1);
+    }
+
+    // Clears the previous vote for the new Moment.
+    setSelectedVote(null);
+
+    // Resets the results animation.
+    resultsOpacity.setValue(0);
+    resultsPosition.setValue(18);
   };
 
   // Returns the player to the Home screen.
@@ -85,13 +230,33 @@ export default function ScenarioScreen() {
   return (
     <View style={styles.container}>
       {/* =================================================
-          Themed Backdrop
+          Category Background
 
-          These oversized faded words match the Home
-          screen and make the page feel distinctly like
-          Roast or Toast.
+          These decorations change automatically based
+          on the category of the current Moment.
       ================================================= */}
 
+      {/* Large faded category name */}
+      <View style={styles.categoryBackdrop}>
+        <Text
+          style={[
+            styles.categoryBackdropText,
+            { color: categoryTheme.accent },
+          ]}
+        >
+          {categoryTheme.label}
+        </Text>
+      </View>
+
+      {/* Soft category-colored circle */}
+      <View
+        style={[
+          styles.categoryCircle,
+          { backgroundColor: categoryTheme.soft },
+        ]}
+      />
+
+      {/* Main Roast or Toast brand decorations */}
       <View style={styles.roastBackdrop}>
         <Text style={styles.roastBackdropText}>ROAST</Text>
       </View>
@@ -99,10 +264,6 @@ export default function ScenarioScreen() {
       <View style={styles.toastBackdrop}>
         <Text style={styles.toastBackdropText}>TOAST</Text>
       </View>
-
-      {/* Small decorative symbols in the backdrop */}
-      <Text style={styles.fireBackdrop}>🔥</Text>
-      <Text style={styles.heartBackdrop}>♥</Text>
 
       {/* =================================================
           Top Navigation
@@ -116,169 +277,256 @@ export default function ScenarioScreen() {
           onPress={handleBackPress}
           style={({ pressed }) => [
             styles.backButton,
-            pressed && styles.backButtonPressed,
+            pressed && styles.buttonPressed,
           ]}
         >
           <Text style={styles.backArrow}>←</Text>
         </Pressable>
 
-        {/* Small app name keeps the screen branded */}
-        <Text style={styles.smallLogo}>Roast or Toast</Text>
+        {/* App name and changing category dot */}
+        <View style={styles.smallLogoContainer}>
+          <View
+            style={[
+              styles.categoryDot,
+              { backgroundColor: categoryTheme.accent },
+            ]}
+          />
 
-        {/* Empty space balances the back button */}
+          <Text style={styles.smallLogo}>Roast or Toast</Text>
+        </View>
+
+        {/* Keeps the logo centered */}
         <View style={styles.topBarSpacer} />
       </View>
 
       {/* =================================================
-          Main Scenario Content
+          Main Content
       ================================================= */}
 
       <View style={styles.content}>
-        {/* Scenario category label */}
-        <View style={styles.hotTakeBadge}>
-          <Text style={styles.hotTakeText}>TODAY&apos;S HOT TAKE</Text>
+        {/* Category badge */}
+        <View
+          style={[
+            styles.categoryBadge,
+            {
+              backgroundColor: categoryTheme.soft,
+              borderColor: categoryTheme.accent,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.categoryBadgeText,
+              { color: categoryTheme.accent },
+            ]}
+          >
+            {categoryTheme.label}
+          </Text>
         </View>
 
-        {/* Main scenario */}
+        {/* Main Moment text */}
         <Text style={styles.scenarioText}>
-          Your coworker hits{"\n"}
-          &quot;Reply All&quot;{"\n"}
-          just to say{"\n"}
-          &quot;Thanks.&quot;
+          {currentMoment.question}
         </Text>
 
-        {/* Short prompt above the voting buttons */}
-        <Text style={styles.votePrompt}>What&apos;s your verdict?</Text>
+        {/* Voting options shown before the player votes */}
+        {!selectedVote && (
+          <>
+            <Text style={styles.votePrompt}>Let&apos;s get real...</Text>
+
+            <View style={styles.buttonContainer}>
+              {/* Roast option */}
+              <Animated.View
+                style={{
+                  transform: [{ scale: roastScale }],
+                }}
+              >
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Vote Roast"
+                  onPress={handleRoastVote}
+                  style={({ pressed }) => [
+                    styles.voteButton,
+                    styles.voteButtonIdle,
+                    pressed && styles.buttonPressed,
+                  ]}
+                >
+                  <View style={styles.voteButtonContent}>
+                    <Text style={styles.roastIcon}>🔥</Text>
+
+                    <View style={styles.voteTextContainer}>
+                      <Text style={styles.voteButtonText}>
+                        Roast
+                      </Text>
+
+                      <Text style={styles.voteButtonSubtext}>
+                        {currentMoment.roastPhrase}
+                      </Text>
+                    </View>
+                  </View>
+                </Pressable>
+              </Animated.View>
+
+              {/* Toast option */}
+              <Animated.View
+                style={{
+                  transform: [{ scale: toastScale }],
+                }}
+              >
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Vote Toast"
+                  onPress={handleToastVote}
+                  style={({ pressed }) => [
+                    styles.voteButton,
+                    styles.voteButtonIdle,
+                    pressed && styles.buttonPressed,
+                  ]}
+                >
+                  <View style={styles.voteButtonContent}>
+                    <Text style={styles.toastIcon}>♥</Text>
+
+                    <View style={styles.voteTextContainer}>
+                      <Text style={styles.voteButtonText}>
+                        Toast
+                      </Text>
+
+                      <Text style={styles.voteButtonSubtext}>
+                        {currentMoment.toastPhrase}
+                      </Text>
+                    </View>
+                  </View>
+                </Pressable>
+              </Animated.View>
+            </View>
+          </>
+        )}
 
         {/* =================================================
-            Voting Buttons
+            Results
+
+            Results fade and rise into view after voting.
         ================================================= */}
 
-        <View style={styles.buttonContainer}>
-          {/* Roast Button */}
-          <Animated.View
-            style={{
-              transform: [{ scale: roastScale }],
-              opacity:
-                selectedVote === "toast"
-                  ? 0.48
-                  : 1,
-            }}
-          >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Vote Roast"
-              onPress={handleRoastVote}
-              style={({ pressed }) => [
-                styles.voteButton,
-
-                selectedVote === "roast"
-                  ? styles.roastButtonSelected
-                  : styles.voteButtonIdle,
-
-                pressed && styles.voteButtonPressed,
-              ]}
-            >
-              <View style={styles.voteButtonContent}>
-                <Text style={styles.voteIcon}>🔥</Text>
-
-                <View>
-                  <Text
-                    style={[
-                      styles.voteButtonText,
-
-                      selectedVote === "roast" &&
-                        styles.selectedButtonText,
-                    ]}
-                  >
-                    Roast
-                  </Text>
-
-                  <Text
-                    style={[
-                      styles.voteButtonSubtext,
-
-                      selectedVote === "roast" &&
-                        styles.selectedButtonSubtext,
-                    ]}
-                  >
-                    Absolutely not.
-                  </Text>
-                </View>
-              </View>
-
-              {/* Check mark appears after selecting Roast */}
-              {selectedVote === "roast" && (
-                <Text style={styles.selectedCheck}>✓</Text>
-              )}
-            </Pressable>
-          </Animated.View>
-
-          {/* Toast Button */}
-          <Animated.View
-            style={{
-              transform: [{ scale: toastScale }],
-              opacity:
-                selectedVote === "roast"
-                  ? 0.48
-                  : 1,
-            }}
-          >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Vote Toast"
-              onPress={handleToastVote}
-              style={({ pressed }) => [
-                styles.voteButton,
-
-                selectedVote === "toast"
-                  ? styles.toastButtonSelected
-                  : styles.voteButtonIdle,
-
-                pressed && styles.voteButtonPressed,
-              ]}
-            >
-              <View style={styles.voteButtonContent}>
-                <Text style={styles.voteIcon}>♥</Text>
-
-                <View>
-                  <Text
-                    style={[
-                      styles.voteButtonText,
-
-                      selectedVote === "toast" &&
-                        styles.selectedButtonText,
-                    ]}
-                  >
-                    Toast
-                  </Text>
-
-                  <Text
-                    style={[
-                      styles.voteButtonSubtext,
-
-                      selectedVote === "toast" &&
-                        styles.selectedButtonSubtext,
-                    ]}
-                  >
-                    I&apos;ll allow it.
-                  </Text>
-                </View>
-              </View>
-
-              {/* Check mark appears after selecting Toast */}
-              {selectedVote === "toast" && (
-                <Text style={styles.selectedCheck}>✓</Text>
-              )}
-            </Pressable>
-          </Animated.View>
-        </View>
-
-        {/* Temporary message confirms that voting works */}
         {selectedVote && (
-          <Text style={styles.voteConfirmation}>
-            Vote locked. Community results are coming next.
-          </Text>
+          <Animated.View
+            style={[
+              styles.resultsContainer,
+              {
+                opacity: resultsOpacity,
+                transform: [
+                  {
+                    translateY: resultsPosition,
+                  },
+                ],
+              },
+            ]}
+          >
+            <Text style={styles.resultsHeading}>
+              The People Have Spoken
+            </Text>
+
+            {/* Confirms the player's choice */}
+            <Text style={styles.yourVoteText}>
+              You chose{" "}
+              <Text
+                style={
+                  selectedVote === "roast"
+                    ? styles.roastText
+                    : styles.toastText
+                }
+              >
+                {selectedVote === "roast"
+                  ? "Roast"
+                  : "Toast"}
+              </Text>
+            </Text>
+
+            {/* Roast result */}
+            <View style={styles.resultSection}>
+              <View style={styles.resultLabelRow}>
+                <Text style={styles.resultLabel}>
+                  🔥 Roast
+                </Text>
+
+                <Text style={styles.resultPercentage}>
+                  {currentMoment.roastPercentage}%
+                </Text>
+              </View>
+
+              <View style={styles.resultBarBackground}>
+                <View
+                  style={[
+                    styles.resultBarFill,
+                    styles.roastResultBar,
+                    {
+                      width: `${currentMoment.roastPercentage}%`,
+                    },
+                  ]}
+                />
+              </View>
+            </View>
+
+            {/* Toast result */}
+            <View style={styles.resultSection}>
+              <View style={styles.resultLabelRow}>
+                <Text style={styles.resultLabel}>♥ Toast</Text>
+
+                <Text style={styles.resultPercentage}>
+                  {currentMoment.toastPercentage}%
+                </Text>
+              </View>
+
+              <View style={styles.resultBarBackground}>
+                <View
+                  style={[
+                    styles.resultBarFill,
+                    styles.toastResultBar,
+                    {
+                      width: `${currentMoment.toastPercentage}%`,
+                    },
+                  ]}
+                />
+              </View>
+            </View>
+
+            {/* Temporary top community comment */}
+            <View
+              style={[
+                styles.commentCard,
+                {
+                  borderLeftColor: categoryTheme.accent,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.commentLabel,
+                  { color: categoryTheme.accent },
+                ]}
+              >
+                TOP COMMENT
+              </Text>
+
+              <Text style={styles.commentText}>
+                “{currentMoment.topComment}”
+              </Text>
+            </View>
+
+            {/* Moves to the next shuffled Moment */}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Show next moment"
+              onPress={handleNextMoment}
+              style={({ pressed }) => [
+                styles.nextButton,
+                pressed && styles.buttonPressed,
+              ]}
+            >
+              <Text style={styles.nextButtonText}>Next</Text>
+              <Text style={styles.nextButtonArrow}>→</Text>
+            </Pressable>
+          </Animated.View>
         )}
       </View>
     </View>
@@ -290,7 +538,6 @@ export default function ScenarioScreen() {
 // =====================================================
 
 const styles = StyleSheet.create({
-  // Main page background
   container: {
     flex: 1,
     backgroundColor: Colors.background,
@@ -319,33 +566,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-
-    shadowColor: "#1D1D1F",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-
-  backButtonPressed: {
-    opacity: 0.65,
   },
 
   backArrow: {
     color: Colors.textPrimary,
     fontSize: 25,
     fontWeight: "600",
-    marginTop: -2,
+  },
+
+  smallLogoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  categoryDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 7,
   },
 
   smallLogo: {
     color: Colors.textPrimary,
     fontSize: 18,
     fontWeight: "900",
-    letterSpacing: -0.7,
+    letterSpacing: -0.6,
   },
 
   topBarSpacer: {
@@ -360,23 +605,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: Spacing.lg,
-    paddingBottom: 42,
+    paddingBottom: 28,
     zIndex: 2,
   },
 
-  hotTakeBadge: {
+  categoryBadge: {
     alignSelf: "flex-start",
-    borderColor: Colors.roast,
     borderWidth: 1.5,
     borderRadius: Radius.pill,
     paddingVertical: 7,
     paddingHorizontal: 15,
-    marginBottom: 30,
+    marginBottom: 25,
     transform: [{ rotate: "-2deg" }],
   },
 
-  hotTakeText: {
-    color: Colors.roast,
+  categoryBadgeText: {
     fontSize: 11,
     fontWeight: "900",
     letterSpacing: 1.7,
@@ -384,17 +627,17 @@ const styles = StyleSheet.create({
 
   scenarioText: {
     color: Colors.textPrimary,
-    fontSize: 39,
+    fontSize: 37,
     fontWeight: "900",
-    letterSpacing: -1.8,
-    lineHeight: 49,
-    marginBottom: 35,
+    letterSpacing: -1.6,
+    lineHeight: 47,
+    marginBottom: 30,
   },
 
   votePrompt: {
     color: Colors.textSecondary,
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "800",
     marginBottom: Spacing.md,
   },
 
@@ -412,19 +655,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     paddingVertical: 16,
     paddingHorizontal: 19,
-
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-
-    shadowColor: "#1D1D1F",
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.07,
-    shadowRadius: 12,
-    elevation: 3,
   },
 
   voteButtonIdle: {
@@ -432,18 +664,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
 
-  roastButtonSelected: {
-    backgroundColor: Colors.roast,
-    borderColor: Colors.roast,
-  },
-
-  toastButtonSelected: {
-    backgroundColor: Colors.toast,
-    borderColor: Colors.toast,
-  },
-
-  voteButtonPressed: {
-    opacity: 0.88,
+  buttonPressed: {
+    opacity: 0.76,
   },
 
   voteButtonContent: {
@@ -451,9 +673,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  voteIcon: {
-    color: Colors.toast,
+  voteTextContainer: {
+    flexShrink: 1,
+  },
+
+  roastIcon: {
     fontSize: 28,
+    marginRight: 15,
+  },
+
+  toastIcon: {
+    color: Colors.toast,
+    fontSize: 31,
     fontWeight: "900",
     marginRight: 15,
   },
@@ -462,7 +693,6 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontSize: 20,
     fontWeight: "900",
-    letterSpacing: -0.5,
   },
 
   voteButtonSubtext: {
@@ -472,79 +702,189 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
 
-  selectedButtonText: {
-    color: Colors.white,
+  // =====================================================
+  // Results
+  // =====================================================
+
+  resultsContainer: {
+    marginTop: -5,
   },
 
-  selectedButtonSubtext: {
-    color: "rgba(255, 255, 255, 0.82)",
+  resultsHeading: {
+    color: Colors.textPrimary,
+    fontSize: 26,
+    fontWeight: "900",
+    marginBottom: 5,
   },
 
-  selectedCheck: {
-    color: Colors.white,
-    fontSize: 24,
+  yourVoteText: {
+    color: Colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 23,
+  },
+
+  roastText: {
+    color: Colors.roast,
     fontWeight: "900",
   },
 
-  voteConfirmation: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "600",
-    textAlign: "center",
-    marginTop: 18,
+  toastText: {
+    color: Colors.toast,
+    fontWeight: "900",
+  },
+
+  resultSection: {
+    marginBottom: 17,
+  },
+
+  resultLabelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+
+  resultLabel: {
+    color: Colors.textPrimary,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
+  resultPercentage: {
+    color: Colors.textPrimary,
+    fontSize: 16,
+    fontWeight: "900",
+  },
+
+  resultBarBackground: {
+    height: 12,
+    backgroundColor: Colors.surfaceAlt,
+    borderRadius: Radius.pill,
+    overflow: "hidden",
+  },
+
+  resultBarFill: {
+    height: "100%",
+    borderRadius: Radius.pill,
+  },
+
+  roastResultBar: {
+    backgroundColor: Colors.roast,
+  },
+
+  toastResultBar: {
+    backgroundColor: Colors.toast,
   },
 
   // =====================================================
-  // Themed Backdrop
+  // Comment and Next Button
+  // =====================================================
+
+  commentCard: {
+    backgroundColor: Colors.surface,
+    borderColor: Colors.border,
+    borderWidth: 1,
+    borderLeftWidth: 5,
+    borderRadius: Radius.lg,
+    padding: 18,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+
+  commentLabel: {
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.5,
+    marginBottom: 8,
+  },
+
+  commentText: {
+    color: Colors.textPrimary,
+    fontSize: 17,
+    fontWeight: "700",
+    lineHeight: 24,
+  },
+
+  nextButton: {
+    backgroundColor: Colors.textPrimary,
+    borderRadius: Radius.pill,
+    paddingVertical: 16,
+    paddingHorizontal: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  nextButtonText: {
+    color: Colors.white,
+    fontSize: 18,
+    fontWeight: "900",
+  },
+
+  nextButtonArrow: {
+    color: Colors.white,
+    fontSize: 23,
+  },
+
+  // =====================================================
+  // Category Background Decorations
+  // =====================================================
+
+  categoryBackdrop: {
+    position: "absolute",
+    top: 132,
+    right: -48,
+    transform: [{ rotate: "8deg" }],
+  },
+
+  categoryBackdropText: {
+    fontSize: 76,
+    fontWeight: "900",
+    letterSpacing: -4,
+    opacity: 0.09,
+  },
+
+  categoryCircle: {
+    position: "absolute",
+    width: 235,
+    height: 235,
+    borderRadius: 118,
+    bottom: -105,
+    right: -90,
+    opacity: 0.75,
+  },
+
+  // =====================================================
+  // Roast or Toast Brand Decorations
   // =====================================================
 
   roastBackdrop: {
     position: "absolute",
-    top: 125,
-    right: -78,
-    transform: [{ rotate: "9deg" }],
+    top: 225,
+    left: -40,
+    transform: [{ rotate: "-8deg" }],
   },
 
   roastBackdropText: {
     color: Colors.roast,
-    fontSize: 90,
+    fontSize: 70,
     fontWeight: "900",
-    letterSpacing: -5,
-    opacity: 0.065,
+    letterSpacing: -4,
+    opacity: 0.04,
   },
 
   toastBackdrop: {
     position: "absolute",
-    bottom: 45,
-    left: -67,
+    bottom: 35,
+    left: -42,
     transform: [{ rotate: "-8deg" }],
   },
 
   toastBackdropText: {
     color: Colors.toast,
-    fontSize: 88,
+    fontSize: 78,
     fontWeight: "900",
-    letterSpacing: -5,
-    opacity: 0.07,
-  },
-
-  fireBackdrop: {
-    position: "absolute",
-    top: 185,
-    right: 26,
-    fontSize: 39,
-    opacity: 0.12,
-    transform: [{ rotate: "8deg" }],
-  },
-
-  heartBackdrop: {
-    position: "absolute",
-    bottom: 113,
-    right: 43,
-    color: Colors.toast,
-    fontSize: 44,
-    fontWeight: "900",
-    opacity: 0.12,
-    transform: [{ rotate: "9deg" }],
+    letterSpacing: -4,
+    opacity: 0.055,
   },
 });

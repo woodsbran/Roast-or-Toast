@@ -1,0 +1,133 @@
+// =====================================================
+// File: family.ts
+//
+// Purpose:
+// Stores Family category moments.
+//
+// Project: Roast or Toast
+// =====================================================
+
+import type { Moment } from "../types";
+
+export const familyMoments: Moment[] = [
+  {
+    id: "family-001",
+    category: "Family",
+    question: "Your sibling borrows your clothes without asking.",
+    roastPhrase: "Return everything.",
+    toastPhrase: "That is what siblings do.",
+    roastPercentage: 76,
+    toastPercentage: 24,
+    topComment: "Borrowing usually includes a request.",
+  },
+  {
+    id: "family-002",
+    category: "Family",
+    question: "Your parent sends you home with food every time you visit.",
+    roastPhrase: "My refrigerator is full.",
+    toastPhrase: "That is love.",
+    roastPercentage: 4,
+    toastPercentage: 96,
+    topComment: "The containers must eventually be returned.",
+  },
+  {
+    id: "family-003",
+    category: "Family",
+    question: "Your sibling pays you back before you have to remind them.",
+    roastPhrase: "What do they want?",
+    toastPhrase: "A rare blessing.",
+    roastPercentage: 6,
+    toastPercentage: 94,
+    topComment: "Check on them. Something has changed.",
+  },
+  {
+    id: "family-004",
+    category: "Family",
+    question: "A relative asks why you are still single at every gathering.",
+    roastPhrase: "Mind your business.",
+    toastPhrase: "They are just curious.",
+    roastPercentage: 91,
+    toastPercentage: 9,
+    topComment: "The potato salad did not come with an interview.",
+  },
+  {
+    id: "family-005",
+    category: "Family",
+    question: "Your family starts cleaning while guests are still sitting down.",
+    roastPhrase: "They are being rushed out.",
+    toastPhrase: "The night is clearly over.",
+    roastPercentage: 53,
+    toastPercentage: 47,
+    topComment: "Once the foil comes out, take the hint.",
+  },
+  {
+    id: "family-006",
+    category: "Family",
+    question: "Your sibling answers your call in the middle of the night.",
+    roastPhrase: "They wanted the gossip.",
+    toastPhrase: "That is real support.",
+    roastPercentage: 8,
+    toastPercentage: 92,
+    topComment: "Emergency availability is a form of love.",
+  },
+  {
+    id: "family-007",
+    category: "Family",
+    question: "A relative posts your childhood pictures on your birthday.",
+    roastPhrase: "Delete that immediately.",
+    toastPhrase: "It is part of the tradition.",
+    roastPercentage: 62,
+    toastPercentage: 38,
+    topComment: "The birthday tribute did not require evidence.",
+  },
+  {
+    id: "family-008",
+    category: "Family",
+    question: "Your parent calls several times because you did not reply quickly.",
+    roastPhrase: "Give me a minute.",
+    toastPhrase: "They are worried.",
+    roastPercentage: 58,
+    toastPercentage: 42,
+    topComment: "Miss one call and the search party begins.",
+  },
+  {
+    id: "family-009",
+    category: "Family",
+    question: "Your family saves you a plate when you cannot attend dinner.",
+    roastPhrase: "They made too much anyway.",
+    toastPhrase: "That is family love.",
+    roastPercentage: 3,
+    toastPercentage: 97,
+    topComment: "A saved plate can heal almost anything.",
+  },
+  {
+    id: "family-010",
+    category: "Family",
+    question: "Your sibling tells your parents something you shared privately.",
+    roastPhrase: "Family betrayal.",
+    toastPhrase: "Maybe they were concerned.",
+    roastPercentage: 87,
+    toastPercentage: 13,
+    topComment: "The sibling confidentiality agreement has been terminated.",
+  },
+  {
+    id: "family-011",
+    category: "Family",
+    question: "Your family takes an hour to say goodbye after every gathering.",
+    roastPhrase: "Please just leave.",
+    toastPhrase: "The goodbye is part of the event.",
+    roastPercentage: 49,
+    toastPercentage: 51,
+    topComment: "The second goodbye happens in the driveway.",
+  },
+  {
+    id: "family-012",
+    category: "Family",
+    question: "A relative quietly helps clean up after the party.",
+    roastPhrase: "They are avoiding conversation.",
+    toastPhrase: "That is thoughtful.",
+    roastPercentage: 5,
+    toastPercentage: 95,
+    topComment: "The person washing dishes is always invited back.",
+  },
+];

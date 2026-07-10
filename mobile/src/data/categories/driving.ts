@@ -1,0 +1,133 @@
+// =====================================================
+// File: driving.ts
+//
+// Purpose:
+// Stores Driving category moments for Roast or Toast.
+//
+// Project: Roast or Toast
+// =====================================================
+
+import type { Moment } from "../types";
+
+export const drivingMoments: Moment[] = [
+  {
+    id: "driving-001",
+    category: "Driving",
+    question: "Someone honks the second the light turns green.",
+    roastPhrase: "Give me one second.",
+    toastPhrase: "We have places to be.",
+    roastPercentage: 82,
+    toastPercentage: 18,
+    topComment: "The light was green for half a breath.",
+  },
+  {
+    id: "driving-002",
+    category: "Driving",
+    question: "Someone drives ten under the speed limit in the fast lane.",
+    roastPhrase: "Move over.",
+    toastPhrase: "They are being safe.",
+    roastPercentage: 91,
+    toastPercentage: 9,
+    topComment: "The fast lane has lost its purpose.",
+  },
+  {
+    id: "driving-003",
+    category: "Driving",
+    question: "Someone lets you merge during heavy traffic.",
+    roastPhrase: "They slowed everyone down.",
+    toastPhrase: "That was considerate.",
+    roastPercentage: 7,
+    toastPercentage: 93,
+    topComment: "A small act of kindness on a very angry freeway.",
+  },
+  {
+    id: "driving-004",
+    category: "Driving",
+    question: "Someone does not wave after you let them merge.",
+    roastPhrase: "Basic manners missing.",
+    toastPhrase: "The wave is optional.",
+    roastPercentage: 71,
+    toastPercentage: 29,
+    topComment: "I did not need a parade, just one little hand.",
+  },
+  {
+    id: "driving-005",
+    category: "Driving",
+    question: "Someone backs into every parking space.",
+    roastPhrase: "Just park normally.",
+    toastPhrase: "The exit will be easier.",
+    roastPercentage: 42,
+    toastPercentage: 58,
+    topComment: "They are preparing for a dramatic getaway.",
+  },
+  {
+    id: "driving-006",
+    category: "Driving",
+    question: "Someone parks across two spaces.",
+    roastPhrase: "Tow it.",
+    toastPhrase: "Maybe the spaces were tight.",
+    roastPercentage: 96,
+    toastPercentage: 4,
+    topComment: "That car did not purchase real estate.",
+  },
+  {
+    id: "driving-007",
+    category: "Driving",
+    question: "Someone leaves a note after accidentally scratching a parked car.",
+    roastPhrase: "They still scratched it.",
+    toastPhrase: "That was honest.",
+    roastPercentage: 8,
+    toastPercentage: 92,
+    topComment: "Accountability still exists in the wild.",
+  },
+  {
+    id: "driving-008",
+    category: "Driving",
+    question: "Someone blasts music with every window down.",
+    roastPhrase: "We did not request a concert.",
+    toastPhrase: "Let them enjoy the drive.",
+    roastPercentage: 53,
+    toastPercentage: 47,
+    topComment: "The whole intersection knows the playlist now.",
+  },
+  {
+    id: "driving-009",
+    category: "Driving",
+    question: "Someone uses their hazard lights to park anywhere they want.",
+    roastPhrase: "That is not a parking pass.",
+    toastPhrase: "They will only be a minute.",
+    roastPercentage: 88,
+    toastPercentage: 12,
+    topComment: "The blinking lights do not erase traffic laws.",
+  },
+  {
+    id: "driving-010",
+    category: "Driving",
+    question: "Someone pulls over to help a stranded driver.",
+    roastPhrase: "That could be dangerous.",
+    toastPhrase: "That is a good person.",
+    roastPercentage: 9,
+    toastPercentage: 91,
+    topComment: "Roadside kindness deserves recognition.",
+  },
+  {
+    id: "driving-011",
+    category: "Driving",
+    question: "Someone eats a full meal while driving.",
+    roastPhrase: "Eyes on the road.",
+    toastPhrase: "Multitasking.",
+    roastPercentage: 78,
+    toastPercentage: 22,
+    topComment: "That burrito has become a safety concern.",
+  },
+  {
+    id: "driving-012",
+    category: "Driving",
+    question: "Someone cuts across three lanes to avoid missing an exit.",
+    roastPhrase: "Take the next exit.",
+    toastPhrase: "They committed to the mission.",
+    roastPercentage: 94,
+    toastPercentage: 6,
+    topComment: "A missed exit is cheaper than a collision.",
+  },
+];
