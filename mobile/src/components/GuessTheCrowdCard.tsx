@@ -8,10 +8,8 @@
 //
 // 1. Predict what most people chose.
 // 2. Give their own personal vote.
-// 3. Compare both choices with the results.
-//
-// This creates a different interaction from the normal
-// Roast or Toast gameplay loop.
+// 3. Compare both choices with the community results.
+// 4. Earn Heat for completing the round.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -19,12 +17,18 @@
 import { useState } from "react";
 import {
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 
 import type { Moment } from "../data/types";
+import type {
+  CrowdGuessProgressResult,
+  PlayerVote,
+} from "../game/progressTypes";
+
 import {
   CategoryName,
   CategoryThemes,
@@ -33,58 +37,82 @@ import {
   Spacing,
 } from "../theme";
 
-// The two available choices.
-type Choice = "roast" | "toast";
-
 // The three stages within Guess the Crowd.
 type GuessStage = "prediction" | "personalVote" | "results";
 
 // Information required by this special mode.
 type GuessTheCrowdCardProps = {
   moment: Moment;
+
+  // Records the prediction in the Heat engine and
+  // returns the reward information.
+  onRecordGuess: (
+    prediction: PlayerVote,
+    roastPercentage: number,
+    toastPercentage: number,
+  ) => CrowdGuessProgressResult;
+
   onContinue: () => void;
 };
 
 export default function GuessTheCrowdCard({
   moment,
+  onRecordGuess,
   onContinue,
 }: GuessTheCrowdCardProps) {
-  // Tracks which part of the mini-game is currently shown.
-  const [stage, setStage] = useState<GuessStage>("prediction");
+  // Tracks which stage is currently visible.
+  const [stage, setStage] =
+    useState<GuessStage>("prediction");
 
-  // Stores what the player thinks the crowd selected.
+  // Stores what the player believes the crowd chose.
   const [crowdPrediction, setCrowdPrediction] =
-    useState<Choice | null>(null);
+    useState<PlayerVote | null>(null);
 
-  // Stores the player's personal Roast or Toast answer.
+  // Stores the player's personal opinion.
   const [personalVote, setPersonalVote] =
-    useState<Choice | null>(null);
+    useState<PlayerVote | null>(null);
 
-  // Gets the correct visual style for this Moment.
+  // Stores the Heat result after the prediction is scored.
+  const [progressResult, setProgressResult] =
+    useState<CrowdGuessProgressResult | null>(null);
+
+  // Gets the correct category styling.
   const categoryTheme =
     CategoryThemes[moment.category as CategoryName] ??
     CategoryThemes["Everyday Life"];
 
-  // Records the player's prediction and moves to the
-  // personal voting stage.
-  const handlePrediction = (choice: Choice) => {
+  // Saves the crowd prediction without revealing whether
+  // it was correct yet.
+  const handlePrediction = (choice: PlayerVote) => {
     setCrowdPrediction(choice);
     setStage("personalVote");
   };
 
-  // Records the player's own opinion and reveals results.
-  const handlePersonalVote = (choice: Choice) => {
+  // Saves the player's own opinion, records the crowd
+  // prediction, and reveals results.
+  const handlePersonalVote = (choice: PlayerVote) => {
+    if (!crowdPrediction) {
+      return;
+    }
+
+    const result = onRecordGuess(
+      crowdPrediction,
+      moment.roastPercentage,
+      moment.toastPercentage,
+    );
+
     setPersonalVote(choice);
+    setProgressResult(result);
     setStage("results");
   };
 
   return (
     <View style={styles.container}>
-      {/* Large decorative background words */}
+      {/* Decorative backdrop words */}
       <Text style={styles.roastBackdrop}>ROAST</Text>
       <Text style={styles.toastBackdrop}>TOAST</Text>
 
-      {/* Soft category-colored background circle */}
+      {/* Soft category decoration */}
       <View
         style={[
           styles.categoryCircle,
@@ -94,7 +122,10 @@ export default function GuessTheCrowdCard({
         ]}
       />
 
-      <View style={styles.content}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Special mode badge */}
         <View
           style={[
@@ -117,7 +148,7 @@ export default function GuessTheCrowdCard({
           </Text>
         </View>
 
-        {/* Category label */}
+        {/* Category name */}
         <Text
           style={[
             styles.categoryLabel,
@@ -129,8 +160,10 @@ export default function GuessTheCrowdCard({
           {categoryTheme.label}
         </Text>
 
-        {/* Fresh, unseen Moment */}
-        <Text style={styles.question}>{moment.question}</Text>
+        {/* Fresh Moment */}
+        <Text style={styles.question}>
+          {moment.question}
+        </Text>
 
         {/* =================================================
             Stage 1: Predict the Crowd
@@ -170,7 +203,6 @@ export default function GuessTheCrowdCard({
 
         {stage === "personalVote" && crowdPrediction && (
           <View>
-            {/* Shows the prediction without revealing results */}
             <Text style={styles.savedChoiceLabel}>
               Your crowd prediction
             </Text>
@@ -183,7 +215,9 @@ export default function GuessTheCrowdCard({
                   : styles.toastText,
               ]}
             >
-              {crowdPrediction === "roast" ? "Roast" : "Toast"}
+              {crowdPrediction === "roast"
+                ? "Roast"
+                : "Toast"}
             </Text>
 
             <Text style={styles.stageHeading}>
@@ -191,7 +225,7 @@ export default function GuessTheCrowdCard({
             </Text>
 
             <Text style={styles.stageDescription}>
-              Your personal vote can be completely different.
+              Your own answer can be completely different.
             </Text>
 
             <View style={styles.choiceContainer}>
@@ -199,14 +233,18 @@ export default function GuessTheCrowdCard({
                 label="Roast"
                 phrase={moment.roastPhrase}
                 type="roast"
-                onPress={() => handlePersonalVote("roast")}
+                onPress={() =>
+                  handlePersonalVote("roast")
+                }
               />
 
               <ChoiceButton
                 label="Toast"
                 phrase={moment.toastPhrase}
                 type="toast"
-                onPress={() => handlePersonalVote("toast")}
+                onPress={() =>
+                  handlePersonalVote("toast")
+                }
               />
             </View>
           </View>
@@ -218,13 +256,14 @@ export default function GuessTheCrowdCard({
 
         {stage === "results" &&
           crowdPrediction &&
-          personalVote && (
+          personalVote &&
+          progressResult && (
             <View>
               <Text style={styles.resultsHeading}>
                 The People Have Spoken
               </Text>
 
-              {/* Keeps both player decisions visible */}
+              {/* Prediction and personal vote summary */}
               <View style={styles.choiceSummary}>
                 <View style={styles.summaryItem}>
                   <Text style={styles.summaryLabel}>
@@ -267,6 +306,19 @@ export default function GuessTheCrowdCard({
                 </View>
               </View>
 
+              {/* Heat reward */}
+              <View style={styles.heatCard}>
+                <Text style={styles.heatAmount}>
+                  🔥 +{progressResult.heatEarned} Heat
+                </Text>
+
+                <Text style={styles.heatMessage}>
+                  {progressResult.guessedCorrectly
+                    ? "You called it."
+                    : "The crowd surprised you."}
+                </Text>
+              </View>
+
               {/* Roast result */}
               <ResultBar
                 label="🔥 Roast"
@@ -281,7 +333,7 @@ export default function GuessTheCrowdCard({
                 fillColor={Colors.toast}
               />
 
-              {/* Community comment */}
+              {/* Top comment */}
               <View
                 style={[
                   styles.commentCard,
@@ -306,7 +358,7 @@ export default function GuessTheCrowdCard({
                 </Text>
               </View>
 
-              {/* Returns to the normal shuffled deck */}
+              {/* Returns to regular gameplay */}
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Continue playing"
@@ -324,22 +376,19 @@ export default function GuessTheCrowdCard({
               </Pressable>
             </View>
           )}
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 // =====================================================
 // Choice Button
-//
-// Reusable Roast or Toast button used during both the
-// prediction and personal-vote stages.
 // =====================================================
 
 type ChoiceButtonProps = {
   label: string;
   phrase: string;
-  type: Choice;
+  type: PlayerVote;
   onPress: () => void;
 };
 
@@ -378,9 +427,6 @@ function ChoiceButton({
 
 // =====================================================
 // Result Bar
-//
-// Displays one animated-style percentage bar.
-// Actual bar animation can be added in a later sprint.
 // =====================================================
 
 type ResultBarProps = {
@@ -430,12 +476,12 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
-  content: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: Spacing.lg,
-    paddingTop: 60,
-    paddingBottom: 30,
+    paddingTop: 72,
+    paddingBottom: 48,
     zIndex: 2,
   },
 
@@ -501,15 +547,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     flexDirection: "row",
     alignItems: "center",
-
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
   },
 
   buttonPressed: {
@@ -574,7 +611,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.lg,
     paddingVertical: 15,
     paddingHorizontal: 18,
-    marginBottom: 22,
+    marginBottom: 16,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -602,6 +639,29 @@ const styles = StyleSheet.create({
     height: 37,
     backgroundColor: Colors.border,
     marginHorizontal: 15,
+  },
+
+  heatCard: {
+    backgroundColor: "#FFF1EC",
+    borderColor: "#F4C9BE",
+    borderWidth: 1,
+    borderRadius: Radius.md,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 20,
+  },
+
+  heatAmount: {
+    color: Colors.roast,
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  heatMessage: {
+    color: Colors.textPrimary,
+    fontSize: 13,
+    fontWeight: "700",
+    marginTop: 4,
   },
 
   roastText: {

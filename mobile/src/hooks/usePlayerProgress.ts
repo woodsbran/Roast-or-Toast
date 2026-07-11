@@ -2,15 +2,17 @@
 // File: usePlayerProgress.ts
 //
 // Purpose:
-// Provides an easy way for screens and game modes to
+// Provides screens and game modes with an easy way to
 // read and update player progress.
 //
 // Current Version:
-// Progress is stored only in memory. It resets when the
-// app fully reloads.
+// Progress is stored in memory and resets after the app
+// fully reloads.
 //
-// Next Version:
-// Save and restore progress using AsyncStorage.
+// Later:
+// • Save progress with AsyncStorage
+// • Resume the current game session
+// • Sync progress with a user account
 //
 // Project: Roast or Toast
 // =====================================================
@@ -31,12 +33,20 @@ import type {
 } from "../game/progressTypes";
 
 export function usePlayerProgress() {
-  // Stores progress for the current app session.
+  // Stores the player's current progress during this app
+  // session.
   const [progress, setProgress] = useState<PlayerProgress>(
     createInitialProgress,
   );
 
+  // =====================================================
+  // Regular Vote
+  // =====================================================
+
   // Records a normal Roast or Toast vote.
+  //
+  // The function returns details such as Heat earned,
+  // majority match, and whether the player leveled up.
   const addRegularVote = (
     vote: PlayerVote,
     roastPercentage: number,
@@ -54,7 +64,11 @@ export function usePlayerProgress() {
     return result;
   };
 
-  // Records a Guess the Crowd prediction.
+  // =====================================================
+  // Guess the Crowd
+  // =====================================================
+
+  // Records the player's Guess the Crowd prediction.
   const addCrowdGuess = (
     prediction: PlayerVote,
     roastPercentage: number,
@@ -72,10 +86,14 @@ export function usePlayerProgress() {
     return result;
   };
 
-  // Resets all temporary player progress.
+  // =====================================================
+  // Reset Progress
+  // =====================================================
+
+  // Clears all temporary progress.
   //
-  // This is useful during development and may later be
-  // used for a separate New Session option.
+  // This is useful during development and could later
+  // support a separate New Session option.
   const resetProgress = () => {
     setProgress(createInitialProgress());
   };

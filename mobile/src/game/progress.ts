@@ -2,17 +2,17 @@
 // File: progress.ts
 //
 // Purpose:
-// Contains the scoring, streak, and leveling rules for
+// Contains the Heat, streak, and leveling rules for
 // Roast or Toast.
 //
 // Current Rules:
-// • Every regular vote earns XP.
-// • Matching the majority earns bonus XP.
-// • Correct Guess the Crowd predictions earn bonus XP.
-// • Players are never punished for choosing the
-//   minority opinion.
+// • Every regular vote earns Heat.
+// • Matching the community majority earns bonus Heat.
+// • Guess the Crowd earns Heat.
+// • Correct crowd predictions earn bonus Heat.
+// • Players never lose Heat for choosing the minority.
 //
-// These values can easily be adjusted after testing.
+// These values can be adjusted later after testing.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -25,36 +25,39 @@ import type {
 } from "./progressTypes";
 
 // =====================================================
-// XP Rules
+// Heat Rules
 // =====================================================
 
-// XP earned simply for completing a regular Moment.
-export const BASE_VOTE_XP = 10;
+// Heat earned for completing a normal Roast or Toast
+// Moment.
+export const BASE_VOTE_HEAT = 10;
 
-// Extra XP earned when the player's vote matches the
+// Extra Heat earned when the player's vote matches the
 // community majority.
-export const MAJORITY_MATCH_BONUS_XP = 5;
+export const MAJORITY_MATCH_BONUS_HEAT = 5;
 
-// XP earned for completing Guess the Crowd.
-export const BASE_CROWD_GUESS_XP = 10;
+// Heat earned for completing Guess the Crowd.
+export const BASE_CROWD_GUESS_HEAT = 10;
 
-// Extra XP earned for correctly predicting the crowd.
-export const CORRECT_CROWD_GUESS_BONUS_XP = 15;
+// Extra Heat earned for correctly predicting what the
+// community chose.
+export const CORRECT_CROWD_GUESS_BONUS_HEAT = 15;
 
 // =====================================================
 // Starting Progress
 // =====================================================
 
-// Creates a clean progress object for a new player.
+// Creates a fresh progress object for a new player.
 //
-// Using a function instead of a shared object prevents
-// accidental changes to the original default values.
+// A function is used instead of one shared object so each
+// new game session receives its own independent values.
 export function createInitialProgress(): PlayerProgress {
   return {
     level: 1,
-    totalXp: 0,
-    currentLevelXp: 0,
-    xpForNextLevel: getXpRequiredForLevel(1),
+
+    totalHeat: 0,
+    currentLevelHeat: 0,
+    heatForNextLevel: getHeatRequiredForLevel(1),
 
     momentsCompleted: 0,
 
@@ -74,37 +77,42 @@ export function createInitialProgress(): PlayerProgress {
 // Leveling
 // =====================================================
 
-// Calculates how much XP is required to complete a
-// particular level.
+// Calculates how much Heat is required to complete a
+// specific level.
 //
-// Early levels move quickly so the player feels progress.
-// Later levels gradually require more XP.
-export function getXpRequiredForLevel(level: number): number {
+// Early levels move faster so new players can feel
+// progress quickly. Later levels gradually require more.
+export function getHeatRequiredForLevel(level: number): number {
   return 100 + (level - 1) * 25;
 }
 
-// Applies earned XP and calculates whether the player
+// Adds earned Heat and calculates whether the player
 // reached a new level.
 //
-// This also supports earning enough XP to cross more
-// than one level at once in future bonus modes.
-function applyXp(
+// This supports crossing more than one level if future
+// game modes award larger Heat bonuses.
+function applyHeat(
   progress: PlayerProgress,
-  xpEarned: number,
+  heatEarned: number,
 ): {
   progress: PlayerProgress;
   leveledUp: boolean;
 } {
   let level = progress.level;
-  let currentLevelXp = progress.currentLevelXp + xpEarned;
-  let xpForNextLevel = getXpRequiredForLevel(level);
+
+  let currentLevelHeat =
+    progress.currentLevelHeat + heatEarned;
+
+  let heatForNextLevel = getHeatRequiredForLevel(level);
+
   let leveledUp = false;
 
-  // Continue leveling while enough XP remains.
-  while (currentLevelXp >= xpForNextLevel) {
-    currentLevelXp -= xpForNextLevel;
+  // Keep leveling while enough Heat remains.
+  while (currentLevelHeat >= heatForNextLevel) {
+    currentLevelHeat -= heatForNextLevel;
     level += 1;
-    xpForNextLevel = getXpRequiredForLevel(level);
+
+    heatForNextLevel = getHeatRequiredForLevel(level);
     leveledUp = true;
   }
 
@@ -113,10 +121,14 @@ function applyXp(
 
     progress: {
       ...progress,
+
       level,
-      totalXp: progress.totalXp + xpEarned,
-      currentLevelXp,
-      xpForNextLevel,
+
+      totalHeat: progress.totalHeat + heatEarned,
+
+      currentLevelHeat,
+
+      heatForNextLevel,
     },
   };
 }
@@ -125,11 +137,11 @@ function applyXp(
 // Majority Helper
 // =====================================================
 
-// Determines which side currently has the larger
-// community percentage.
+// Determines which side has the larger community
+// percentage.
 //
-// A tied result returns null because neither side has a
-// true majority.
+// A tied result returns null because neither option has
+// a true majority.
 export function getMajorityChoice(
   roastPercentage: number,
   toastPercentage: number,
@@ -149,7 +161,7 @@ export function getMajorityChoice(
 // Record a Regular Vote
 // =====================================================
 
-// Updates player progress after a standard Roast or Toast
+// Updates player progress after a normal Roast or Toast
 // vote.
 export function recordRegularVote(
   currentProgress: PlayerProgress,
@@ -162,22 +174,34 @@ export function recordRegularVote(
     toastPercentage,
   );
 
-  // A tied community result does not count as a match.
+  // Tied community results do not count as a majority
+  // match.
   const matchedMajority =
-    majorityChoice !== null && playerVote === majorityChoice;
+    majorityChoice !== null &&
+    playerVote === majorityChoice;
 
-  const xpEarned =
-    BASE_VOTE_XP +
-    (matchedMajority ? MAJORITY_MATCH_BONUS_XP : 0);
+  // Every vote earns base Heat.
+  //
+  // Matching the majority earns a small bonus.
+  const heatEarned =
+    BASE_VOTE_HEAT +
+    (matchedMajority
+      ? MAJORITY_MATCH_BONUS_HEAT
+      : 0);
 
+  // A majority match continues the streak.
+  //
+  // Choosing the minority resets the majority-match
+  // streak, but the player never loses Heat.
   const updatedStreak = matchedMajority
     ? currentProgress.currentStreak + 1
     : 0;
 
-  const progressBeforeXp: PlayerProgress = {
+  const progressBeforeHeat: PlayerProgress = {
     ...currentProgress,
 
-    momentsCompleted: currentProgress.momentsCompleted + 1,
+    momentsCompleted:
+      currentProgress.momentsCompleted + 1,
 
     roastCount:
       currentProgress.roastCount +
@@ -199,13 +223,16 @@ export function recordRegularVote(
     ),
   };
 
-  const xpResult = applyXp(progressBeforeXp, xpEarned);
+  const heatResult = applyHeat(
+    progressBeforeHeat,
+    heatEarned,
+  );
 
   return {
-    updatedProgress: xpResult.progress,
-    xpEarned,
+    updatedProgress: heatResult.progress,
+    heatEarned,
     matchedMajority,
-    leveledUp: xpResult.leveledUp,
+    leveledUp: heatResult.leveledUp,
   };
 }
 
@@ -213,10 +240,11 @@ export function recordRegularVote(
 // Record Guess the Crowd
 // =====================================================
 
-// Updates progress after a Guess the Crowd prediction.
+// Updates progress after the player predicts what most
+// people selected.
 //
-// The player's personal Roast or Toast vote is handled
-// separately from this prediction.
+// The player's personal Roast or Toast answer is separate
+// from this prediction.
 export function recordCrowdGuess(
   currentProgress: PlayerProgress,
   prediction: PlayerVote,
@@ -229,30 +257,39 @@ export function recordCrowdGuess(
   );
 
   const guessedCorrectly =
-    majorityChoice !== null && prediction === majorityChoice;
+    majorityChoice !== null &&
+    prediction === majorityChoice;
 
-  const xpEarned =
-    BASE_CROWD_GUESS_XP +
+  // Every Guess the Crowd round earns base Heat.
+  //
+  // A correct prediction earns a larger bonus because it
+  // requires reading the community.
+  const heatEarned =
+    BASE_CROWD_GUESS_HEAT +
     (guessedCorrectly
-      ? CORRECT_CROWD_GUESS_BONUS_XP
+      ? CORRECT_CROWD_GUESS_BONUS_HEAT
       : 0);
 
-  const progressBeforeXp: PlayerProgress = {
+  const progressBeforeHeat: PlayerProgress = {
     ...currentProgress,
 
-    crowdGuesses: currentProgress.crowdGuesses + 1,
+    crowdGuesses:
+      currentProgress.crowdGuesses + 1,
 
     correctCrowdGuesses:
       currentProgress.correctCrowdGuesses +
       (guessedCorrectly ? 1 : 0),
   };
 
-  const xpResult = applyXp(progressBeforeXp, xpEarned);
+  const heatResult = applyHeat(
+    progressBeforeHeat,
+    heatEarned,
+  );
 
   return {
-    updatedProgress: xpResult.progress,
-    xpEarned,
+    updatedProgress: heatResult.progress,
+    heatEarned,
     guessedCorrectly,
-    leveledUp: xpResult.leveledUp,
+    leveledUp: heatResult.leveledUp,
   };
 }
