@@ -6,15 +6,11 @@
 // Purpose:
 // Controls the main Roast or Toast gameplay experience.
 //
-// Responsibilities:
-// • Creates a shuffled, no-repeat Moment deck
-// • Records regular Roast or Toast votes
-// • Tracks Heat, levels, streaks, and titles
-// • Displays Guess the Crowd
-// • Displays Quick Break
-// • Displays Session Recap
-// • Keeps result content scrollable
-// • Keeps the Next button fixed and easy to reach
+// Layout Rules:
+// • Back and Home remain available in the header.
+// • All gameplay content lives inside one ScrollView.
+// • The Next button follows the Top Comment.
+// • Nothing floats over or covers result content.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -24,7 +20,6 @@ import { useRef, useState } from "react";
 
 import {
   Animated,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -47,30 +42,28 @@ import { scenarios } from "../data/scenarios";
 import type { Moment } from "../data/types";
 
 import type { VoteProgressResult } from "../game/progressTypes";
-
 import { usePlayerProgress } from "../hooks/usePlayerProgress";
 
 import {
   CategoryName,
   CategoryThemes,
   Colors,
-  Radius,
   Spacing,
 } from "../theme";
 
-// A special gameplay event appears after every five
-// completed regular Moments.
+// A special event appears after every five regular
+// Moments.
 const INTERMISSION_FREQUENCY = 5;
 
-// Special gameplay screen currently being displayed.
+// Special screen currently being displayed.
 type IntermissionType =
   | "quick"
   | "guess"
   | "recap"
   | null;
 
-// Stores where the regular deck should resume after
-// Guess the Crowd consumes a fresh Moment.
+// Stores where regular gameplay resumes after Guess the
+// Crowd consumes a fresh Moment.
 type ResumePosition = {
   deck: Moment[];
   index: number;
@@ -80,13 +73,10 @@ type ResumePosition = {
 // Shuffle Helpers
 // =====================================================
 
-// Creates a randomized copy of the supplied Moment list.
-//
-// The original scenarios list is never changed.
+// Creates a randomized copy of the Moment list.
 function shuffleMoments(moments: Moment[]): Moment[] {
   const shuffledMoments = [...moments];
 
-  // Fisher-Yates shuffle.
   for (
     let currentIndex = shuffledMoments.length - 1;
     currentIndex > 0;
@@ -108,10 +98,7 @@ function shuffleMoments(moments: Moment[]): Moment[] {
   return shuffledMoments;
 }
 
-// Creates a fresh shuffled deck.
-//
-// When possible, the new deck will not begin with the
-// same Moment that the player just completed.
+// Creates a fresh deck while avoiding an immediate repeat.
 function createFreshDeck(lastMomentId?: string): Moment[] {
   const newDeck = shuffleMoments(scenarios);
 
@@ -140,45 +127,36 @@ export default function ScenarioScreen() {
     addCrowdGuess,
   } = usePlayerProgress();
 
-  // Stores reward information from the latest regular
-  // Roast or Toast vote.
+  // Stores reward details from the latest regular vote.
   const [lastVoteResult, setLastVoteResult] =
     useState<VoteProgressResult | null>(null);
 
   // =====================================================
-  // Shuffled Moment Deck
+  // Shuffled Deck
   // =====================================================
 
-  // Creates one shuffled deck when the screen opens.
   const [momentDeck, setMomentDeck] = useState<Moment[]>(() =>
     createFreshDeck(),
   );
 
-  // Tracks the player's current position in the deck.
   const [momentIndex, setMomentIndex] = useState(0);
 
-  // Stores the player's current Roast or Toast selection.
   const [selectedVote, setSelectedVote] =
     useState<VoteChoice>(null);
 
-  // Counts regular Moments completed during this session.
   const [completedMoments, setCompletedMoments] =
     useState(0);
 
   // =====================================================
-  // Special Gameplay Modes
+  // Special Modes
   // =====================================================
 
-  // Tracks which special mode is currently visible.
   const [intermissionType, setIntermissionType] =
     useState<IntermissionType>(null);
 
-  // Stores the fresh Moment used by Guess the Crowd.
   const [guessMoment, setGuessMoment] =
     useState<Moment | null>(null);
 
-  // Stores the deck position that should load when Guess
-  // the Crowd is complete.
   const [resumePosition, setResumePosition] =
     useState<ResumePosition | null>(null);
 
@@ -186,39 +164,44 @@ export default function ScenarioScreen() {
   // Animations
   // =====================================================
 
-  // Controls the Roast button bounce.
   const roastScale = useRef(
     new Animated.Value(1),
   ).current;
 
-  // Controls the Toast button bounce.
   const toastScale = useRef(
     new Animated.Value(1),
   ).current;
 
-  // Controls result opacity.
   const resultsOpacity = useRef(
     new Animated.Value(0),
   ).current;
 
-  // Controls the result upward movement.
   const resultsPosition = useRef(
     new Animated.Value(18),
   ).current;
 
-  // Current regular Moment.
   const currentMoment = momentDeck[momentIndex];
 
-  // Visual category theme for the current Moment.
   const categoryTheme =
     CategoryThemes[currentMoment.category as CategoryName] ??
     CategoryThemes["Everyday Life"];
 
   // =====================================================
+  // Navigation
+  // =====================================================
+
+  const handleBackPress = () => {
+    router.back();
+  };
+
+  const handleHomePress = () => {
+    router.replace("/");
+  };
+
+  // =====================================================
   // Animation Helpers
   // =====================================================
 
-  // Gives the selected voting button a quick bounce.
   const animateVoteButton = (
     animation: Animated.Value,
   ) => {
@@ -239,7 +222,6 @@ export default function ScenarioScreen() {
     ]).start();
   };
 
-  // Fades and raises the results into view.
   const revealResults = () => {
     resultsOpacity.setValue(0);
     resultsPosition.setValue(18);
@@ -264,17 +246,14 @@ export default function ScenarioScreen() {
   // Regular Voting
   // =====================================================
 
-  // Handles either a Roast or Toast vote.
   const recordVote = (
     vote: Exclude<VoteChoice, null>,
     animation: Animated.Value,
   ) => {
-    // Prevents changing the vote after selecting.
     if (selectedVote) {
       return;
     }
 
-    // Updates Heat, level, totals, and streaks.
     const progressResult = addRegularVote(
       vote,
       currentMoment.roastPercentage,
@@ -288,12 +267,10 @@ export default function ScenarioScreen() {
     revealResults();
   };
 
-  // Records a Roast vote.
   const handleRoastVote = () => {
     recordVote("roast", roastScale);
   };
 
-  // Records a Toast vote.
   const handleToastVote = () => {
     recordVote("toast", toastScale);
   };
@@ -302,7 +279,6 @@ export default function ScenarioScreen() {
   // Regular Deck Movement
   // =====================================================
 
-  // Clears the previous vote and result state.
   const resetRegularMoment = () => {
     setSelectedVote(null);
     setLastVoteResult(null);
@@ -311,10 +287,6 @@ export default function ScenarioScreen() {
     resultsPosition.setValue(18);
   };
 
-  // Moves to the next regular Moment.
-  //
-  // If the player reaches the end, a fresh deck is
-  // shuffled automatically.
   const moveToNextMoment = () => {
     const reachedEndOfDeck =
       momentIndex === momentDeck.length - 1;
@@ -338,13 +310,10 @@ export default function ScenarioScreen() {
   // Guess the Crowd Preparation
   // =====================================================
 
-  // Removes a fresh, unseen Moment from the regular deck
-  // and uses it for Guess the Crowd.
   const prepareGuessTheCrowd = () => {
     const nextIndex = momentIndex + 1;
     const indexAfterGuess = momentIndex + 2;
 
-    // At least two unused Moments remain.
     if (indexAfterGuess < momentDeck.length) {
       setGuessMoment(momentDeck[nextIndex]);
 
@@ -357,13 +326,9 @@ export default function ScenarioScreen() {
       return;
     }
 
-    // Exactly one unused Moment remains.
     if (nextIndex < momentDeck.length) {
-      const specialMoment =
-        momentDeck[nextIndex];
-
-      const newDeck =
-        createFreshDeck(specialMoment.id);
+      const specialMoment = momentDeck[nextIndex];
+      const newDeck = createFreshDeck(specialMoment.id);
 
       setGuessMoment(specialMoment);
 
@@ -376,10 +341,7 @@ export default function ScenarioScreen() {
       return;
     }
 
-    // The current Moment was the last item in the deck.
-    const newDeck =
-      createFreshDeck(currentMoment.id);
-
+    const newDeck = createFreshDeck(currentMoment.id);
     const specialMoment = newDeck[0];
 
     setGuessMoment(specialMoment);
@@ -396,8 +358,6 @@ export default function ScenarioScreen() {
   // Special Event Selection
   // =====================================================
 
-  // Runs when the player presses Next after viewing
-  // regular results.
   const handleNextMoment = () => {
     const newCompletedTotal =
       completedMoments + 1;
@@ -409,27 +369,15 @@ export default function ScenarioScreen() {
         INTERMISSION_FREQUENCY ===
       0;
 
-    // Continue to a normal Moment when a special event is
-    // not due yet.
     if (!shouldShowSpecialEvent) {
       moveToNextMoment();
       return;
     }
 
-    // Determines which numbered break this is.
-    //
-    // Break 1 = after 5 Moments
-    // Break 2 = after 10 Moments
-    // Break 3 = after 15 Moments
     const breakNumber =
       newCompletedTotal /
       INTERMISSION_FREQUENCY;
 
-    // Repeating rhythm:
-    //
-    // 1. Guess the Crowd
-    // 2. Quick Break
-    // 3. Session Recap
     const eventPosition = breakNumber % 3;
 
     if (eventPosition === 1) {
@@ -449,19 +397,16 @@ export default function ScenarioScreen() {
   // Special Event Continuation
   // =====================================================
 
-  // Continues after Quick Break.
   const handleContinueAfterQuickBreak = () => {
     setIntermissionType(null);
     moveToNextMoment();
   };
 
-  // Continues after Session Recap.
   const handleContinueAfterRecap = () => {
     setIntermissionType(null);
     moveToNextMoment();
   };
 
-  // Continues after Guess the Crowd.
   const handleContinueAfterGuess = () => {
     if (!resumePosition) {
       setIntermissionType(null);
@@ -479,28 +424,20 @@ export default function ScenarioScreen() {
     resetRegularMoment();
   };
 
-  // Returns the player to the Home screen.
-  const handleBackPress = () => {
-    router.back();
-  };
-
   // =====================================================
   // Special Screens
   // =====================================================
 
-  // Quick Break screen.
   if (intermissionType === "quick") {
     return (
       <IntermissionCard
         completedMoments={completedMoments}
-        onContinue={
-          handleContinueAfterQuickBreak
-        }
+        onContinue={handleContinueAfterQuickBreak}
+        onHomePress={handleHomePress}
       />
     );
   }
 
-  // Guess the Crowd screen.
   if (
     intermissionType === "guess" &&
     guessMoment
@@ -509,21 +446,16 @@ export default function ScenarioScreen() {
       <GuessTheCrowdCard
         moment={guessMoment}
         onRecordGuess={addCrowdGuess}
-        onContinue={
-          handleContinueAfterGuess
-        }
+        onContinue={handleContinueAfterGuess}
       />
     );
   }
 
-  // Session Recap screen.
   if (intermissionType === "recap") {
     return (
       <SessionRecapCard
         progress={progress}
-        onContinue={
-          handleContinueAfterRecap
-        }
+        onContinue={handleContinueAfterRecap}
       />
     );
   }
@@ -534,7 +466,7 @@ export default function ScenarioScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Current category backdrop word */}
+      {/* Category decorations */}
       <View style={styles.categoryBackdrop}>
         <Text
           style={[
@@ -548,149 +480,80 @@ export default function ScenarioScreen() {
         </Text>
       </View>
 
-      {/* Soft category-colored circle */}
       <View
         style={[
           styles.categoryCircle,
           {
-            backgroundColor:
-              categoryTheme.soft,
+            backgroundColor: categoryTheme.soft,
           },
         ]}
       />
 
-      {/* Roast background decoration */}
       <View style={styles.roastBackdrop}>
         <Text style={styles.roastBackdropText}>
           ROAST
         </Text>
       </View>
 
-      {/* Toast background decoration */}
       <View style={styles.toastBackdrop}>
         <Text style={styles.toastBackdropText}>
           TOAST
         </Text>
       </View>
 
-      {/* Fixed top navigation */}
+      {/* Shared Back, brand, and Home navigation */}
       <ScenarioHeader
-        categoryAccent={
-          categoryTheme.accent
-        }
+        accentColor={categoryTheme.accent}
         onBackPress={handleBackPress}
+        onHomePress={handleHomePress}
       />
 
-      {/* Scrollable question and results content */}
+      {/* All gameplay content scrolls together */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
-        contentContainerStyle={
-          styles.scrollContent
-        }
+        contentContainerStyle={styles.scrollContent}
       >
-        {/* Player title, level, and current streak */}
         <PlayerBadge progress={progress} />
 
-        {/* Category badge and current Moment */}
         <ScenarioCard
-          categoryLabel={
-            categoryTheme.label
-          }
-          categoryAccent={
-            categoryTheme.accent
-          }
-          categorySoft={
-            categoryTheme.soft
-          }
-          question={
-            currentMoment.question
-          }
+          categoryLabel={categoryTheme.label}
+          categoryAccent={categoryTheme.accent}
+          categorySoft={categoryTheme.soft}
+          question={currentMoment.question}
+          compact={selectedVote !== null}
         />
 
-        {/* Voting options shown before selection */}
         {!selectedVote && (
           <VoteButtons
-            roastPhrase={
-              currentMoment.roastPhrase
-            }
-            toastPhrase={
-              currentMoment.toastPhrase
-            }
+            roastPhrase={currentMoment.roastPhrase}
+            toastPhrase={currentMoment.toastPhrase}
             roastScale={roastScale}
             toastScale={toastScale}
-            onRoastPress={
-              handleRoastVote
-            }
-            onToastPress={
-              handleToastVote
-            }
+            onRoastPress={handleRoastVote}
+            onToastPress={handleToastVote}
           />
         )}
 
-        {/* Results shown after voting */}
-        {selectedVote &&
-          lastVoteResult && (
-            <ResultsCard
-              moment={currentMoment}
-              selectedVote={
-                selectedVote
-              }
-              categoryAccent={
-                categoryTheme.accent
-              }
-              heatEarned={
-                lastVoteResult.heatEarned
-              }
-              matchedMajority={
-                lastVoteResult.matchedMajority
-              }
-              leveledUp={
-                lastVoteResult.leveledUp
-              }
-              currentLevel={
-                lastVoteResult
-                  .updatedProgress.level
-              }
-              opacity={
-                resultsOpacity
-              }
-              translateY={
-                resultsPosition
-              }
-            />
-          )}
+        {selectedVote && lastVoteResult && (
+          <ResultsCard
+            moment={currentMoment}
+            selectedVote={selectedVote}
+            categoryAccent={categoryTheme.accent}
+            heatEarned={lastVoteResult.heatEarned}
+            matchedMajority={
+              lastVoteResult.matchedMajority
+            }
+            leveledUp={lastVoteResult.leveledUp}
+            currentLevel={
+              lastVoteResult.updatedProgress.level
+            }
+            opacity={resultsOpacity}
+            translateY={resultsPosition}
+            onNextPress={handleNextMoment}
+          />
+        )}
       </ScrollView>
-
-      {/* =================================================
-          Fixed Next Button
-
-          This button stays at the bottom while the result
-          content above it can scroll independently.
-      ================================================= */}
-
-      {selectedVote && lastVoteResult && (
-        <View style={styles.fixedNextContainer}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Show next moment"
-            onPress={handleNextMoment}
-            style={({ pressed }) => [
-              styles.fixedNextButton,
-              pressed &&
-                styles.fixedNextButtonPressed,
-            ]}
-          >
-            <Text style={styles.fixedNextButtonText}>
-              Next
-            </Text>
-
-            <Text style={styles.fixedNextButtonArrow}>
-              →
-            </Text>
-          </Pressable>
-        </View>
-      )}
     </View>
   );
 }
@@ -700,83 +563,24 @@ export default function ScenarioScreen() {
 // =====================================================
 
 const styles = StyleSheet.create({
-  // Main screen container.
   container: {
     flex: 1,
     backgroundColor: Colors.background,
     overflow: "hidden",
   },
 
-  // Scrollable question and result area.
   scrollView: {
     flex: 1,
     zIndex: 2,
   },
 
-  // Inner spacing for the scrollable area.
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: Spacing.lg,
-    paddingTop: 22,
-
-    // Extra space allows the content to scroll above the
-    // fixed Next button.
-    paddingBottom: 145,
+    paddingTop: 18,
+    paddingBottom: 42,
   },
-
-  // =====================================================
-  // Fixed Next Button
-  // =====================================================
-
-  fixedNextContainer: {
-    position: "absolute",
-    left: Spacing.lg,
-    right: Spacing.lg,
-    bottom: 22,
-    zIndex: 10,
-  },
-
-  fixedNextButton: {
-    backgroundColor: Colors.textPrimary,
-    borderRadius: Radius.pill,
-    paddingVertical: 17,
-    paddingHorizontal: 25,
-
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 14,
-    elevation: 7,
-  },
-
-  fixedNextButtonPressed: {
-    opacity: 0.78,
-    transform: [{ scale: 0.985 }],
-  },
-
-  fixedNextButtonText: {
-    color: Colors.white,
-    fontSize: 18,
-    fontWeight: "900",
-  },
-
-  fixedNextButtonArrow: {
-    color: Colors.white,
-    fontSize: 23,
-    fontWeight: "700",
-  },
-
-  // =====================================================
-  // Category Decorations
-  // =====================================================
 
   categoryBackdrop: {
     position: "absolute",
@@ -801,10 +605,6 @@ const styles = StyleSheet.create({
     right: -90,
     opacity: 0.75,
   },
-
-  // =====================================================
-  // Roast or Toast Brand Decorations
-  // =====================================================
 
   roastBackdrop: {
     position: "absolute",

@@ -3,17 +3,10 @@
 //
 // Purpose:
 // Gives the player a short break after completing a set
-// number of Roast or Toast Moments.
+// of Roast or Toast Moments.
 //
-// This keeps gameplay from feeling like an endless list
-// of questions.
-//
-// Future Versions:
-// • Guess the Crowd
-// • Speed Round
-// • Session statistics
-// • Bonus Moments
-// • Rewards and points
+// Navigation remains consistent with the rest of the
+// gameplay experience.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -21,52 +14,70 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Colors, Radius, Spacing } from "../theme";
+import ScenarioHeader from "./ScenarioHeader";
 
-// Information required by the intermission card.
 type IntermissionCardProps = {
   completedMoments: number;
+
+  // Returns to regular gameplay.
   onContinue: () => void;
+
+  // Returns directly to Home.
+  onHomePress: () => void;
 };
 
 export default function IntermissionCard({
   completedMoments,
   onContinue,
+  onHomePress,
 }: IntermissionCardProps) {
   return (
     <View style={styles.container}>
+      {/* Shared gameplay navigation */}
+      <ScenarioHeader
+        accentColor={Colors.roast}
+        onBackPress={onContinue}
+        onHomePress={onHomePress}
+      />
+
       {/* Decorative background words */}
       <Text style={styles.roastBackdrop}>ROAST</Text>
       <Text style={styles.toastBackdrop}>TOAST</Text>
 
-      {/* Small intermission label */}
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>QUICK BREAK</Text>
+      <View style={styles.content}>
+        {/* Small intermission label */}
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>QUICK BREAK</Text>
+        </View>
+
+        {/* Main break message */}
+        <Text style={styles.heading}>Okay, pause.</Text>
+
+        <Text style={styles.message}>
+          You just weighed in on {completedMoments} hot takes.
+        </Text>
+
+        <Text style={styles.subMessage}>
+          Take a breath. The next round is waiting.
+        </Text>
+
+        {/* Returns to the shuffled Moment deck */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Continue playing"
+          onPress={onContinue}
+          style={({ pressed }) => [
+            styles.continueButton,
+            pressed && styles.buttonPressed,
+          ]}
+        >
+          <Text style={styles.continueButtonText}>
+            Keep Going
+          </Text>
+
+          <Text style={styles.continueArrow}>→</Text>
+        </Pressable>
       </View>
-
-      {/* Main break message */}
-      <Text style={styles.heading}>Okay, pause.</Text>
-
-      <Text style={styles.message}>
-        You just weighed in on {completedMoments} hot takes.
-      </Text>
-
-      <Text style={styles.subMessage}>
-        Take a breath. The next round is waiting.
-      </Text>
-
-      {/* Returns the player to the shuffled Moment deck */}
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Continue playing"
-        onPress={onContinue}
-        style={({ pressed }) => [
-          styles.continueButton,
-          pressed && styles.continueButtonPressed,
-        ]}
-      >
-        <Text style={styles.continueButtonText}>Keep Going</Text>
-        <Text style={styles.continueArrow}>→</Text>
-      </Pressable>
     </View>
   );
 }
@@ -79,20 +90,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+    overflow: "hidden",
+  },
+
+  content: {
+    flex: 1,
     justifyContent: "center",
     paddingHorizontal: Spacing.lg,
-    overflow: "hidden",
+    paddingBottom: 55,
+    zIndex: 2,
   },
 
   badge: {
     alignSelf: "flex-start",
+
     backgroundColor: Colors.surface,
     borderColor: Colors.roast,
     borderWidth: 1.5,
     borderRadius: Radius.pill,
+
     paddingVertical: 7,
     paddingHorizontal: 15,
     marginBottom: 30,
+
     transform: [{ rotate: "-2deg" }],
   },
 
@@ -131,25 +151,18 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: Colors.textPrimary,
     borderRadius: Radius.pill,
+
     paddingVertical: 17,
     paddingHorizontal: 25,
+
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.14,
-    shadowRadius: 14,
-    elevation: 5,
   },
 
-  continueButtonPressed: {
+  buttonPressed: {
     opacity: 0.78,
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.985 }],
   },
 
   continueButtonText: {
@@ -166,13 +179,15 @@ const styles = StyleSheet.create({
 
   roastBackdrop: {
     position: "absolute",
-    top: 90,
+    top: 145,
     right: -55,
+
     color: Colors.roast,
     fontSize: 96,
     fontWeight: "900",
     letterSpacing: -5,
     opacity: 0.08,
+
     transform: [{ rotate: "8deg" }],
   },
 
@@ -180,11 +195,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 70,
     left: -48,
+
     color: Colors.toast,
     fontSize: 92,
     fontWeight: "900",
     letterSpacing: -5,
     opacity: 0.08,
+
     transform: [{ rotate: "-8deg" }],
   },
 });

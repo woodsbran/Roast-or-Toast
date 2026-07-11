@@ -2,10 +2,11 @@
 // File: ScenarioCard.tsx
 //
 // Purpose:
-// Displays the current category badge and the main
-// Roast or Toast Moment.
+// Displays the current category badge and Moment.
 //
-// The scenario remains the visual focus of the screen.
+// Before voting, the Moment is large and visually bold.
+// After voting, compact mode reduces the question size
+// so the results fit more comfortably on the screen.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -20,6 +21,9 @@ type ScenarioCardProps = {
   categoryAccent: string;
   categorySoft: string;
   question: string;
+
+  // Compact mode is used after the player votes.
+  compact?: boolean;
 };
 
 export default function ScenarioCard({
@@ -27,10 +31,11 @@ export default function ScenarioCard({
   categoryAccent,
   categorySoft,
   question,
+  compact = false,
 }: ScenarioCardProps) {
   return (
     <View>
-      {/* Category badge changes color for each category */}
+      {/* Category badge changes with the current Moment */}
       <View
         style={[
           styles.categoryBadge,
@@ -38,20 +43,30 @@ export default function ScenarioCard({
             backgroundColor: categorySoft,
             borderColor: categoryAccent,
           },
+          compact && styles.compactCategoryBadge,
         ]}
       >
         <Text
           style={[
             styles.categoryBadgeText,
-            { color: categoryAccent },
+            {
+              color: categoryAccent,
+            },
           ]}
         >
           {categoryLabel}
         </Text>
       </View>
 
-      {/* Main situation shown to the player */}
-      <Text style={styles.scenarioText}>{question}</Text>
+      {/* Main Moment text */}
+      <Text
+        style={[
+          styles.scenarioText,
+          compact && styles.compactScenarioText,
+        ]}
+      >
+        {question}
+      </Text>
     </View>
   );
 }
@@ -71,6 +86,10 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "-2deg" }],
   },
 
+  compactCategoryBadge: {
+    marginBottom: 16,
+  },
+
   categoryBadgeText: {
     fontSize: 11,
     fontWeight: "900",
@@ -84,5 +103,13 @@ const styles = StyleSheet.create({
     letterSpacing: -1.6,
     lineHeight: 47,
     marginBottom: 30,
+  },
+
+  // Results do not need the question to remain enormous.
+  compactScenarioText: {
+    fontSize: 28,
+    lineHeight: 36,
+    letterSpacing: -1.1,
+    marginBottom: 24,
   },
 });

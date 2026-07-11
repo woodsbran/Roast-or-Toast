@@ -2,56 +2,87 @@
 // File: ScenarioHeader.tsx
 //
 // Purpose:
-// Displays the top navigation area of the Scenario
-// screen, including the back button, app name, and
-// category-colored dot.
+// Provides consistent navigation across every gameplay
+// screen.
+//
+// The header includes:
+// • Back button
+// • Roast or Toast branding
+// • Home button
 //
 // Project: Roast or Toast
 // =====================================================
 
+import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Colors, Radius, Spacing } from "../theme";
 
-// Information required by the header.
 type ScenarioHeaderProps = {
-  categoryAccent: string;
+  // Accent color changes with the current category or mode.
+  accentColor: string;
+
+  // Controls the back button behavior.
   onBackPress: () => void;
+
+  // Returns directly to the Home screen.
+  onHomePress: () => void;
 };
 
 export default function ScenarioHeader({
-  categoryAccent,
+  accentColor,
   onBackPress,
+  onHomePress,
 }: ScenarioHeaderProps) {
   return (
-    <View style={styles.topBar}>
-      {/* Returns the player to the Home screen */}
+    <View style={styles.container}>
+      {/* Back button */}
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Return to Home"
+        accessibilityLabel="Go back"
         onPress={onBackPress}
         style={({ pressed }) => [
-          styles.backButton,
+          styles.navigationButton,
           pressed && styles.buttonPressed,
         ]}
       >
-        <Text style={styles.backArrow}>←</Text>
+        <Ionicons
+          name="arrow-back"
+          size={25}
+          color={Colors.textPrimary}
+        />
       </Pressable>
 
-      {/* Small app logo with the current category color */}
+      {/* App branding */}
       <View style={styles.logoContainer}>
         <View
           style={[
-            styles.categoryDot,
-            { backgroundColor: categoryAccent },
+            styles.accentDot,
+            {
+              backgroundColor: accentColor,
+            },
           ]}
         />
 
         <Text style={styles.logoText}>Roast or Toast</Text>
       </View>
 
-      {/* Keeps the logo centered between both sides */}
-      <View style={styles.rightSpacer} />
+      {/* Home button */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Return to Home"
+        onPress={onHomePress}
+        style={({ pressed }) => [
+          styles.navigationButton,
+          pressed && styles.buttonPressed,
+        ]}
+      >
+        <Ionicons
+          name="home-outline"
+          size={23}
+          color={Colors.textPrimary}
+        />
+      </Pressable>
     </View>
   );
 }
@@ -61,22 +92,29 @@ export default function ScenarioHeader({
 // =====================================================
 
 const styles = StyleSheet.create({
-  topBar: {
-    paddingTop: 68,
+  container: {
+    paddingTop: 62,
+    paddingBottom: 16,
     paddingHorizontal: Spacing.lg,
+
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    zIndex: 3,
+
+    backgroundColor: Colors.background,
+    zIndex: 20,
   },
 
-  backButton: {
+  navigationButton: {
     width: 44,
     height: 44,
+
     borderRadius: Radius.pill,
-    backgroundColor: Colors.surface,
-    borderColor: Colors.border,
     borderWidth: 1,
+    borderColor: Colors.border,
+
+    backgroundColor: Colors.surface,
+
     alignItems: "center",
     justifyContent: "center",
 
@@ -92,13 +130,7 @@ const styles = StyleSheet.create({
 
   buttonPressed: {
     opacity: 0.65,
-  },
-
-  backArrow: {
-    color: Colors.textPrimary,
-    fontSize: 25,
-    fontWeight: "600",
-    marginTop: -2,
+    transform: [{ scale: 0.96 }],
   },
 
   logoContainer: {
@@ -106,21 +138,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  categoryDot: {
+  accentDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginRight: 7,
+    marginRight: 8,
   },
 
   logoText: {
     color: Colors.textPrimary,
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: "900",
-    letterSpacing: -0.6,
-  },
-
-  rightSpacer: {
-    width: 44,
+    letterSpacing: -0.7,
   },
 });
