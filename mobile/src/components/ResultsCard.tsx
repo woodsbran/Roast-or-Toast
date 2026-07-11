@@ -2,17 +2,30 @@
 // File: ResultsCard.tsx
 //
 // Purpose:
-// Displays results after a regular Roast or Toast vote.
+// Displays community results after a regular Roast or
+// Toast vote.
 //
-// The Next button is included after the Top Comment.
-// Because everything is inside the ScrollView, the button
-// can never cover or cut off result content.
+// Current Features:
+// • Confirms the player's vote
+// • Displays animated Roast and Toast percentages
+// • Shows animated Heat earned
+// • Shows majority-match feedback
+// • Celebrates level increases
+// • Displays the top comment
+// • Provides the Next action
 //
 // Project: Roast or Toast
 // =====================================================
 
 import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
   Animated,
+  Easing,
   Pressable,
   StyleSheet,
   Text,
@@ -20,13 +33,20 @@ import {
 } from "react-native";
 
 import type { Moment } from "../data/types";
-import { Colors, Radius } from "../theme";
+
+import {
+  Colors,
+  Radius,
+} from "../theme";
 
 import FloatingHeat from "./FloatingHeat";
 import LevelUpCard from "./LevelUpCard";
-import type { VoteChoice } from "./VoteButtons";
 
-// Information required to display the results.
+import type {
+  VoteChoice,
+} from "./VoteButtons";
+
+// Information required to display one result screen.
 type ResultsCardProps = {
   moment: Moment;
   selectedVote: Exclude<VoteChoice, null>;
@@ -40,7 +60,6 @@ type ResultsCardProps = {
   opacity: Animated.Value;
   translateY: Animated.Value;
 
-  // Moves to the next Moment or special event.
   onNextPress: () => void;
 };
 
@@ -60,9 +79,15 @@ export default function ResultsCard({
     <Animated.View
       style={[
         styles.resultsContainer,
+
         {
           opacity,
-          transform: [{ translateY }],
+
+          transform: [
+            {
+              translateY,
+            },
+          ],
         },
       ]}
     >
@@ -71,9 +96,10 @@ export default function ResultsCard({
         The People Have Spoken
       </Text>
 
-      {/* Confirms the player's selection */}
+      {/* Confirms the player's selected answer */}
       <Text style={styles.yourVoteText}>
         You chose{" "}
+
         <Text
           style={
             selectedVote === "roast"
@@ -81,49 +107,63 @@ export default function ResultsCard({
               : styles.toastText
           }
         >
-          {selectedVote === "roast" ? "Roast" : "Toast"}
+          {selectedVote === "roast"
+            ? "Roast"
+            : "Toast"}
         </Text>
       </Text>
 
-      {/* Heat earned from this answer */}
+      {/* Animated Heat reward */}
       <FloatingHeat
         heatEarned={heatEarned}
         matchedMajority={matchedMajority}
       />
 
-      {/* Level celebration appears only when needed */}
+      {/* Appears only when the player reaches a new level */}
       {leveledUp && (
-        <LevelUpCard level={currentLevel} />
+        <LevelUpCard
+          level={currentLevel}
+        />
       )}
 
-      {/* Community Roast result */}
-      <ResultBar
+      {/* Animated Roast result */}
+      <AnimatedResultBar
         label="🔥 Roast"
-        percentage={moment.roastPercentage}
+        percentage={
+          moment.roastPercentage
+        }
         fillColor={Colors.roast}
+        delay={120}
       />
 
-      {/* Community Toast result */}
-      <ResultBar
+      {/* Animated Toast result */}
+      <AnimatedResultBar
         label="♥ Toast"
-        percentage={moment.toastPercentage}
+        percentage={
+          moment.toastPercentage
+        }
         fillColor={Colors.toast}
+        delay={270}
       />
 
       {/* Top community comment */}
       <View
         style={[
           styles.commentCard,
+
           {
-            borderLeftColor: categoryAccent,
+            borderLeftColor:
+              categoryAccent,
           },
         ]}
       >
         <Text
           style={[
             styles.commentLabel,
+
             {
-              color: categoryAccent,
+              color:
+                categoryAccent,
             },
           ]}
         >
@@ -135,55 +175,154 @@ export default function ResultsCard({
         </Text>
       </View>
 
-      {/* Next comes after all result content */}
+      {/* Moves to the next Moment or special event */}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Show next moment"
         onPress={onNextPress}
         style={({ pressed }) => [
           styles.nextButton,
-          pressed && styles.buttonPressed,
+
+          pressed &&
+            styles.buttonPressed,
         ]}
       >
-        <Text style={styles.nextButtonText}>Next</Text>
-        <Text style={styles.nextButtonArrow}>→</Text>
+        <Text style={styles.nextButtonText}>
+          Next
+        </Text>
+
+        <Text style={styles.nextButtonArrow}>
+          →
+        </Text>
       </Pressable>
     </Animated.View>
   );
 }
 
 // =====================================================
-// Result Bar
+// Animated Result Bar
 // =====================================================
 
-type ResultBarProps = {
+type AnimatedResultBarProps = {
   label: string;
   percentage: number;
   fillColor: string;
+
+  // Allows Roast and Toast to animate one after another.
+  delay?: number;
 };
 
-function ResultBar({
+function AnimatedResultBar({
   label,
   percentage,
   fillColor,
-}: ResultBarProps) {
+  delay = 0,
+}: AnimatedResultBarProps) {
+  // Restricts invalid percentage values.
+  const safePercentage = Math.min(
+    Math.max(percentage, 0),
+    100,
+  );
+
+  // Controls the visual bar fill from zero to one.
+  const fillProgress = useRef(
+    new Animated.Value(0),
+  ).current;
+
+  // Stores the visible percentage number.
+  const [
+    displayedPercentage,
+    setDisplayedPercentage,
+  ] = useState(0);
+
+  useEffect(() => {
+    // Reset the bar whenever a new result loads.
+    fillProgress.stopAnimation();
+    fillProgress.setValue(0);
+    setDisplayedPercentage(0);
+
+    // Updates the percentage label during the animation.
+    const listenerId =
+      fillProgress.addListener(
+        ({ value }) => {
+          setDisplayedPercentage(
+            Math.round(
+              value *
+                safePercentage,
+            ),
+          );
+        },
+      );
+
+    // Smoothly fills the result bar.
+    Animated.timing(
+      fillProgress,
+      {
+        toValue: 1,
+        duration: 720,
+        delay,
+        easing:
+          Easing.out(
+            Easing.cubic,
+          ),
+        useNativeDriver: false,
+      },
+    ).start();
+
+    return () => {
+      fillProgress.removeListener(
+        listenerId,
+      );
+    };
+  }, [
+    delay,
+    fillProgress,
+    safePercentage,
+  ]);
+
+  // Converts the animated value into a percentage width.
+  const animatedWidth =
+    fillProgress.interpolate({
+      inputRange: [0, 1],
+
+      outputRange: [
+        "0%",
+        `${safePercentage}%`,
+      ],
+    });
+
   return (
     <View style={styles.resultSection}>
+      {/* Label and animated number */}
       <View style={styles.resultLabelRow}>
-        <Text style={styles.resultLabel}>{label}</Text>
+        <Text style={styles.resultLabel}>
+          {label}
+        </Text>
 
-        <Text style={styles.resultPercentage}>
-          {percentage}%
+        <Text
+          style={
+            styles.resultPercentage
+          }
+        >
+          {displayedPercentage}%
         </Text>
       </View>
 
-      <View style={styles.resultBarBackground}>
-        <View
+      {/* Empty bar track */}
+      <View
+        style={
+          styles.resultBarBackground
+        }
+      >
+        {/* Animated colored fill */}
+        <Animated.View
           style={[
             styles.resultBarFill,
+
             {
-              width: `${percentage}%`,
-              backgroundColor: fillColor,
+              width: animatedWidth,
+              backgroundColor:
+                fillColor,
             },
           ]}
         />
@@ -246,6 +385,9 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontSize: 16,
     fontWeight: "900",
+
+    minWidth: 44,
+    textAlign: "right",
   },
 
   resultBarBackground: {
@@ -262,11 +404,14 @@ const styles = StyleSheet.create({
 
   commentCard: {
     backgroundColor: Colors.surface,
+
     borderColor: Colors.border,
     borderWidth: 1,
     borderLeftWidth: 5,
     borderRadius: Radius.lg,
+
     padding: 18,
+
     marginTop: 7,
     marginBottom: 20,
   },
@@ -288,6 +433,7 @@ const styles = StyleSheet.create({
   nextButton: {
     backgroundColor: Colors.textPrimary,
     borderRadius: Radius.pill,
+
     paddingVertical: 17,
     paddingHorizontal: 25,
 
@@ -300,7 +446,12 @@ const styles = StyleSheet.create({
 
   buttonPressed: {
     opacity: 0.78,
-    transform: [{ scale: 0.985 }],
+
+    transform: [
+      {
+        scale: 0.985,
+      },
+    ],
   },
 
   nextButtonText: {

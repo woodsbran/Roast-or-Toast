@@ -1,107 +1,143 @@
 // =====================================================
- // File: progressStorage.ts
- //
- // Purpose:
- // Saves and restores Roast or Toast player progress.
- //
- // The saved data includes:
- // • Heat
- // • Level
- // • Roast and Toast totals
- // • Majority matches
- // • Current and best streak
- // • Guess the Crowd totals
- //
- // AsyncStorage saves data locally on the device.
- //
- // Project: Roast or Toast
- // =====================================================
+// File: progressStorage.ts
+//
+// Purpose:
+// Saves and restores Roast or Toast player progress.
+//
+// Permanent saved progress includes:
+// • Heat
+// • Level
+// • Roast and Toast totals
+// • Majority matches
+// • Best streak
+// • Guess the Crowd totals
+//
+// Current streak is also stored so Continue Session can
+// restore it. Starting a new game resets only the current
+// streak while preserving permanent progress.
+//
+// Project: Roast or Toast
+// =====================================================
 
- import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
- import type { PlayerProgress } from "./progressTypes";
+import type { PlayerProgress } from "./progressTypes";
 
- // Unique storage key used only for player progress.
- const PLAYER_PROGRESS_STORAGE_KEY =
-   "@roast_or_toast/player_progress";
+// Unique storage key used only for player progress.
+const PLAYER_PROGRESS_STORAGE_KEY =
+  "@roast_or_toast/player_progress";
 
- // =====================================================
- // Save Progress
- // =====================================================
+// =====================================================
+// Save Progress
+// =====================================================
 
- // Converts the progress object into JSON and saves it
- // locally on the player's device.
- export async function savePlayerProgress(
-   progress: PlayerProgress,
- ): Promise<void> {
-   try {
-     const progressJson = JSON.stringify(progress);
+// Converts the progress object into JSON and saves it
+// locally on the player's device.
+export async function savePlayerProgress(
+  progress: PlayerProgress,
+): Promise<void> {
+  try {
+    const progressJson = JSON.stringify(progress);
 
-     await AsyncStorage.setItem(
-       PLAYER_PROGRESS_STORAGE_KEY,
-       progressJson,
-     );
-   } catch (error) {
-     // Saving should never crash gameplay.
-     //
-     // The error is logged so it can still be found during
-     // development.
-     console.error(
-       "Unable to save player progress:",
-       error,
-     );
-   }
- }
+    await AsyncStorage.setItem(
+      PLAYER_PROGRESS_STORAGE_KEY,
+      progressJson,
+    );
+  } catch (error) {
+    // Storage problems should never crash gameplay.
+    console.error(
+      "Unable to save player progress:",
+      error,
+    );
+  }
+}
 
- // =====================================================
- // Load Progress
- // =====================================================
+// =====================================================
+// Load Progress
+// =====================================================
 
- // Reads saved progress from the device.
- //
- // Returns null when no saved progress exists yet.
- export async function loadPlayerProgress(): Promise<
-   PlayerProgress | null
- > {
-   try {
-     const savedProgress = await AsyncStorage.getItem(
-       PLAYER_PROGRESS_STORAGE_KEY,
-     );
+// Reads saved progress from the device.
+//
+// Returns null when the player has no saved progress yet.
+export async function loadPlayerProgress(): Promise<
+  PlayerProgress | null
+> {
+  try {
+    const savedProgress = await AsyncStorage.getItem(
+      PLAYER_PROGRESS_STORAGE_KEY,
+    );
 
-     if (!savedProgress) {
-       return null;
-     }
+    if (!savedProgress) {
+      return null;
+    }
 
-     return JSON.parse(savedProgress) as PlayerProgress;
-   } catch (error) {
-     // Invalid or unavailable saved data should not stop
-     // the app from opening.
-     console.error(
-       "Unable to load player progress:",
-       error,
-     );
+    return JSON.parse(savedProgress) as PlayerProgress;
+  } catch (error) {
+    console.error(
+      "Unable to load player progress:",
+      error,
+    );
 
-     return null;
-   }
- }
+    return null;
+  }
+}
 
- // =====================================================
- // Clear Progress
- // =====================================================
+// =====================================================
+// Reset Current Session Streak
+// =====================================================
 
- // Removes all saved player progress.
- //
- // This is useful for development and may later support a
- // Reset Progress option in Settings.
- export async function clearSavedPlayerProgress(): Promise<void> {
-   try {
-     await AsyncStorage.removeItem(
-       PLAYER_PROGRESS_STORAGE_KEY,
-     );
-   } catch (error) {
-     console.error(
-       "Unable to clear player progress:",
-       error,
-     );
-   }
- }
+// Resets only the player's active majority-match streak.
+//
+// This is used when the player starts a new game.
+//
+// The following permanent information remains untouched:
+// • Total Heat
+// • Level
+// • Best streak
+// • Roast and Toast totals
+// • Guess the Crowd totals
+export async function resetSavedCurrentStreak(): Promise<void> {
+  try {
+    const savedProgress = await loadPlayerProgress();
+
+    // A first-time player may not have any stored
+    // progress yet.
+    if (!savedProgress) {
+      return;
+    }
+
+    const updatedProgress: PlayerProgress = {
+      ...savedProgress,
+      currentStreak: 0,
+    };
+
+    await savePlayerProgress(updatedProgress);
+  } catch (error) {
+    console.error(
+      "Unable to reset the current streak:",
+      error,
+    );
+  }
+}
+
+// =====================================================
+// Clear All Progress
+// =====================================================
+
+// Removes all saved player progress.
+//
+// This is intended for development or a future Reset
+// Profile option. Starting a new game should not call
+// this function.
+export async function clearSavedPlayerProgress(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(
+      PLAYER_PROGRESS_STORAGE_KEY,
+    );
+  } catch (error) {
+    console.error(
+      "Unable to clear player progress:",
+      error,
+    );
+  }
+}

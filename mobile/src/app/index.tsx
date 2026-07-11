@@ -4,14 +4,18 @@
 // Screen: Home
 //
 // Purpose:
-// Introduces the Roast or Toast brand and allows the
-// player to:
+// Introduces the Roast or Toast brand and provides two
+// clear gameplay actions:
 //
-// • Continue a locally saved game session
-// • Start a fresh game session
+// • Continue Session:
+//   Resumes the exact saved question or special screen.
 //
-// Player Heat, levels, and totals are saved separately
-// from the active question session.
+// • New Round:
+//   Starts a new shuffled round while keeping permanent
+//   Heat, level, totals, and best streak.
+//
+// Reset Progress will eventually live inside Settings,
+// away from the primary gameplay actions.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -36,6 +40,10 @@ import {
 } from "react-native";
 
 import {
+  resetSavedCurrentStreak,
+} from "../game/progressStorage";
+
+import {
   clearGameSession,
   loadGameSession,
 } from "../game/sessionStorage";
@@ -47,58 +55,59 @@ import {
 } from "../theme";
 
 export default function HomeScreen() {
-  // Controls the animation of the main action button.
+  // Controls the subtle press animation on the primary
+  // action button.
   const buttonScale = useRef(
     new Animated.Value(1),
   ).current;
 
-  // Tracks whether a resumable game exists locally.
+  // Determines whether a resumable session exists.
   const [
     hasSavedSession,
     setHasSavedSession,
   ] = useState(false);
 
-  // Prevents buttons from flashing into the wrong state
-  // before device storage has been checked.
+  // Prevents the wrong Home actions from briefly showing
+  // before local storage is checked.
   const [
     isCheckingSession,
     setIsCheckingSession,
   ] = useState(true);
 
   // =====================================================
-  // Check for a Saved Session
+  // Check for an Active Session
   // =====================================================
 
-  // Runs whenever Home becomes the active screen.
+  // Runs whenever Home becomes the active route.
   //
-  // This matters because the player may return Home after
-  // creating or updating a session.
+  // This ensures Continue Session appears immediately
+  // after the player returns from gameplay.
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
-      const checkForSavedSession = async () => {
-        setIsCheckingSession(true);
+      const checkForSavedSession =
+        async () => {
+          setIsCheckingSession(true);
 
-        const savedSession =
-          await loadGameSession();
+          const savedSession =
+            await loadGameSession();
 
-        if (!isActive) {
-          return;
-        }
+          if (!isActive) {
+            return;
+          }
 
-        setHasSavedSession(
-          Boolean(
-            savedSession?.hasActiveSession,
-          ),
-        );
+          setHasSavedSession(
+            Boolean(
+              savedSession?.hasActiveSession,
+            ),
+          );
 
-        setIsCheckingSession(false);
-      };
+          setIsCheckingSession(false);
+        };
 
       void checkForSavedSession();
 
-      // Prevents state updates after Home loses focus.
       return () => {
         isActive = false;
       };
@@ -109,7 +118,6 @@ export default function HomeScreen() {
   // Button Animation
   // =====================================================
 
-  // Slightly shrinks the main button when pressed.
   const handlePressIn = () => {
     Animated.spring(buttonScale, {
       toValue: 0.96,
@@ -119,7 +127,6 @@ export default function HomeScreen() {
     }).start();
   };
 
-  // Returns the main button to its normal size.
   const handlePressOut = () => {
     Animated.spring(buttonScale, {
       toValue: 1,
@@ -130,41 +137,47 @@ export default function HomeScreen() {
   };
 
   // =====================================================
-  // Session Navigation
+  // Continue Session
   // =====================================================
 
-  // Opens the saved session from the same question,
-  // result screen, or special event.
+  // Resumes the exact saved question, result screen, or
+  // special gameplay event.
   const handleContinueSession = () => {
     router.push({
       pathname: "/scenario",
+
       params: {
         mode: "continue",
       },
     });
   };
 
-  // Removes only the active session and begins a new
-  // shuffled game.
+  // =====================================================
+  // New Round
+  // =====================================================
+
+  // Starts a new shuffled gameplay round.
   //
-  // Permanent progress such as Heat and level remains.
-  const handleStartFresh = async () => {
+  // Keeps:
+  // • Total Heat
+  // • Level
+  // • Best streak
+  // • Lifetime Roast and Toast counts
+  // • Guess the Crowd statistics
+  //
+  // Resets:
+  // • Current question deck
+  // • Current session position
+  // • Current streak
+  const handleNewRound = async () => {
     await clearGameSession();
+    await resetSavedCurrentStreak();
 
     setHasSavedSession(false);
 
     router.push({
       pathname: "/scenario",
-      params: {
-        mode: "fresh",
-      },
-    });
-  };
 
-  // Used when there is no saved session yet.
-  const handleReadyPress = () => {
-    router.push({
-      pathname: "/scenario",
       params: {
         mode: "fresh",
       },
@@ -177,24 +190,20 @@ export default function HomeScreen() {
           Themed Background
       ================================================= */}
 
-      {/* Roast backdrop near the top */}
+      {/* Roast backdrop */}
       <View style={styles.roastBackdrop}>
         <Text style={styles.roastSymbol}>
           🔥
         </Text>
 
-        <Text
-          style={styles.roastBackdropText}
-        >
+        <Text style={styles.roastBackdropText}>
           ROAST
         </Text>
       </View>
 
-      {/* Toast backdrop near the bottom */}
+      {/* Toast backdrop */}
       <View style={styles.toastBackdrop}>
-        <Text
-          style={styles.toastBackdropText}
-        >
+        <Text style={styles.toastBackdropText}>
           TOAST
         </Text>
 
@@ -203,7 +212,7 @@ export default function HomeScreen() {
         </Text>
       </View>
 
-      {/* Small decorative labels */}
+      {/* Decorative debate labels */}
       <View style={styles.hotTakeBadge}>
         <Text style={styles.hotTakeText}>
           HOT TAKE
@@ -232,30 +241,24 @@ export default function HomeScreen() {
               or
             </Text>
 
-            <Text
-              style={styles.logoSecondary}
-            >
+            <Text style={styles.logoSecondary}>
               Toast
             </Text>
           </View>
         </View>
 
         {/* Conversational greeting */}
-        <View
-          style={styles.taglineContainer}
-        >
+        <View style={styles.taglineContainer}>
           <Text style={styles.tagline}>
             Alright...
           </Text>
 
-          <Text
-            style={styles.taglineEmphasis}
-          >
+          <Text style={styles.taglineEmphasis}>
             let&apos;s be honest.
           </Text>
         </View>
 
-        {/* Storage check placeholder */}
+        {/* Brief storage check */}
         {isCheckingSession && (
           <Text style={styles.loadingText}>
             Checking your last round...
@@ -263,7 +266,7 @@ export default function HomeScreen() {
         )}
 
         {/* =================================================
-            No Saved Session
+            No Active Session
         ================================================= */}
 
         {!isCheckingSession &&
@@ -271,6 +274,7 @@ export default function HomeScreen() {
             <Animated.View
               style={[
                 styles.buttonWrapper,
+
                 {
                   transform: [
                     {
@@ -282,29 +286,22 @@ export default function HomeScreen() {
             >
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Begin a new Roast or Toast game"
-                onPress={handleReadyPress}
+                accessibilityLabel="Start a new Roast or Toast round"
+                onPress={handleNewRound}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 style={({ pressed }) => [
                   styles.primaryButton,
+
                   pressed &&
                     styles.primaryButtonPressed,
                 ]}
               >
-                <Text
-                  style={
-                    styles.primaryButtonText
-                  }
-                >
+                <Text style={styles.primaryButtonText}>
                   Ready
                 </Text>
 
-                <Text
-                  style={
-                    styles.primaryButtonArrow
-                  }
-                >
+                <Text style={styles.primaryButtonArrow}>
                   →
                 </Text>
               </Pressable>
@@ -312,16 +309,17 @@ export default function HomeScreen() {
           )}
 
         {/* =================================================
-            Saved Session Available
+            Active Session Available
         ================================================= */}
 
         {!isCheckingSession &&
           hasSavedSession && (
             <View style={styles.sessionActions}>
-              {/* Resumes the saved session */}
+              {/* Primary action: Resume gameplay */}
               <Animated.View
                 style={[
                   styles.fullWidthButtonWrapper,
+
                   {
                     transform: [
                       {
@@ -334,24 +332,19 @@ export default function HomeScreen() {
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Continue saved game session"
-                  onPress={
-                    handleContinueSession
-                  }
+                  onPress={handleContinueSession}
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
                   style={({ pressed }) => [
                     styles.primaryButton,
                     styles.fullWidthButton,
+
                     pressed &&
                       styles.primaryButtonPressed,
                   ]}
                 >
-                  <View>
-                    <Text
-                      style={
-                        styles.primaryButtonText
-                      }
-                    >
+                  <View style={styles.actionText}>
+                    <Text style={styles.primaryButtonText}>
                       Continue Session
                     </Text>
 
@@ -364,41 +357,40 @@ export default function HomeScreen() {
                     </Text>
                   </View>
 
-                  <Text
-                    style={
-                      styles.primaryButtonArrow
-                    }
-                  >
+                  <Text style={styles.primaryButtonArrow}>
                     →
                   </Text>
                 </Pressable>
               </Animated.View>
 
-              {/* Starts a new session without deleting Heat */}
+              {/* Secondary action: Begin new questions */}
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Start a fresh game session"
-                onPress={handleStartFresh}
+                accessibilityLabel="Start a new round"
+                onPress={handleNewRound}
                 style={({ pressed }) => [
-                  styles.secondaryButton,
+                  styles.newRoundButton,
+
                   pressed &&
                     styles.secondaryButtonPressed,
                 ]}
               >
-                <Text
-                  style={
-                    styles.secondaryButtonText
-                  }
-                >
-                  Start Fresh
-                </Text>
+                <View style={styles.actionText}>
+                  <Text style={styles.newRoundButtonText}>
+                    New Round
+                  </Text>
 
-                <Text
-                  style={
-                    styles.secondaryButtonSubtext
-                  }
-                >
-                  Your Heat and level stay saved.
+                  <Text
+                    style={
+                      styles.newRoundButtonSubtext
+                    }
+                  >
+                    New questions. Same Heat and level.
+                  </Text>
+                </View>
+
+                <Text style={styles.newRoundButtonArrow}>
+                  ↻
                 </Text>
               </Pressable>
             </View>
@@ -413,17 +405,13 @@ export default function HomeScreen() {
 // =====================================================
 
 const styles = StyleSheet.create({
-  // Main screen background.
   container: {
     flex: 1,
-    backgroundColor:
-      Colors.background,
-    paddingHorizontal:
-      Spacing.lg,
+    backgroundColor: Colors.background,
+    paddingHorizontal: Spacing.lg,
     overflow: "hidden",
   },
 
-  // Centers the main content vertically.
   content: {
     flex: 1,
     justifyContent: "center",
@@ -431,7 +419,7 @@ const styles = StyleSheet.create({
   },
 
   // =====================================================
-  // Brand Title
+  // Logo
   // =====================================================
 
   logoContainer: {
@@ -496,12 +484,12 @@ const styles = StyleSheet.create({
   },
 
   // =====================================================
-  // Session Actions
+  // Action Layout
   // =====================================================
 
   sessionActions: {
     width: "100%",
-    gap: 13,
+    gap: 14,
   },
 
   buttonWrapper: {
@@ -516,14 +504,18 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
+  actionText: {
+    flex: 1,
+    paddingRight: 12,
+  },
+
   // =====================================================
   // Primary Button
   // =====================================================
 
   primaryButton: {
     minWidth: 188,
-    backgroundColor:
-      Colors.textPrimary,
+    backgroundColor: Colors.textPrimary,
     borderRadius: Radius.pill,
 
     paddingVertical: 17,
@@ -534,10 +526,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
 
     shadowColor: "#1D1D1F",
+
     shadowOffset: {
       width: 0,
       height: 9,
     },
+
     shadowOpacity: 0.17,
     shadowRadius: 16,
     elevation: 6,
@@ -568,10 +562,10 @@ const styles = StyleSheet.create({
   },
 
   // =====================================================
-  // Secondary Button
+  // New Round Button
   // =====================================================
 
-  secondaryButton: {
+  newRoundButton: {
     width: "100%",
     backgroundColor: Colors.surface,
 
@@ -581,28 +575,39 @@ const styles = StyleSheet.create({
 
     paddingVertical: 15,
     paddingHorizontal: 20,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  newRoundButtonText: {
+    color: Colors.textPrimary,
+    fontSize: 17,
+    fontWeight: "900",
+  },
+
+  newRoundButtonSubtext: {
+    color: Colors.textSecondary,
+    fontSize: 12,
+    fontWeight: "600",
+    marginTop: 3,
+  },
+
+  newRoundButtonArrow: {
+    color: Colors.roast,
+    fontSize: 25,
+    fontWeight: "800",
   },
 
   secondaryButtonPressed: {
-    opacity: 0.7,
+    opacity: 0.68,
+
     transform: [
       {
         scale: 0.985,
       },
     ],
-  },
-
-  secondaryButtonText: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "900",
-  },
-
-  secondaryButtonSubtext: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    fontWeight: "600",
-    marginTop: 3,
   },
 
   // =====================================================
@@ -674,7 +679,7 @@ const styles = StyleSheet.create({
   },
 
   // =====================================================
-  // Small Debate Labels
+  // Decorative Labels
   // =====================================================
 
   hotTakeBadge: {
