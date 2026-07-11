@@ -10,22 +10,37 @@
 // • Roast or Toast branding
 // • Home button
 //
+// Navigation buttons use the shared Game Effects layer
+// so their feedback stays consistent.
+//
 // Project: Roast or Toast
 // =====================================================
 
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { Colors, Radius, Spacing } from "../theme";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+import { triggerNavigationEffect } from "../game/effects";
+
+import {
+  Colors,
+  Radius,
+  Spacing,
+} from "../theme";
 
 type ScenarioHeaderProps = {
-  // Accent color changes with the current category or mode.
+  // Accent color changes with the category or mode.
   accentColor: string;
 
-  // Controls the back button behavior.
+  // Controls the back button.
   onBackPress: () => void;
 
-  // Returns directly to the Home screen.
+  // Returns directly to Home.
   onHomePress: () => void;
 };
 
@@ -34,13 +49,25 @@ export default function ScenarioHeader({
   onBackPress,
   onHomePress,
 }: ScenarioHeaderProps) {
+  // Provides touch feedback before going back.
+  const handleBackPress = () => {
+    triggerNavigationEffect();
+    onBackPress();
+  };
+
+  // Provides touch feedback before returning Home.
+  const handleHomePress = () => {
+    triggerNavigationEffect();
+    onHomePress();
+  };
+
   return (
     <View style={styles.container}>
       {/* Back button */}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Go back"
-        onPress={onBackPress}
+        onPress={handleBackPress}
         style={({ pressed }) => [
           styles.navigationButton,
           pressed && styles.buttonPressed,
@@ -64,14 +91,16 @@ export default function ScenarioHeader({
           ]}
         />
 
-        <Text style={styles.logoText}>Roast or Toast</Text>
+        <Text style={styles.logoText}>
+          Roast or Toast
+        </Text>
       </View>
 
       {/* Home button */}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Return to Home"
-        onPress={onHomePress}
+        onPress={handleHomePress}
         style={({ pressed }) => [
           styles.navigationButton,
           pressed && styles.buttonPressed,

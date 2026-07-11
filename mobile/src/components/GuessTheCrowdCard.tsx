@@ -8,12 +8,10 @@
 //
 // 1. Predict what most people chose.
 // 2. Give their own personal vote.
-// 3. Compare both choices with the community results.
-// 4. Earn Heat for completing the round.
+// 3. Compare both choices with the results.
+// 4. Earn Heat.
 //
-// Navigation:
-// • Back returns to the previous gameplay screen.
-// • Home returns directly to the landing screen.
+// The shared Game Effects layer controls all haptics.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -29,6 +27,14 @@ import {
 } from "react-native";
 
 import type { Moment } from "../data/types";
+
+import {
+  triggerCrowdPredictionEffect,
+  triggerCrowdResultEffect,
+  triggerNavigationEffect,
+  triggerRoastEffect,
+  triggerToastEffect,
+} from "../game/effects";
 
 import type {
   CrowdGuessProgressResult,
@@ -51,9 +57,7 @@ type GuessStage =
   | "personalVote"
   | "results";
 
-// Information required by this special mode.
 type GuessTheCrowdCardProps = {
-  // Fresh Moment used only for this mini-game.
   moment: Moment;
 
   // Records the crowd prediction and awards Heat.
@@ -63,13 +67,13 @@ type GuessTheCrowdCardProps = {
     toastPercentage: number,
   ) => CrowdGuessProgressResult;
 
-  // Continues regular gameplay after the results.
+  // Continues regular gameplay.
   onContinue: () => void;
 
   // Returns to the previous gameplay screen.
   onBackPress: () => void;
 
-  // Returns directly to Home.
+  // Returns directly Home.
   onHomePress: () => void;
 };
 
@@ -80,11 +84,11 @@ export default function GuessTheCrowdCard({
   onBackPress,
   onHomePress,
 }: GuessTheCrowdCardProps) {
-  // Tracks which part of the mini-game is visible.
+  // Tracks the currently visible mini-game stage.
   const [stage, setStage] =
     useState<GuessStage>("prediction");
 
-  // Stores what the player believes the crowd chose.
+  // Stores the player's crowd prediction.
   const [crowdPrediction, setCrowdPrediction] =
     useState<PlayerVote | null>(null);
 
@@ -92,11 +96,11 @@ export default function GuessTheCrowdCard({
   const [personalVote, setPersonalVote] =
     useState<PlayerVote | null>(null);
 
-  // Stores Heat and scoring information after results.
+  // Stores the resulting Heat and prediction outcome.
   const [progressResult, setProgressResult] =
     useState<CrowdGuessProgressResult | null>(null);
 
-  // Gets the correct styling for the current category.
+  // Gets category-specific styling.
   const categoryTheme =
     CategoryThemes[moment.category as CategoryName] ??
     CategoryThemes["Everyday Life"];
@@ -105,13 +109,12 @@ export default function GuessTheCrowdCard({
   // Prediction
   // =====================================================
 
-  // Saves what the player thinks the crowd selected.
-  //
-  // The actual result remains hidden until after the
-  // player gives their own opinion.
+  // Locks in what the player thinks the crowd selected.
   const handlePrediction = (
     choice: PlayerVote,
   ) => {
+    triggerCrowdPredictionEffect();
+
     setCrowdPrediction(choice);
     setStage("personalVote");
   };
@@ -120,13 +123,20 @@ export default function GuessTheCrowdCard({
   // Personal Vote
   // =====================================================
 
-  // Saves the player's personal vote, scores the crowd
-  // prediction, awards Heat, and reveals the results.
+  // Records the personal answer, scores the prediction,
+  // and reveals the results.
   const handlePersonalVote = (
     choice: PlayerVote,
   ) => {
     if (!crowdPrediction) {
       return;
+    }
+
+    // Roast and Toast receive different touch feedback.
+    if (choice === "roast") {
+      triggerRoastEffect();
+    } else {
+      triggerToastEffect();
     }
 
     const result = onRecordGuess(
@@ -138,6 +148,20 @@ export default function GuessTheCrowdCard({
     setPersonalVote(choice);
     setProgressResult(result);
     setStage("results");
+
+    // Wait briefly so the result feedback does not fire
+    // at the exact same moment as the vote feedback.
+    setTimeout(() => {
+      triggerCrowdResultEffect(
+        result.guessedCorrectly,
+      );
+    }, 300);
+  };
+
+  // Continues regular gameplay with a subtle tap.
+  const handleContinue = () => {
+    triggerNavigationEffect();
+    onContinue();
   };
 
   return (
@@ -151,7 +175,7 @@ export default function GuessTheCrowdCard({
         TOAST
       </Text>
 
-      {/* Soft category-colored background circle */}
+      {/* Soft category circle */}
       <View
         style={[
           styles.categoryCircle,
@@ -162,20 +186,17 @@ export default function GuessTheCrowdCard({
         ]}
       />
 
-      {/* Shared Back, brand, and Home navigation */}
+      {/* Shared gameplay navigation */}
       <ScenarioHeader
         accentColor={categoryTheme.accent}
         onBackPress={onBackPress}
         onHomePress={onHomePress}
       />
 
-      {/* Scrollable mini-game content */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
-        contentContainerStyle={
-          styles.scrollContent
-        }
+        contentContainerStyle={styles.scrollContent}
       >
         {/* Special mode badge */}
         <View
@@ -216,7 +237,7 @@ export default function GuessTheCrowdCard({
           {categoryTheme.label}
         </Text>
 
-        {/* Fresh, unseen Moment */}
+        {/* Fresh Moment */}
         <Text style={styles.question}>
           {moment.question}
         </Text>
@@ -264,19 +285,13 @@ export default function GuessTheCrowdCard({
         {stage === "personalVote" &&
           crowdPrediction && (
             <View>
-              {/* Keeps the saved prediction visible */}
-              <Text
-                style={
-                  styles.savedChoiceLabel
-                }
-              >
+              <Text style={styles.savedChoiceLabel}>
                 Your crowd prediction
               </Text>
 
               <Text
                 style={[
                   styles.savedChoice,
-
                   crowdPrediction === "roast"
                     ? styles.roastText
                     : styles.toastText,
@@ -291,42 +306,26 @@ export default function GuessTheCrowdCard({
                 Now, what do you think?
               </Text>
 
-              <Text
-                style={
-                  styles.stageDescription
-                }
-              >
+              <Text style={styles.stageDescription}>
                 Your answer can be completely different.
               </Text>
 
-              <View
-                style={
-                  styles.choiceContainer
-                }
-              >
+              <View style={styles.choiceContainer}>
                 <ChoiceButton
                   label="Roast"
-                  phrase={
-                    moment.roastPhrase
-                  }
+                  phrase={moment.roastPhrase}
                   type="roast"
                   onPress={() =>
-                    handlePersonalVote(
-                      "roast",
-                    )
+                    handlePersonalVote("roast")
                   }
                 />
 
                 <ChoiceButton
                   label="Toast"
-                  phrase={
-                    moment.toastPhrase
-                  }
+                  phrase={moment.toastPhrase}
                   type="toast"
                   onPress={() =>
-                    handlePersonalVote(
-                      "toast",
-                    )
+                    handlePersonalVote("toast")
                   }
                 />
               </View>
@@ -342,71 +341,42 @@ export default function GuessTheCrowdCard({
           personalVote &&
           progressResult && (
             <View>
-              <Text
-                style={
-                  styles.resultsHeading
-                }
-              >
+              <Text style={styles.resultsHeading}>
                 The People Have Spoken
               </Text>
 
               {/* Prediction and personal vote summary */}
-              <View
-                style={
-                  styles.choiceSummary
-                }
-              >
-                <View
-                  style={styles.summaryItem}
-                >
-                  <Text
-                    style={
-                      styles.summaryLabel
-                    }
-                  >
+              <View style={styles.choiceSummary}>
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>
                     Crowd guess
                   </Text>
 
                   <Text
                     style={[
                       styles.summaryValue,
-
-                      crowdPrediction ===
-                      "roast"
+                      crowdPrediction === "roast"
                         ? styles.roastText
                         : styles.toastText,
                     ]}
                   >
-                    {crowdPrediction ===
-                    "roast"
+                    {crowdPrediction === "roast"
                       ? "Roast"
                       : "Toast"}
                   </Text>
                 </View>
 
-                <View
-                  style={
-                    styles.summaryDivider
-                  }
-                />
+                <View style={styles.summaryDivider} />
 
-                <View
-                  style={styles.summaryItem}
-                >
-                  <Text
-                    style={
-                      styles.summaryLabel
-                    }
-                  >
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>
                     Your vote
                   </Text>
 
                   <Text
                     style={[
                       styles.summaryValue,
-
-                      personalVote ===
-                      "roast"
+                      personalVote === "roast"
                         ? styles.roastText
                         : styles.toastText,
                     ]}
@@ -420,42 +390,26 @@ export default function GuessTheCrowdCard({
 
               {/* Heat reward */}
               <View style={styles.heatCard}>
-                <Text
-                  style={
-                    styles.heatAmount
-                  }
-                >
-                  🔥 +
-                  {progressResult.heatEarned}{" "}
-                  Heat
+                <Text style={styles.heatAmount}>
+                  🔥 +{progressResult.heatEarned} Heat
                 </Text>
 
-                <Text
-                  style={
-                    styles.heatMessage
-                  }
-                >
+                <Text style={styles.heatMessage}>
                   {progressResult.guessedCorrectly
                     ? "You called it."
                     : "The crowd surprised you."}
                 </Text>
               </View>
 
-              {/* Roast result */}
               <ResultBar
                 label="🔥 Roast"
-                percentage={
-                  moment.roastPercentage
-                }
+                percentage={moment.roastPercentage}
                 fillColor={Colors.roast}
               />
 
-              {/* Toast result */}
               <ResultBar
                 label="♥ Toast"
-                percentage={
-                  moment.toastPercentage
-                }
+                percentage={moment.toastPercentage}
                 fillColor={Colors.toast}
               />
 
@@ -481,11 +435,7 @@ export default function GuessTheCrowdCard({
                   TOP COMMENT
                 </Text>
 
-                <Text
-                  style={
-                    styles.commentText
-                  }
-                >
+                <Text style={styles.commentText}>
                   “{moment.topComment}”
                 </Text>
               </View>
@@ -494,27 +444,18 @@ export default function GuessTheCrowdCard({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Continue playing"
-                onPress={onContinue}
+                onPress={handleContinue}
                 style={({ pressed }) => [
                   styles.continueButton,
-
                   pressed &&
                     styles.buttonPressed,
                 ]}
               >
-                <Text
-                  style={
-                    styles.continueButtonText
-                  }
-                >
+                <Text style={styles.continueButtonText}>
                   Keep Going
                 </Text>
 
-                <Text
-                  style={
-                    styles.continueArrow
-                  }
-                >
+                <Text style={styles.continueArrow}>
                   →
                 </Text>
               </Pressable>
@@ -527,9 +468,6 @@ export default function GuessTheCrowdCard({
 
 // =====================================================
 // Choice Button
-//
-// Reusable Roast or Toast button used during prediction
-// and personal voting.
 // =====================================================
 
 type ChoiceButtonProps = {
@@ -558,7 +496,6 @@ function ChoiceButton({
       <Text
         style={[
           styles.choiceIcon,
-
           type === "toast" &&
             styles.toastIcon,
         ]}
@@ -566,18 +503,12 @@ function ChoiceButton({
         {type === "roast" ? "🔥" : "♥"}
       </Text>
 
-      <View
-        style={
-          styles.choiceTextContainer
-        }
-      >
+      <View style={styles.choiceTextContainer}>
         <Text style={styles.choiceLabel}>
           {label}
         </Text>
 
-        <Text
-          style={styles.choicePhrase}
-        >
+        <Text style={styles.choicePhrase}>
           {phrase}
         </Text>
       </View>
@@ -602,27 +533,17 @@ function ResultBar({
 }: ResultBarProps) {
   return (
     <View style={styles.resultSection}>
-      <View
-        style={styles.resultLabelRow}
-      >
+      <View style={styles.resultLabelRow}>
         <Text style={styles.resultLabel}>
           {label}
         </Text>
 
-        <Text
-          style={
-            styles.resultPercentage
-          }
-        >
+        <Text style={styles.resultPercentage}>
           {percentage}%
         </Text>
       </View>
 
-      <View
-        style={
-          styles.resultBarBackground
-        }
-      >
+      <View style={styles.resultBarBackground}>
         <View
           style={[
             styles.resultBarFill,
@@ -656,7 +577,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
-
     paddingHorizontal: Spacing.lg,
     paddingTop: 18,
     paddingBottom: 48,
@@ -664,15 +584,11 @@ const styles = StyleSheet.create({
 
   modeBadge: {
     alignSelf: "flex-start",
-
     borderWidth: 1.5,
     borderRadius: Radius.pill,
-
     paddingVertical: 7,
     paddingHorizontal: 15,
-
     marginBottom: 20,
-
     transform: [{ rotate: "-2deg" }],
   },
 
@@ -720,16 +636,12 @@ const styles = StyleSheet.create({
 
   choiceButton: {
     minHeight: 82,
-
     backgroundColor: Colors.surface,
-
     borderColor: Colors.border,
     borderWidth: 1.5,
     borderRadius: Radius.lg,
-
     paddingVertical: 15,
     paddingHorizontal: 18,
-
     flexDirection: "row",
     alignItems: "center",
   },
@@ -791,16 +703,12 @@ const styles = StyleSheet.create({
 
   choiceSummary: {
     backgroundColor: Colors.surface,
-
     borderColor: Colors.border,
     borderWidth: 1,
     borderRadius: Radius.lg,
-
     paddingVertical: 15,
     paddingHorizontal: 18,
-
     marginBottom: 16,
-
     flexDirection: "row",
     alignItems: "center",
   },
@@ -832,14 +740,11 @@ const styles = StyleSheet.create({
 
   heatCard: {
     backgroundColor: "#FFF1EC",
-
     borderColor: "#F4C9BE",
     borderWidth: 1,
     borderRadius: Radius.md,
-
     paddingVertical: 12,
     paddingHorizontal: 14,
-
     marginBottom: 20,
   },
 
@@ -900,14 +805,11 @@ const styles = StyleSheet.create({
 
   commentCard: {
     backgroundColor: Colors.surface,
-
     borderColor: Colors.border,
     borderWidth: 1,
     borderLeftWidth: 5,
     borderRadius: Radius.lg,
-
     padding: 16,
-
     marginTop: 5,
     marginBottom: 18,
   },
@@ -929,14 +831,11 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: Colors.textPrimary,
     borderRadius: Radius.pill,
-
     paddingVertical: 16,
     paddingHorizontal: 24,
-
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-
     marginBottom: 18,
   },
 
@@ -956,15 +855,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 145,
     right: -48,
-
     color: Colors.roast,
-
     fontSize: 91,
     fontWeight: "900",
     letterSpacing: -5,
-
     opacity: 0.07,
-
     transform: [{ rotate: "8deg" }],
   },
 
@@ -972,28 +867,21 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 50,
     left: -43,
-
     color: Colors.toast,
-
     fontSize: 89,
     fontWeight: "900",
     letterSpacing: -5,
-
     opacity: 0.07,
-
     transform: [{ rotate: "-8deg" }],
   },
 
   categoryCircle: {
     position: "absolute",
-
     width: 230,
     height: 230,
     borderRadius: 115,
-
     bottom: -105,
     right: -90,
-
     opacity: 0.75,
   },
 });

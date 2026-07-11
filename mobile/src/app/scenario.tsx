@@ -6,19 +6,16 @@
 // Purpose:
 // Controls the main Roast or Toast gameplay experience.
 //
-// Session Features:
+// Current Features:
 // • Starts a fresh shuffled session
 // • Restores a locally saved session
-// • Restores the exact regular question
-// • Restores regular results after voting
-// • Restores Quick Break, Guess the Crowd, or Recap
-// • Automatically saves session changes
-// • Saves before returning Home
-//
-// Note:
-// Guess the Crowd restores the same special Moment, but
-// currently restarts that mini-game at its prediction
-// stage.
+// • Saves the exact current question and results
+// • Waits for saved player progress before rendering
+// • Tracks Heat, levels, streaks, and titles
+// • Displays Guess the Crowd
+// • Displays Quick Break
+// • Displays Session Check-In
+// • Uses shared haptic effects for gameplay actions
 //
 // Project: Roast or Toast
 // =====================================================
@@ -54,13 +51,19 @@ import VoteButtons, {
   VoteChoice,
 } from "../components/VoteButtons";
 
+import { scenarios } from "../data/scenarios";
+import type { Moment } from "../data/types";
+
 import {
-  scenarios,
-} from "../data/scenarios";
+  triggerLevelUpEffect,
+  triggerNavigationEffect,
+  triggerRoastEffect,
+  triggerToastEffect,
+} from "../game/effects";
 
 import type {
-  Moment,
-} from "../data/types";
+  VoteProgressResult,
+} from "../game/progressTypes";
 
 import {
   clearGameSession,
@@ -72,10 +75,6 @@ import type {
   SavedGameSession,
   SavedIntermissionType,
 } from "../game/sessionTypes";
-
-import type {
-  VoteProgressResult,
-} from "../game/progressTypes";
 
 import {
   usePlayerProgress,
@@ -117,8 +116,7 @@ function shuffleMoments(
     currentIndex -= 1
   ) {
     const randomIndex = Math.floor(
-      Math.random() *
-        (currentIndex + 1),
+      Math.random() * (currentIndex + 1),
     );
 
     [
@@ -138,8 +136,7 @@ function shuffleMoments(
 function createFreshDeck(
   lastMomentId?: string,
 ): Moment[] {
-  const newDeck =
-    shuffleMoments(scenarios);
+  const newDeck = shuffleMoments(scenarios);
 
   if (
     lastMomentId &&
@@ -156,11 +153,11 @@ function createFreshDeck(
 }
 
 // =====================================================
-// Saved-ID Helpers
+// Saved Session Helpers
 // =====================================================
 
 // Converts saved Moment IDs back into complete Moment
-// objects using the current content library.
+// objects using the current scenario library.
 function restoreDeckFromIds(
   deckIds: string[],
 ): Moment[] {
@@ -179,7 +176,7 @@ function restoreDeckFromIds(
     );
 }
 
-// Finds one Moment from its saved ID.
+// Finds one complete Moment using its saved ID.
 function findMomentById(
   momentId: string | null,
 ): Moment | null {
@@ -189,13 +186,12 @@ function findMomentById(
 
   return (
     scenarios.find(
-      (moment) =>
-        moment.id === momentId,
+      (moment) => moment.id === momentId,
     ) ?? null
   );
 }
 
-// Keeps a restored index inside the available deck.
+// Keeps a restored deck index inside a valid range.
 function getSafeIndex(
   requestedIndex: number,
   deckLength: number,
@@ -215,7 +211,7 @@ function getSafeIndex(
 // =====================================================
 
 // Converts live gameplay state into a serializable object
-// that can be written to AsyncStorage.
+// that can be saved with AsyncStorage.
 function createSessionSnapshot({
   momentDeck,
   momentIndex,
@@ -280,8 +276,7 @@ function createSessionSnapshot({
 }
 
 export default function ScenarioScreen() {
-  // Determines whether Home requested a fresh session or
-  // a restored session.
+  // Home sends either "fresh" or "continue".
   const {
     mode,
   } = useLocalSearchParams<{
@@ -294,6 +289,11 @@ export default function ScenarioScreen() {
 
   const {
     progress,
+
+    // Prevents the screen from showing temporary zero
+    // values while saved progress is still loading.
+    hasLoadedProgress,
+
     addRegularVote,
     addCrowdGuess,
   } = usePlayerProgress();
@@ -364,8 +364,8 @@ export default function ScenarioScreen() {
   // Session Loading
   // =====================================================
 
-  // Prevents gameplay from displaying before saved data
-  // has been restored or a fresh session has been made.
+  // Prevents gameplay from appearing before a saved
+  // session is restored or a new one is created.
   const [
     sessionReady,
     setSessionReady,
@@ -414,8 +414,8 @@ export default function ScenarioScreen() {
 
     const initializeSession =
       async () => {
-        // A fresh request deliberately removes the old
-        // active session without touching Heat or level.
+        // Starting fresh removes only the active session.
+        // Heat and permanent progress remain saved.
         if (mode === "fresh") {
           await clearGameSession();
 
@@ -442,8 +442,8 @@ export default function ScenarioScreen() {
           return;
         }
 
-        // Continue requests attempt to restore the saved
-        // session.
+        // Continue attempts to restore the locally saved
+        // gameplay session.
         const savedSession =
           await loadGameSession();
 
@@ -460,8 +460,8 @@ export default function ScenarioScreen() {
               savedSession.deckIds,
             );
 
-          // If content was removed or changed and the old
-          // deck is no longer valid, begin a safe new deck.
+          // If saved content is no longer valid, create a
+          // safe replacement deck.
           const usableDeck =
             restoredDeck.length > 0
               ? restoredDeck
@@ -474,6 +474,7 @@ export default function ScenarioScreen() {
             );
 
           setMomentDeck(usableDeck);
+
           setMomentIndex(
             safeMomentIndex,
           );
@@ -540,8 +541,8 @@ export default function ScenarioScreen() {
             setResumePosition(null);
           }
 
-          // Restored results should be visible immediately
-          // rather than replaying from zero opacity.
+          // Restored result screens should already be
+          // visible rather than replaying the animation.
           if (
             savedSession.selectedVote &&
             savedSession.lastVoteResult
@@ -553,8 +554,8 @@ export default function ScenarioScreen() {
             resultsPosition.setValue(18);
           }
 
-          // A broken Guess state safely returns to the
-          // regular screen.
+          // A broken saved Guess the Crowd state safely
+          // returns to regular gameplay.
           if (
             savedSession.intermissionType ===
               "guess" &&
@@ -567,8 +568,8 @@ export default function ScenarioScreen() {
           return;
         }
 
-        // If Continue was requested but nothing valid was
-        // saved, begin a fresh session.
+        // If Continue was requested but no valid session
+        // exists, begin a new one safely.
         setMomentDeck(
           createFreshDeck(),
         );
@@ -580,6 +581,9 @@ export default function ScenarioScreen() {
         setIntermissionType(null);
         setGuessMoment(null);
         setResumePosition(null);
+
+        resultsOpacity.setValue(0);
+        resultsPosition.setValue(18);
 
         setSessionReady(true);
       };
@@ -634,7 +638,7 @@ export default function ScenarioScreen() {
   const currentMoment =
     momentDeck[momentIndex];
 
-  // Category styling associated with the current Moment.
+  // Category styling for the current Moment.
   const categoryTheme =
     CategoryThemes[
       currentMoment.category as CategoryName
@@ -648,6 +652,8 @@ export default function ScenarioScreen() {
   // Saves before returning to the previous route.
   const handleBackPress =
     async () => {
+      triggerNavigationEffect();
+
       const snapshot =
         createSessionSnapshot({
           momentDeck,
@@ -670,6 +676,8 @@ export default function ScenarioScreen() {
   // Saves before returning directly Home.
   const handleHomePress =
     async () => {
+      triggerNavigationEffect();
+
       const snapshot =
         createSessionSnapshot({
           momentDeck,
@@ -689,7 +697,7 @@ export default function ScenarioScreen() {
       router.replace("/");
     };
 
-  // Returns from a special event to the previous results
+  // Returns from a special screen to the previous results
   // without permanently skipping the event.
   const handleBackFromSpecialScreen =
     () => {
@@ -710,6 +718,7 @@ export default function ScenarioScreen() {
   // Animation Helpers
   // =====================================================
 
+  // Gives the selected voting button a quick bounce.
   const animateVoteButton = (
     animation: Animated.Value,
   ) => {
@@ -730,6 +739,7 @@ export default function ScenarioScreen() {
     ]).start();
   };
 
+  // Reveals results with a fade-and-rise animation.
   const revealResults = () => {
     resultsOpacity.setValue(0);
     resultsPosition.setValue(18);
@@ -760,6 +770,7 @@ export default function ScenarioScreen() {
   // Regular Voting
   // =====================================================
 
+  // Records either a Roast or Toast vote.
   const recordVote = (
     vote: Exclude<
       VoteChoice,
@@ -768,6 +779,7 @@ export default function ScenarioScreen() {
 
     animation: Animated.Value,
   ) => {
+    // Prevents changing the answer after voting.
     if (selectedVote) {
       return;
     }
@@ -779,6 +791,16 @@ export default function ScenarioScreen() {
         currentMoment.toastPercentage,
       );
 
+    // Level-up haptics fire slightly after the initial
+    // Roast or Toast tap feedback.
+    if (
+      progressResult.leveledUp
+    ) {
+      setTimeout(() => {
+        triggerLevelUpEffect();
+      }, 350);
+    }
+
     setSelectedVote(vote);
 
     setLastVoteResult(
@@ -789,14 +811,20 @@ export default function ScenarioScreen() {
     revealResults();
   };
 
+  // Records a Roast vote and triggers its stronger effect.
   const handleRoastVote = () => {
+    triggerRoastEffect();
+
     recordVote(
       "roast",
       roastScale,
     );
   };
 
+  // Records a Toast vote and triggers its softer effect.
   const handleToastVote = () => {
+    triggerToastEffect();
+
     recordVote(
       "toast",
       toastScale,
@@ -807,6 +835,7 @@ export default function ScenarioScreen() {
   // Regular Deck Movement
   // =====================================================
 
+  // Clears state from the previous regular Moment.
   const resetRegularMoment =
     () => {
       setSelectedVote(null);
@@ -816,6 +845,7 @@ export default function ScenarioScreen() {
       resultsPosition.setValue(18);
     };
 
+  // Moves to the next regular Moment.
   const moveToNextMoment =
     () => {
       const reachedEndOfDeck =
@@ -844,6 +874,8 @@ export default function ScenarioScreen() {
   // Guess the Crowd Preparation
   // =====================================================
 
+  // Selects a fresh Moment and stores the location where
+  // regular gameplay should resume afterward.
   const prepareGuessTheCrowd =
     () => {
       const nextIndex =
@@ -852,6 +884,7 @@ export default function ScenarioScreen() {
       const indexAfterGuess =
         momentIndex + 2;
 
+      // At least two unused Moments remain.
       if (
         indexAfterGuess <
         momentDeck.length
@@ -873,6 +906,7 @@ export default function ScenarioScreen() {
         return;
       }
 
+      // Exactly one unused Moment remains.
       if (
         nextIndex <
         momentDeck.length
@@ -901,6 +935,7 @@ export default function ScenarioScreen() {
         return;
       }
 
+      // Current Moment was the final deck item.
       const newDeck =
         createFreshDeck(
           currentMoment.id,
@@ -931,6 +966,7 @@ export default function ScenarioScreen() {
   // Special Event Selection
   // =====================================================
 
+  // Runs after the player presses Next on regular results.
   const handleNextMoment = () => {
     const newCompletedTotal =
       completedMoments + 1;
@@ -951,10 +987,17 @@ export default function ScenarioScreen() {
       return;
     }
 
+    // Break 1 = after 5 Moments.
+    // Break 2 = after 10 Moments.
+    // Break 3 = after 15 Moments.
     const breakNumber =
       newCompletedTotal /
       INTERMISSION_FREQUENCY;
 
+    // Repeating rhythm:
+    // 1. Guess the Crowd
+    // 2. Quick Break
+    // 3. Session Check-In
     const eventPosition =
       breakNumber % 3;
 
@@ -982,12 +1025,16 @@ export default function ScenarioScreen() {
 
   const handleContinueAfterQuickBreak =
     () => {
+      triggerNavigationEffect();
+
       setIntermissionType(null);
       moveToNextMoment();
     };
 
   const handleContinueAfterRecap =
     () => {
+      triggerNavigationEffect();
+
       setIntermissionType(null);
       moveToNextMoment();
     };
@@ -1019,14 +1066,34 @@ export default function ScenarioScreen() {
   // Loading Screen
   // =====================================================
 
-  if (!sessionReady) {
+  // Waits for both the active session and permanent
+  // player progress to load before rendering stats.
+  //
+  // This prevents Session Check-In from briefly showing
+  // Level 1, zero Heat, and zero vote totals.
+  if (
+    !sessionReady ||
+    !hasLoadedProgress
+  ) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingEmoji}>
+      <View
+        style={
+          styles.loadingContainer
+        }
+      >
+        <Text
+          style={
+            styles.loadingEmoji
+          }
+        >
           🔥
         </Text>
 
-        <Text style={styles.loadingTitle}>
+        <Text
+          style={
+            styles.loadingTitle
+          }
+        >
           Getting your takes together...
         </Text>
       </View>
@@ -1103,7 +1170,7 @@ export default function ScenarioScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Category decorations */}
+      {/* Category background word */}
       <View
         style={
           styles.categoryBackdrop
@@ -1123,6 +1190,7 @@ export default function ScenarioScreen() {
         </Text>
       </View>
 
+      {/* Soft category circle */}
       <View
         style={[
           styles.categoryCircle,
@@ -1134,6 +1202,7 @@ export default function ScenarioScreen() {
         ]}
       />
 
+      {/* Roast background decoration */}
       <View
         style={
           styles.roastBackdrop
@@ -1148,6 +1217,7 @@ export default function ScenarioScreen() {
         </Text>
       </View>
 
+      {/* Toast background decoration */}
       <View
         style={
           styles.toastBackdrop
@@ -1185,10 +1255,12 @@ export default function ScenarioScreen() {
           styles.scrollContent
         }
       >
+        {/* Player identity */}
         <PlayerBadge
           progress={progress}
         />
 
+        {/* Current Moment */}
         <ScenarioCard
           categoryLabel={
             categoryTheme.label
@@ -1207,6 +1279,7 @@ export default function ScenarioScreen() {
           }
         />
 
+        {/* Vote buttons */}
         {!selectedVote && (
           <VoteButtons
             roastPhrase={
@@ -1230,6 +1303,7 @@ export default function ScenarioScreen() {
           />
         )}
 
+        {/* Results */}
         {selectedVote &&
           lastVoteResult && (
             <ResultsCard
@@ -1261,9 +1335,10 @@ export default function ScenarioScreen() {
               translateY={
                 resultsPosition
               }
-              onNextPress={
-                handleNextMoment
-              }
+              onNextPress={() => {
+                triggerNavigationEffect();
+                handleNextMoment();
+              }}
             />
           )}
       </ScrollView>
@@ -1276,6 +1351,7 @@ export default function ScenarioScreen() {
 // =====================================================
 
 const styles = StyleSheet.create({
+  // Main screen.
   container: {
     flex: 1,
     backgroundColor:
@@ -1283,12 +1359,15 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
+  // Session and progress restoration screen.
   loadingContainer: {
     flex: 1,
     backgroundColor:
       Colors.background,
+
     alignItems: "center",
     justifyContent: "center",
+
     paddingHorizontal:
       Spacing.lg,
   },
@@ -1305,6 +1384,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
+  // Standard gameplay scroll area.
   scrollView: {
     flex: 1,
     zIndex: 2,

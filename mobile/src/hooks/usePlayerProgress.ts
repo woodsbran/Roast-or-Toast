@@ -2,28 +2,30 @@
 // File: usePlayerProgress.ts
 //
 // Purpose:
-// Provides screens and game modes with an easy way to
-// read and update player progress.
+// Loads, updates, and permanently saves the player's
+// Roast or Toast progress.
 //
-// Current Version:
-// Progress is stored in memory and resets after the app
-// fully reloads.
-//
-// Later:
-// • Save progress with AsyncStorage
-// • Resume the current game session
-// • Sync progress with a user account
+// Important:
+// The hook exposes hasLoadedProgress so gameplay screens
+// do not render temporary zero values while AsyncStorage
+// is still restoring the real progress.
 //
 // Project: Roast or Toast
 // =====================================================
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   createInitialProgress,
   recordCrowdGuess,
   recordRegularVote,
 } from "../game/progress";
+
+import {
+  clearSavedPlayerProgress,
+  loadPlayerProgress,
+  savePlayerProgress,
+} from "../game/progressStorage";
 
 import type {
   CrowdGuessProgressResult,
@@ -32,26 +34,95 @@ import type {
   VoteProgressResult,
 } from "../game/progressTypes";
 
+// Ensures older or incomplete saved objects still contain
+// every property expected by the current app version.
+function normalizeProgress(
+  savedProgress: PlayerProgress,
+): PlayerProgress {
+  const freshProgress = createInitialProgress();
+
+  return {
+    ...freshProgress,
+    ...savedProgress,
+  };
+}
+
 export function usePlayerProgress() {
-  // Stores the player's current progress during this app
-  // session.
-  const [progress, setProgress] = useState<PlayerProgress>(
-    createInitialProgress,
-  );
+  // Temporary starting values are used only until device
+  // storage finishes loading.
+  const [progress, setProgress] =
+    useState<PlayerProgress>(
+      createInitialProgress,
+    );
+
+  // Prevents gameplay and recap screens from displaying
+  // temporary zero values.
+  const [
+    hasLoadedProgress,
+    setHasLoadedProgress,
+  ] = useState(false);
 
   // =====================================================
-  // Regular Vote
+  // Restore Saved Progress
   // =====================================================
 
-  // Records a normal Roast or Toast vote.
-  //
-  // The function returns details such as Heat earned,
-  // majority match, and whether the player leveled up.
+  useEffect(() => {
+    let isMounted = true;
+
+    const restoreProgress = async () => {
+      const savedProgress =
+        await loadPlayerProgress();
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (savedProgress) {
+        setProgress(
+          normalizeProgress(savedProgress),
+        );
+      }
+
+      setHasLoadedProgress(true);
+    };
+
+    void restoreProgress();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // =====================================================
+  // Save Updated Progress
+  // =====================================================
+
+  useEffect(() => {
+    // This guard is critical.
+    //
+    // Without it, the initial zero-value object could
+    // overwrite the real saved progress before loading
+    // finishes.
+    if (!hasLoadedProgress) {
+      return;
+    }
+
+    void savePlayerProgress(progress);
+  }, [
+    progress,
+    hasLoadedProgress,
+  ]);
+
+  // =====================================================
+  // Regular Roast or Toast Vote
+  // =====================================================
+
   const addRegularVote = (
     vote: PlayerVote,
     roastPercentage: number,
     toastPercentage: number,
   ): VoteProgressResult => {
+    // Calculate from the latest available state.
     const result = recordRegularVote(
       progress,
       vote,
@@ -68,7 +139,6 @@ export function usePlayerProgress() {
   // Guess the Crowd
   // =====================================================
 
-  // Records the player's Guess the Crowd prediction.
   const addCrowdGuess = (
     prediction: PlayerVote,
     roastPercentage: number,
@@ -90,16 +160,25 @@ export function usePlayerProgress() {
   // Reset Progress
   // =====================================================
 
-  // Clears all temporary progress.
-  //
-  // This is useful during development and could later
-  // support a separate New Session option.
-  const resetProgress = () => {
-    setProgress(createInitialProgress());
-  };
+  const resetProgress =
+    async (): Promise<void> => {
+      const freshProgress =
+        createInitialProgress();
+
+      setProgress(freshProgress);
+
+      await clearSavedPlayerProgress();
+
+      // Save the new blank state so the app remains
+      // consistent after restarting.
+      await savePlayerProgress(
+        freshProgress,
+      );
+    };
 
   return {
     progress,
+    hasLoadedProgress,
     addRegularVote,
     addCrowdGuess,
     resetProgress,
