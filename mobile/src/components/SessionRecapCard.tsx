@@ -5,6 +5,11 @@
 // Gives the player a personality-filled summary after
 // completing a section of gameplay.
 //
+// The recap message changes based on:
+// • Roast versus Toast behavior
+// • Crowd-match percentage
+// • Current and best streak
+//
 // Navigation:
 // • Back returns to regular gameplay.
 // • Home returns directly to the landing screen.
@@ -26,8 +31,13 @@ import {
   View,
 } from "react-native";
 
-import type { PlayerProgress } from "../game/progressTypes";
-import { getPlayerTitle } from "../game/titles";
+import type {
+  PlayerProgress,
+} from "../game/progressTypes";
+
+import {
+  getPlayerTitle,
+} from "../game/titles";
 
 import {
   Colors,
@@ -39,7 +49,6 @@ import ScenarioHeader from "./ScenarioHeader";
 
 // Information required by the recap screen.
 type SessionRecapCardProps = {
-  // Player totals and current progression.
   progress: PlayerProgress;
 
   // Continues the active session.
@@ -52,6 +61,174 @@ type SessionRecapCardProps = {
   onHomePress: () => void;
 };
 
+// Personality message displayed near the top.
+type RecapMessage = {
+  heading: string;
+  message: string;
+  supportingText: string;
+};
+
+// =====================================================
+// Dynamic Recap Message
+// =====================================================
+
+// Builds a playful message based on the player's overall
+// behavior so the recap does not feel identical every
+// time it appears.
+function getRecapMessage(
+  progress: PlayerProgress,
+  crowdMatchPercentage: number,
+): RecapMessage {
+  const totalVotes =
+    progress.roastCount +
+    progress.toastCount;
+
+  const roastPercentage =
+    totalVotes > 0
+      ? Math.round(
+          (progress.roastCount /
+            totalVotes) *
+            100,
+        )
+      : 0;
+
+  const toastPercentage =
+    totalVotes > 0
+      ? Math.round(
+          (progress.toastCount /
+            totalVotes) *
+            100,
+        )
+      : 0;
+
+  // Strong Roast majority.
+  if (
+    totalVotes >= 5 &&
+    roastPercentage >= 75
+  ) {
+    return {
+      heading:
+        "You woke up choosing chaos.",
+
+      message:
+        "You roasted almost everything in sight.",
+
+      supportingText:
+        "At least you’re consistent.",
+    };
+  }
+
+  // Strong Toast majority.
+  if (
+    totalVotes >= 5 &&
+    toastPercentage >= 75
+  ) {
+    return {
+      heading:
+        "Look at you being nice.",
+
+      message:
+        "Apparently everybody gets grace today.",
+
+      supportingText:
+        "Suspicious, but kind of refreshing.",
+    };
+  }
+
+  // Very high agreement with the crowd.
+  if (
+    progress.momentsCompleted >= 5 &&
+    crowdMatchPercentage >= 80
+  ) {
+    return {
+      heading:
+        "You read the room.",
+
+      message:
+        "The crowd keeps agreeing with you.",
+
+      supportingText:
+        "Either you get people, or everyone is copying you.",
+    };
+  }
+
+  // Very low agreement with the crowd.
+  if (
+    progress.momentsCompleted >= 5 &&
+    crowdMatchPercentage <= 35
+  ) {
+    return {
+      heading:
+        "You said what you said.",
+
+      message:
+        "The crowd does not always understand your vision.",
+
+      supportingText:
+        "That sounds like their problem.",
+    };
+  }
+
+  // Strong active streak.
+  if (progress.currentStreak >= 5) {
+    return {
+      heading:
+        "Okay, mind reader.",
+
+      message:
+        "You keep calling the crowd correctly.",
+
+      supportingText:
+        "Do not let it go to your head.",
+    };
+  }
+
+  // Strong historical streak.
+  if (progress.bestStreak >= 8) {
+    return {
+      heading:
+        "The receipts are there.",
+
+      message:
+        "That best streak is doing a lot of talking.",
+
+      supportingText:
+        "You clearly know how people think.",
+    };
+  }
+
+  // Balanced Roast and Toast behavior.
+  if (
+    totalVotes >= 6 &&
+    Math.abs(
+      progress.roastCount -
+        progress.toastCount,
+    ) <= 2
+  ) {
+    return {
+      heading:
+        "A little Roast. A little Toast.",
+
+      message:
+        "You are keeping everybody guessing.",
+
+      supportingText:
+        "Balanced... or just unpredictable.",
+    };
+  }
+
+  // Default message.
+  return {
+    heading: "Well...",
+
+    message:
+      "That says a lot about you.",
+
+    supportingText:
+      "We are still deciding whether that is good or bad.",
+  };
+}
+
 export default function SessionRecapCard({
   progress,
   onContinue,
@@ -62,8 +239,8 @@ export default function SessionRecapCard({
   const playerTitle =
     getPlayerTitle(progress.level);
 
-  // Calculates how often the player's regular votes
-  // matched the community majority.
+  // Calculates how often regular votes matched the
+  // community majority.
   const crowdMatchPercentage =
     progress.momentsCompleted > 0
       ? Math.round(
@@ -72,6 +249,13 @@ export default function SessionRecapCard({
             100,
         )
       : 0;
+
+  // Builds the dynamic personality recap.
+  const recapMessage =
+    getRecapMessage(
+      progress,
+      crowdMatchPercentage,
+    );
 
   return (
     <View style={styles.container}>
@@ -106,39 +290,44 @@ export default function SessionRecapCard({
           </Text>
         </View>
 
+        {/* Dynamic personality message */}
         <Text style={styles.heading}>
-          Well...
+          {recapMessage.heading}
         </Text>
 
         <Text style={styles.subheading}>
-          That says a lot about you.
+          {recapMessage.message}
+        </Text>
+
+        <Text style={styles.supportingMessage}>
+          {recapMessage.supportingText}
         </Text>
 
         {/* Current player identity */}
         <View style={styles.identityCard}>
-          <Text
-            style={
-              styles.identityEyebrow
-            }
-          >
-            CURRENT ENERGY
-          </Text>
+          <View>
+            <Text style={styles.identityEyebrow}>
+              CURRENT ENERGY
+            </Text>
 
-          <Text
-            style={
-              styles.identityTitle
-            }
-          >
-            {playerTitle}
-          </Text>
+            <Text style={styles.identityTitle}>
+              {playerTitle}
+            </Text>
 
-          <Text
-            style={
-              styles.identityLevel
-            }
-          >
-            Level {progress.level}
-          </Text>
+            <Text style={styles.identityLevel}>
+              Level {progress.level}
+            </Text>
+          </View>
+
+          <View style={styles.identityHeat}>
+            <Text style={styles.identityHeatIcon}>
+              🔥
+            </Text>
+
+            <Text style={styles.identityHeatValue}>
+              {progress.totalHeat}
+            </Text>
+          </View>
         </View>
 
         {/* Session statistics */}
@@ -168,16 +357,28 @@ export default function SessionRecapCard({
           />
         </View>
 
-        {/* Total Heat earned */}
-        <View style={styles.heatSummary}>
-          <Text style={styles.heatLabel}>
-            HEAT COLLECTED
-          </Text>
+        {/* Guess the Crowd summary */}
+        {progress.crowdGuesses > 0 && (
+          <View style={styles.crowdGuessCard}>
+            <View>
+              <Text style={styles.crowdGuessLabel}>
+                GUESS THE CROWD
+              </Text>
 
-          <Text style={styles.heatValue}>
-            🔥 {progress.totalHeat}
-          </Text>
-        </View>
+              <Text style={styles.crowdGuessText}>
+                You called{" "}
+                {progress.correctCrowdGuesses}
+                {" of "}
+                {progress.crowdGuesses}
+                {" correctly."}
+              </Text>
+            </View>
+
+            <Text style={styles.crowdGuessEmoji}>
+              👀
+            </Text>
+          </View>
+        )}
 
         {/* Continues the current session */}
         <Pressable
@@ -191,19 +392,11 @@ export default function SessionRecapCard({
               styles.buttonPressed,
           ]}
         >
-          <Text
-            style={
-              styles.continueButtonText
-            }
-          >
+          <Text style={styles.continueButtonText}>
             Keep Going
           </Text>
 
-          <Text
-            style={
-              styles.continueArrow
-            }
-          >
+          <Text style={styles.continueArrow}>
             →
           </Text>
         </Pressable>
@@ -251,7 +444,10 @@ function StatItem({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+
+    backgroundColor:
+      Colors.background,
+
     overflow: "hidden",
   },
 
@@ -262,9 +458,10 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
 
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal:
+      Spacing.lg,
+
     paddingTop: 18,
     paddingBottom: 48,
   },
@@ -272,53 +469,86 @@ const styles = StyleSheet.create({
   badge: {
     alignSelf: "flex-start",
 
-    backgroundColor: Colors.surface,
+    backgroundColor:
+      Colors.surface,
 
-    borderColor: Colors.roast,
+    borderColor:
+      Colors.roast,
+
     borderWidth: 1.5,
     borderRadius: Radius.pill,
 
     paddingVertical: 7,
     paddingHorizontal: 15,
 
-    marginBottom: 25,
+    marginBottom: 22,
 
-    transform: [{ rotate: "-2deg" }],
+    transform: [
+      {
+        rotate: "-2deg",
+      },
+    ],
   },
 
   badgeText: {
     color: Colors.roast,
+
     fontSize: 11,
     fontWeight: "900",
+
     letterSpacing: 1.7,
   },
 
   heading: {
     color: Colors.textPrimary,
 
-    fontSize: 48,
+    fontSize: 38,
     fontWeight: "900",
-    letterSpacing: -2,
-    lineHeight: 52,
+
+    letterSpacing: -1.7,
+    lineHeight: 43,
+
+    marginBottom: 5,
   },
 
   subheading: {
     color: Colors.textPrimary,
 
-    fontSize: 27,
+    fontSize: 23,
     fontWeight: "800",
-    lineHeight: 35,
 
-    marginBottom: 28,
+    lineHeight: 30,
+
+    marginBottom: 6,
   },
 
+  supportingMessage: {
+    color: Colors.textSecondary,
+
+    fontSize: 14,
+    fontWeight: "600",
+
+    lineHeight: 21,
+
+    marginBottom: 24,
+  },
+
+  // =====================================================
+  // Identity Card
+  // =====================================================
+
   identityCard: {
-    backgroundColor: Colors.textPrimary,
+    backgroundColor:
+      Colors.textPrimary,
 
     borderRadius: Radius.lg,
 
-    padding: 20,
+    padding: 19,
     marginBottom: 18,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   identityEyebrow: {
@@ -326,6 +556,7 @@ const styles = StyleSheet.create({
 
     fontSize: 10,
     fontWeight: "900",
+
     letterSpacing: 1.5,
 
     marginBottom: 6,
@@ -333,16 +564,42 @@ const styles = StyleSheet.create({
 
   identityTitle: {
     color: Colors.white,
-    fontSize: 24,
+
+    fontSize: 22,
     fontWeight: "900",
   },
 
   identityLevel: {
     color: "#CFCFCF",
+
     fontSize: 13,
     fontWeight: "700",
+
     marginTop: 4,
   },
+
+  identityHeat: {
+    alignItems: "center",
+
+    marginLeft: 12,
+  },
+
+  identityHeatIcon: {
+    fontSize: 20,
+  },
+
+  identityHeatValue: {
+    color: Colors.white,
+
+    fontSize: 15,
+    fontWeight: "900",
+
+    marginTop: 3,
+  },
+
+  // =====================================================
+  // Statistics
+  // =====================================================
 
   statsGrid: {
     flexDirection: "row",
@@ -356,9 +613,12 @@ const styles = StyleSheet.create({
   statCard: {
     width: "48%",
 
-    backgroundColor: Colors.surface,
+    backgroundColor:
+      Colors.surface,
 
-    borderColor: Colors.border,
+    borderColor:
+      Colors.border,
+
     borderWidth: 1,
     borderRadius: Radius.lg,
 
@@ -372,25 +632,34 @@ const styles = StyleSheet.create({
 
   statValue: {
     color: Colors.textPrimary,
+
     fontSize: 24,
     fontWeight: "900",
   },
 
   statLabel: {
     color: Colors.textSecondary,
+
     fontSize: 11,
     fontWeight: "700",
+
     marginTop: 3,
   },
 
-  heatSummary: {
+  // =====================================================
+  // Guess the Crowd Summary
+  // =====================================================
+
+  crowdGuessCard: {
     backgroundColor: "#FFF1EC",
 
     borderColor: "#F4C9BE",
     borderWidth: 1,
     borderRadius: Radius.lg,
 
-    padding: 17,
+    paddingVertical: 15,
+    paddingHorizontal: 17,
+
     marginBottom: 20,
 
     flexDirection: "row",
@@ -398,22 +667,39 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  heatLabel: {
-    color: Colors.textPrimary,
-    fontSize: 11,
+  crowdGuessLabel: {
+    color: Colors.roast,
+
+    fontSize: 10,
     fontWeight: "900",
+
     letterSpacing: 1.2,
+
+    marginBottom: 4,
   },
 
-  heatValue: {
-    color: Colors.roast,
-    fontSize: 20,
-    fontWeight: "900",
+  crowdGuessText: {
+    color: Colors.textPrimary,
+
+    fontSize: 13,
+    fontWeight: "700",
   },
+
+  crowdGuessEmoji: {
+    fontSize: 24,
+    marginLeft: 14,
+  },
+
+  // =====================================================
+  // Continue Button
+  // =====================================================
 
   continueButton: {
-    backgroundColor: Colors.textPrimary,
-    borderRadius: Radius.pill,
+    backgroundColor:
+      Colors.textPrimary,
+
+    borderRadius:
+      Radius.pill,
 
     paddingVertical: 17,
     paddingHorizontal: 25,
@@ -427,23 +713,35 @@ const styles = StyleSheet.create({
 
   buttonPressed: {
     opacity: 0.76,
-    transform: [{ scale: 0.985 }],
+
+    transform: [
+      {
+        scale: 0.985,
+      },
+    ],
   },
 
   continueButtonText: {
     color: Colors.white,
+
     fontSize: 18,
     fontWeight: "900",
   },
 
   continueArrow: {
     color: Colors.white,
+
     fontSize: 23,
     fontWeight: "700",
   },
 
+  // =====================================================
+  // Background Decorations
+  // =====================================================
+
   roastBackdrop: {
     position: "absolute",
+
     top: 145,
     right: -50,
 
@@ -454,11 +752,16 @@ const styles = StyleSheet.create({
 
     opacity: 0.07,
 
-    transform: [{ rotate: "8deg" }],
+    transform: [
+      {
+        rotate: "8deg",
+      },
+    ],
   },
 
   toastBackdrop: {
     position: "absolute",
+
     bottom: 50,
     left: -45,
 
@@ -469,6 +772,10 @@ const styles = StyleSheet.create({
 
     opacity: 0.07,
 
-    transform: [{ rotate: "-8deg" }],
+    transform: [
+      {
+        rotate: "-8deg",
+      },
+    ],
   },
 });

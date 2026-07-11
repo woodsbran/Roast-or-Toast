@@ -2,19 +2,43 @@
 // File: LevelUpCard.tsx
 //
 // Purpose:
-// Celebrates a level increase.
+// Celebrates a player reaching a new level.
 //
-// A new title is only announced when the player's title
-// actually changes. Normal level increases still receive
-// a smaller celebration.
+// Celebration Types:
+// • Normal Level:
+//   Announces the new level and encourages the player.
+//
+// • Title Unlock:
+//   Announces the newly unlocked personality title.
+//
+// Animation:
+// • Card fades and rises into view
+// • Fire icon pops
+// • Main message scales into place
 //
 // Project: Roast or Toast
 // =====================================================
 
-import { StyleSheet, Text, View } from "react-native";
+import {
+  useEffect,
+  useRef,
+} from "react";
 
-import { getPlayerTitle } from "../game/titles";
-import { Colors, Radius } from "../theme";
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+import {
+  getPlayerTitle,
+} from "../game/titles";
+
+import {
+  Colors,
+  Radius,
+} from "../theme";
 
 // Information required by the level-up card.
 type LevelUpCardProps = {
@@ -24,34 +48,200 @@ type LevelUpCardProps = {
 export default function LevelUpCard({
   level,
 }: LevelUpCardProps) {
-  const currentTitle = getPlayerTitle(level);
+  const currentTitle =
+    getPlayerTitle(level);
 
-  // Compare the current title with the previous level.
+  // Compare the current title with the title from the
+  // previous level.
   //
   // When they differ, the player unlocked a new title.
   const previousTitle =
-    level > 1 ? getPlayerTitle(level - 1) : currentTitle;
+    level > 1
+      ? getPlayerTitle(level - 1)
+      : currentTitle;
 
-  const unlockedNewTitle = currentTitle !== previousTitle;
+  const unlockedNewTitle =
+    currentTitle !== previousTitle;
+
+  // =====================================================
+  // Animation Values
+  // =====================================================
+
+  const cardOpacity = useRef(
+    new Animated.Value(0),
+  ).current;
+
+  const cardTranslateY = useRef(
+    new Animated.Value(18),
+  ).current;
+
+  const iconScale = useRef(
+    new Animated.Value(0.45),
+  ).current;
+
+  const messageScale = useRef(
+    new Animated.Value(0.92),
+  ).current;
+
+  useEffect(() => {
+    // Reset values whenever a new level-up occurs.
+    cardOpacity.setValue(0);
+    cardTranslateY.setValue(18);
+    iconScale.setValue(0.45);
+    messageScale.setValue(0.92);
+
+    Animated.sequence([
+      // Reveal the card.
+      Animated.parallel([
+        Animated.timing(
+          cardOpacity,
+          {
+            toValue: 1,
+            duration: 220,
+            useNativeDriver: true,
+          },
+        ),
+
+        Animated.spring(
+          cardTranslateY,
+          {
+            toValue: 0,
+            speed: 18,
+            bounciness: 5,
+            useNativeDriver: true,
+          },
+        ),
+      ]),
+
+      // Pop the fire icon and message.
+      Animated.parallel([
+        Animated.spring(
+          iconScale,
+          {
+            toValue: 1.18,
+            speed: 24,
+            bounciness: 9,
+            useNativeDriver: true,
+          },
+        ),
+
+        Animated.spring(
+          messageScale,
+          {
+            toValue: 1,
+            speed: 20,
+            bounciness: 6,
+            useNativeDriver: true,
+          },
+        ),
+      ]),
+
+      // Settle the icon.
+      Animated.spring(
+        iconScale,
+        {
+          toValue: 1,
+          speed: 22,
+          bounciness: 4,
+          useNativeDriver: true,
+        },
+      ),
+    ]).start();
+  }, [
+    level,
+    cardOpacity,
+    cardTranslateY,
+    iconScale,
+    messageScale,
+  ]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.eyebrow}>
-        {unlockedNewTitle
-          ? "NEW TITLE UNLOCKED"
-          : "YOU HEATED UP"}
-      </Text>
+    <Animated.View
+      style={[
+        styles.container,
 
-      <Text style={styles.level}>Level {level}</Text>
+        {
+          opacity: cardOpacity,
 
-      {unlockedNewTitle ? (
-        <Text style={styles.title}>{currentTitle}</Text>
-      ) : (
-        <Text style={styles.message}>
-          Keep bringing the Heat.
+          transform: [
+            {
+              translateY:
+                cardTranslateY,
+            },
+          ],
+        },
+      ]}
+    >
+      {/* Decorative glow */}
+      <View style={styles.glowCircle} />
+
+      {/* Fire celebration icon */}
+      <Animated.View
+        style={[
+          styles.iconContainer,
+
+          {
+            transform: [
+              {
+                scale: iconScale,
+              },
+            ],
+          },
+        ]}
+      >
+        <Text style={styles.icon}>
+          🔥
         </Text>
-      )}
-    </View>
+      </Animated.View>
+
+      {/* Level-up content */}
+      <Animated.View
+        style={[
+          styles.content,
+
+          {
+            transform: [
+              {
+                scale:
+                  messageScale,
+              },
+            ],
+          },
+        ]}
+      >
+        <Text style={styles.eyebrow}>
+          {unlockedNewTitle
+            ? "NEW TITLE UNLOCKED"
+            : "YOU HEATED UP"}
+        </Text>
+
+        <Text style={styles.level}>
+          Level {level}
+        </Text>
+
+        {unlockedNewTitle ? (
+          <>
+            <Text style={styles.title}>
+              {currentTitle}
+            </Text>
+
+            <Text style={styles.supportingText}>
+              Okay, now you&apos;re becoming a problem.
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.message}>
+              Keep bringing the Heat.
+            </Text>
+
+            <Text style={styles.supportingText}>
+              The next title is getting closer.
+            </Text>
+          </>
+        )}
+      </Animated.View>
+    </Animated.View>
   );
 }
 
@@ -61,38 +251,122 @@ export default function LevelUpCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.textPrimary,
+    position: "relative",
+
+    backgroundColor:
+      Colors.textPrimary,
+
     borderRadius: Radius.lg,
-    paddingVertical: 16,
+
+    paddingVertical: 18,
     paddingHorizontal: 18,
-    marginBottom: 16,
+
+    marginBottom: 18,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    overflow: "hidden",
+
+    shadowColor: Colors.black,
+
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+
+    shadowOpacity: 0.14,
+    shadowRadius: 14,
+
+    elevation: 5,
+  },
+
+  glowCircle: {
+    position: "absolute",
+
+    width: 130,
+    height: 130,
+
+    borderRadius: 65,
+
+    right: -45,
+    top: -52,
+
+    backgroundColor:
+      Colors.roast,
+
+    opacity: 0.18,
+  },
+
+  iconContainer: {
+    width: 54,
+    height: 54,
+
+    borderRadius: 27,
+
+    backgroundColor:
+      "#3A2724",
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    marginRight: 15,
+  },
+
+  icon: {
+    fontSize: 28,
+  },
+
+  content: {
+    flex: 1,
   },
 
   eyebrow: {
     color: Colors.roast,
+
     fontSize: 10,
     fontWeight: "900",
+
     letterSpacing: 1.5,
+
     marginBottom: 5,
   },
 
   level: {
-    color: Colors.white,
-    fontSize: 14,
-    fontWeight: "700",
+    color: "#D7D7D7",
+
+    fontSize: 13,
+    fontWeight: "800",
   },
 
   title: {
     color: Colors.white,
-    fontSize: 21,
+
+    fontSize: 22,
     fontWeight: "900",
+
+    lineHeight: 27,
+
     marginTop: 2,
   },
 
   message: {
     color: Colors.white,
-    fontSize: 18,
-    fontWeight: "800",
-    marginTop: 3,
+
+    fontSize: 19,
+    fontWeight: "900",
+
+    marginTop: 2,
+  },
+
+  supportingText: {
+    color: "#CFCFCF",
+
+    fontSize: 11,
+    fontWeight: "600",
+
+    lineHeight: 16,
+
+    marginTop: 5,
   },
 });
