@@ -11,10 +11,15 @@
 // 3. Compare both choices with the community results.
 // 4. Earn Heat for completing the round.
 //
+// Navigation:
+// • Back returns to the previous gameplay screen.
+// • Home returns directly to the landing screen.
+//
 // Project: Roast or Toast
 // =====================================================
 
 import { useState } from "react";
+
 import {
   Pressable,
   ScrollView,
@@ -24,6 +29,7 @@ import {
 } from "react-native";
 
 import type { Moment } from "../data/types";
+
 import type {
   CrowdGuessProgressResult,
   PlayerVote,
@@ -37,30 +43,44 @@ import {
   Spacing,
 } from "../theme";
 
-// The three stages within Guess the Crowd.
-type GuessStage = "prediction" | "personalVote" | "results";
+import ScenarioHeader from "./ScenarioHeader";
+
+// The three stages inside Guess the Crowd.
+type GuessStage =
+  | "prediction"
+  | "personalVote"
+  | "results";
 
 // Information required by this special mode.
 type GuessTheCrowdCardProps = {
+  // Fresh Moment used only for this mini-game.
   moment: Moment;
 
-  // Records the prediction in the Heat engine and
-  // returns the reward information.
+  // Records the crowd prediction and awards Heat.
   onRecordGuess: (
     prediction: PlayerVote,
     roastPercentage: number,
     toastPercentage: number,
   ) => CrowdGuessProgressResult;
 
+  // Continues regular gameplay after the results.
   onContinue: () => void;
+
+  // Returns to the previous gameplay screen.
+  onBackPress: () => void;
+
+  // Returns directly to Home.
+  onHomePress: () => void;
 };
 
 export default function GuessTheCrowdCard({
   moment,
   onRecordGuess,
   onContinue,
+  onBackPress,
+  onHomePress,
 }: GuessTheCrowdCardProps) {
-  // Tracks which stage is currently visible.
+  // Tracks which part of the mini-game is visible.
   const [stage, setStage] =
     useState<GuessStage>("prediction");
 
@@ -72,25 +92,39 @@ export default function GuessTheCrowdCard({
   const [personalVote, setPersonalVote] =
     useState<PlayerVote | null>(null);
 
-  // Stores the Heat result after the prediction is scored.
+  // Stores Heat and scoring information after results.
   const [progressResult, setProgressResult] =
     useState<CrowdGuessProgressResult | null>(null);
 
-  // Gets the correct category styling.
+  // Gets the correct styling for the current category.
   const categoryTheme =
     CategoryThemes[moment.category as CategoryName] ??
     CategoryThemes["Everyday Life"];
 
-  // Saves the crowd prediction without revealing whether
-  // it was correct yet.
-  const handlePrediction = (choice: PlayerVote) => {
+  // =====================================================
+  // Prediction
+  // =====================================================
+
+  // Saves what the player thinks the crowd selected.
+  //
+  // The actual result remains hidden until after the
+  // player gives their own opinion.
+  const handlePrediction = (
+    choice: PlayerVote,
+  ) => {
     setCrowdPrediction(choice);
     setStage("personalVote");
   };
 
-  // Saves the player's own opinion, records the crowd
-  // prediction, and reveals results.
-  const handlePersonalVote = (choice: PlayerVote) => {
+  // =====================================================
+  // Personal Vote
+  // =====================================================
+
+  // Saves the player's personal vote, scores the crowd
+  // prediction, awards Heat, and reveals the results.
+  const handlePersonalVote = (
+    choice: PlayerVote,
+  ) => {
     if (!crowdPrediction) {
       return;
     }
@@ -108,31 +142,51 @@ export default function GuessTheCrowdCard({
 
   return (
     <View style={styles.container}>
-      {/* Decorative backdrop words */}
-      <Text style={styles.roastBackdrop}>ROAST</Text>
-      <Text style={styles.toastBackdrop}>TOAST</Text>
+      {/* Decorative background words */}
+      <Text style={styles.roastBackdrop}>
+        ROAST
+      </Text>
 
-      {/* Soft category decoration */}
+      <Text style={styles.toastBackdrop}>
+        TOAST
+      </Text>
+
+      {/* Soft category-colored background circle */}
       <View
         style={[
           styles.categoryCircle,
           {
-            backgroundColor: categoryTheme.soft,
+            backgroundColor:
+              categoryTheme.soft,
           },
         ]}
       />
 
+      {/* Shared Back, brand, and Home navigation */}
+      <ScenarioHeader
+        accentColor={categoryTheme.accent}
+        onBackPress={onBackPress}
+        onHomePress={onHomePress}
+      />
+
+      {/* Scrollable mini-game content */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        style={styles.scrollView}
+        contentContainerStyle={
+          styles.scrollContent
+        }
       >
         {/* Special mode badge */}
         <View
           style={[
             styles.modeBadge,
             {
-              borderColor: categoryTheme.accent,
-              backgroundColor: categoryTheme.soft,
+              borderColor:
+                categoryTheme.accent,
+
+              backgroundColor:
+                categoryTheme.soft,
             },
           ]}
         >
@@ -140,7 +194,8 @@ export default function GuessTheCrowdCard({
             style={[
               styles.modeBadgeText,
               {
-                color: categoryTheme.accent,
+                color:
+                  categoryTheme.accent,
               },
             ]}
           >
@@ -148,19 +203,20 @@ export default function GuessTheCrowdCard({
           </Text>
         </View>
 
-        {/* Category name */}
+        {/* Category label */}
         <Text
           style={[
             styles.categoryLabel,
             {
-              color: categoryTheme.accent,
+              color:
+                categoryTheme.accent,
             },
           ]}
         >
           {categoryTheme.label}
         </Text>
 
-        {/* Fresh Moment */}
+        {/* Fresh, unseen Moment */}
         <Text style={styles.question}>
           {moment.question}
         </Text>
@@ -176,7 +232,7 @@ export default function GuessTheCrowdCard({
             </Text>
 
             <Text style={styles.stageDescription}>
-              Predict the crowd before giving your own answer.
+              Read the room before giving your own answer.
             </Text>
 
             <View style={styles.choiceContainer}>
@@ -184,14 +240,18 @@ export default function GuessTheCrowdCard({
                 label="Roast"
                 phrase="The crowd roasted it."
                 type="roast"
-                onPress={() => handlePrediction("roast")}
+                onPress={() =>
+                  handlePrediction("roast")
+                }
               />
 
               <ChoiceButton
                 label="Toast"
                 phrase="The crowd approved."
                 type="toast"
-                onPress={() => handlePrediction("toast")}
+                onPress={() =>
+                  handlePrediction("toast")
+                }
               />
             </View>
           </View>
@@ -201,54 +261,77 @@ export default function GuessTheCrowdCard({
             Stage 2: Personal Vote
         ================================================= */}
 
-        {stage === "personalVote" && crowdPrediction && (
-          <View>
-            <Text style={styles.savedChoiceLabel}>
-              Your crowd prediction
-            </Text>
-
-            <Text
-              style={[
-                styles.savedChoice,
-                crowdPrediction === "roast"
-                  ? styles.roastText
-                  : styles.toastText,
-              ]}
-            >
-              {crowdPrediction === "roast"
-                ? "Roast"
-                : "Toast"}
-            </Text>
-
-            <Text style={styles.stageHeading}>
-              Now, what do you think?
-            </Text>
-
-            <Text style={styles.stageDescription}>
-              Your own answer can be completely different.
-            </Text>
-
-            <View style={styles.choiceContainer}>
-              <ChoiceButton
-                label="Roast"
-                phrase={moment.roastPhrase}
-                type="roast"
-                onPress={() =>
-                  handlePersonalVote("roast")
+        {stage === "personalVote" &&
+          crowdPrediction && (
+            <View>
+              {/* Keeps the saved prediction visible */}
+              <Text
+                style={
+                  styles.savedChoiceLabel
                 }
-              />
+              >
+                Your crowd prediction
+              </Text>
 
-              <ChoiceButton
-                label="Toast"
-                phrase={moment.toastPhrase}
-                type="toast"
-                onPress={() =>
-                  handlePersonalVote("toast")
+              <Text
+                style={[
+                  styles.savedChoice,
+
+                  crowdPrediction === "roast"
+                    ? styles.roastText
+                    : styles.toastText,
+                ]}
+              >
+                {crowdPrediction === "roast"
+                  ? "Roast"
+                  : "Toast"}
+              </Text>
+
+              <Text style={styles.stageHeading}>
+                Now, what do you think?
+              </Text>
+
+              <Text
+                style={
+                  styles.stageDescription
                 }
-              />
+              >
+                Your answer can be completely different.
+              </Text>
+
+              <View
+                style={
+                  styles.choiceContainer
+                }
+              >
+                <ChoiceButton
+                  label="Roast"
+                  phrase={
+                    moment.roastPhrase
+                  }
+                  type="roast"
+                  onPress={() =>
+                    handlePersonalVote(
+                      "roast",
+                    )
+                  }
+                />
+
+                <ChoiceButton
+                  label="Toast"
+                  phrase={
+                    moment.toastPhrase
+                  }
+                  type="toast"
+                  onPress={() =>
+                    handlePersonalVote(
+                      "toast",
+                    )
+                  }
+                />
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
         {/* =================================================
             Stage 3: Results
@@ -259,42 +342,71 @@ export default function GuessTheCrowdCard({
           personalVote &&
           progressResult && (
             <View>
-              <Text style={styles.resultsHeading}>
+              <Text
+                style={
+                  styles.resultsHeading
+                }
+              >
                 The People Have Spoken
               </Text>
 
               {/* Prediction and personal vote summary */}
-              <View style={styles.choiceSummary}>
-                <View style={styles.summaryItem}>
-                  <Text style={styles.summaryLabel}>
+              <View
+                style={
+                  styles.choiceSummary
+                }
+              >
+                <View
+                  style={styles.summaryItem}
+                >
+                  <Text
+                    style={
+                      styles.summaryLabel
+                    }
+                  >
                     Crowd guess
                   </Text>
 
                   <Text
                     style={[
                       styles.summaryValue,
-                      crowdPrediction === "roast"
+
+                      crowdPrediction ===
+                      "roast"
                         ? styles.roastText
                         : styles.toastText,
                     ]}
                   >
-                    {crowdPrediction === "roast"
+                    {crowdPrediction ===
+                    "roast"
                       ? "Roast"
                       : "Toast"}
                   </Text>
                 </View>
 
-                <View style={styles.summaryDivider} />
+                <View
+                  style={
+                    styles.summaryDivider
+                  }
+                />
 
-                <View style={styles.summaryItem}>
-                  <Text style={styles.summaryLabel}>
+                <View
+                  style={styles.summaryItem}
+                >
+                  <Text
+                    style={
+                      styles.summaryLabel
+                    }
+                  >
                     Your vote
                   </Text>
 
                   <Text
                     style={[
                       styles.summaryValue,
-                      personalVote === "roast"
+
+                      personalVote ===
+                      "roast"
                         ? styles.roastText
                         : styles.toastText,
                     ]}
@@ -308,11 +420,21 @@ export default function GuessTheCrowdCard({
 
               {/* Heat reward */}
               <View style={styles.heatCard}>
-                <Text style={styles.heatAmount}>
-                  🔥 +{progressResult.heatEarned} Heat
+                <Text
+                  style={
+                    styles.heatAmount
+                  }
+                >
+                  🔥 +
+                  {progressResult.heatEarned}{" "}
+                  Heat
                 </Text>
 
-                <Text style={styles.heatMessage}>
+                <Text
+                  style={
+                    styles.heatMessage
+                  }
+                >
                   {progressResult.guessedCorrectly
                     ? "You called it."
                     : "The crowd surprised you."}
@@ -322,23 +444,28 @@ export default function GuessTheCrowdCard({
               {/* Roast result */}
               <ResultBar
                 label="🔥 Roast"
-                percentage={moment.roastPercentage}
+                percentage={
+                  moment.roastPercentage
+                }
                 fillColor={Colors.roast}
               />
 
               {/* Toast result */}
               <ResultBar
                 label="♥ Toast"
-                percentage={moment.toastPercentage}
+                percentage={
+                  moment.toastPercentage
+                }
                 fillColor={Colors.toast}
               />
 
-              {/* Top comment */}
+              {/* Top community comment */}
               <View
                 style={[
                   styles.commentCard,
                   {
-                    borderLeftColor: categoryTheme.accent,
+                    borderLeftColor:
+                      categoryTheme.accent,
                   },
                 ]}
               >
@@ -346,14 +473,19 @@ export default function GuessTheCrowdCard({
                   style={[
                     styles.commentLabel,
                     {
-                      color: categoryTheme.accent,
+                      color:
+                        categoryTheme.accent,
                     },
                   ]}
                 >
                   TOP COMMENT
                 </Text>
 
-                <Text style={styles.commentText}>
+                <Text
+                  style={
+                    styles.commentText
+                  }
+                >
                   “{moment.topComment}”
                 </Text>
               </View>
@@ -365,14 +497,26 @@ export default function GuessTheCrowdCard({
                 onPress={onContinue}
                 style={({ pressed }) => [
                   styles.continueButton,
-                  pressed && styles.buttonPressed,
+
+                  pressed &&
+                    styles.buttonPressed,
                 ]}
               >
-                <Text style={styles.continueButtonText}>
+                <Text
+                  style={
+                    styles.continueButtonText
+                  }
+                >
                   Keep Going
                 </Text>
 
-                <Text style={styles.continueArrow}>→</Text>
+                <Text
+                  style={
+                    styles.continueArrow
+                  }
+                >
+                  →
+                </Text>
               </Pressable>
             </View>
           )}
@@ -383,6 +527,9 @@ export default function GuessTheCrowdCard({
 
 // =====================================================
 // Choice Button
+//
+// Reusable Roast or Toast button used during prediction
+// and personal voting.
 // =====================================================
 
 type ChoiceButtonProps = {
@@ -411,15 +558,28 @@ function ChoiceButton({
       <Text
         style={[
           styles.choiceIcon,
-          type === "toast" && styles.toastIcon,
+
+          type === "toast" &&
+            styles.toastIcon,
         ]}
       >
         {type === "roast" ? "🔥" : "♥"}
       </Text>
 
-      <View style={styles.choiceTextContainer}>
-        <Text style={styles.choiceLabel}>{label}</Text>
-        <Text style={styles.choicePhrase}>{phrase}</Text>
+      <View
+        style={
+          styles.choiceTextContainer
+        }
+      >
+        <Text style={styles.choiceLabel}>
+          {label}
+        </Text>
+
+        <Text
+          style={styles.choicePhrase}
+        >
+          {phrase}
+        </Text>
       </View>
     </Pressable>
   );
@@ -442,15 +602,27 @@ function ResultBar({
 }: ResultBarProps) {
   return (
     <View style={styles.resultSection}>
-      <View style={styles.resultLabelRow}>
-        <Text style={styles.resultLabel}>{label}</Text>
+      <View
+        style={styles.resultLabelRow}
+      >
+        <Text style={styles.resultLabel}>
+          {label}
+        </Text>
 
-        <Text style={styles.resultPercentage}>
+        <Text
+          style={
+            styles.resultPercentage
+          }
+        >
           {percentage}%
         </Text>
       </View>
 
-      <View style={styles.resultBarBackground}>
+      <View
+        style={
+          styles.resultBarBackground
+        }
+      >
         <View
           style={[
             styles.resultBarFill,
@@ -476,22 +648,31 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
+  scrollView: {
+    flex: 1,
+    zIndex: 2,
+  },
+
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
+
     paddingHorizontal: Spacing.lg,
-    paddingTop: 72,
+    paddingTop: 18,
     paddingBottom: 48,
-    zIndex: 2,
   },
 
   modeBadge: {
     alignSelf: "flex-start",
+
     borderWidth: 1.5,
     borderRadius: Radius.pill,
+
     paddingVertical: 7,
     paddingHorizontal: 15,
+
     marginBottom: 20,
+
     transform: [{ rotate: "-2deg" }],
   },
 
@@ -539,12 +720,16 @@ const styles = StyleSheet.create({
 
   choiceButton: {
     minHeight: 82,
+
     backgroundColor: Colors.surface,
+
     borderColor: Colors.border,
     borderWidth: 1.5,
     borderRadius: Radius.lg,
+
     paddingVertical: 15,
     paddingHorizontal: 18,
+
     flexDirection: "row",
     alignItems: "center",
   },
@@ -606,12 +791,16 @@ const styles = StyleSheet.create({
 
   choiceSummary: {
     backgroundColor: Colors.surface,
+
     borderColor: Colors.border,
     borderWidth: 1,
     borderRadius: Radius.lg,
+
     paddingVertical: 15,
     paddingHorizontal: 18,
+
     marginBottom: 16,
+
     flexDirection: "row",
     alignItems: "center",
   },
@@ -643,11 +832,14 @@ const styles = StyleSheet.create({
 
   heatCard: {
     backgroundColor: "#FFF1EC",
+
     borderColor: "#F4C9BE",
     borderWidth: 1,
     borderRadius: Radius.md,
+
     paddingVertical: 12,
     paddingHorizontal: 14,
+
     marginBottom: 20,
   },
 
@@ -708,11 +900,14 @@ const styles = StyleSheet.create({
 
   commentCard: {
     backgroundColor: Colors.surface,
+
     borderColor: Colors.border,
     borderWidth: 1,
     borderLeftWidth: 5,
     borderRadius: Radius.lg,
+
     padding: 16,
+
     marginTop: 5,
     marginBottom: 18,
   },
@@ -734,11 +929,15 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: Colors.textPrimary,
     borderRadius: Radius.pill,
+
     paddingVertical: 16,
     paddingHorizontal: 24,
+
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+
+    marginBottom: 18,
   },
 
   continueButtonText: {
@@ -755,13 +954,17 @@ const styles = StyleSheet.create({
 
   roastBackdrop: {
     position: "absolute",
-    top: 70,
+    top: 145,
     right: -48,
+
     color: Colors.roast,
+
     fontSize: 91,
     fontWeight: "900",
     letterSpacing: -5,
+
     opacity: 0.07,
+
     transform: [{ rotate: "8deg" }],
   },
 
@@ -769,21 +972,28 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 50,
     left: -43,
+
     color: Colors.toast,
+
     fontSize: 89,
     fontWeight: "900",
     letterSpacing: -5,
+
     opacity: 0.07,
+
     transform: [{ rotate: "-8deg" }],
   },
 
   categoryCircle: {
     position: "absolute",
+
     width: 230,
     height: 230,
     borderRadius: 115,
+
     bottom: -105,
     right: -90,
+
     opacity: 0.75,
   },
 });
