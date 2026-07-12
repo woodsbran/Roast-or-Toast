@@ -10,6 +10,7 @@
 // • Quick 10, Standard 20, and Endless modes
 // • Smart category-balanced Moment deck
 // • Recently seen Moment avoidance
+// • Animated transitions between regular Moments
 // • Saved and restored round mode
 // • Round progress counter
 // • Round completion screen
@@ -44,6 +45,11 @@ import {
 
 import GuessTheCrowdCard from "../components/GuessTheCrowdCard";
 import IntermissionCard from "../components/IntermissionCard";
+
+import MomentTransition, {
+  type MomentTransitionHandle,
+} from "../components/MomentTransition";
+
 import PlayerBadge from "../components/PlayerBadge";
 import ResultsCard from "../components/ResultsCard";
 import RoundCompleteCard from "../components/RoundCompleteCard";
@@ -107,8 +113,12 @@ import {
   Spacing,
 } from "../theme";
 
+// A special event appears after every five regular
+// Moments.
 const INTERMISSION_FREQUENCY = 5;
 
+// Stores where regular gameplay resumes after Guess the
+// Crowd consumes a separate Moment.
 type ResumePosition = {
   deck: Moment[];
   index: number;
@@ -118,6 +128,8 @@ type ResumePosition = {
 // Saved Session Helpers
 // =====================================================
 
+// Converts saved Moment IDs back into complete Moment
+// objects using the current scenario library.
 function restoreDeckFromIds(
   deckIds: string[],
 ): Moment[] {
@@ -136,6 +148,7 @@ function restoreDeckFromIds(
     );
 }
 
+// Finds one complete Moment using its saved ID.
 function findMomentById(
   momentId: string | null,
 ): Moment | null {
@@ -151,6 +164,7 @@ function findMomentById(
   );
 }
 
+// Keeps a restored deck index inside a valid range.
 function getSafeIndex(
   requestedIndex: number,
   deckLength: number,
@@ -166,9 +180,11 @@ function getSafeIndex(
 }
 
 // =====================================================
-// Session Snapshot
+// Session Snapshot Helper
 // =====================================================
 
+// Converts live gameplay state into a serializable object
+// that can be saved with AsyncStorage.
 function createSessionSnapshot({
   roundMode,
   momentDeck,
@@ -224,7 +240,8 @@ function createSessionSnapshot({
         ? {
             deckIds:
               resumePosition.deck.map(
-                (moment) => moment.id,
+                (moment) =>
+                  moment.id,
               ),
 
             index:
@@ -245,6 +262,9 @@ function createSessionSnapshot({
 }
 
 export default function ScenarioScreen() {
+  // Home sends either fresh or continue.
+  //
+  // Fresh rounds also include the selected round mode.
   const params =
     useLocalSearchParams<{
       mode?: string;
@@ -252,7 +272,13 @@ export default function ScenarioScreen() {
     }>();
 
   const requestedRoundMode =
-    getRoundMode(params.roundMode);
+    getRoundMode(
+      params.roundMode,
+    );
+
+  // =====================================================
+  // Player Progress
+  // =====================================================
 
   const {
     progress,
@@ -262,7 +288,7 @@ export default function ScenarioScreen() {
   } = usePlayerProgress();
 
   // =====================================================
-  // Recent-History State
+  // Recent Moment History
   // =====================================================
 
   // Kept in memory so Endless mode can build another
@@ -283,6 +309,8 @@ export default function ScenarioScreen() {
     requestedRoundMode,
   );
 
+  // Starting lifetime totals are saved so the Round
+  // Complete screen can calculate round-only statistics.
   const [
     roundStartHeat,
     setRoundStartHeat,
@@ -303,6 +331,8 @@ export default function ScenarioScreen() {
     setRoundStartMajorityMatches,
   ] = useState(0);
 
+  // Stores the Heat and majority result from the most
+  // recent regular vote.
   const [
     lastVoteResult,
     setLastVoteResult,
@@ -336,6 +366,7 @@ export default function ScenarioScreen() {
   ] =
     useState<VoteChoice>(null);
 
+  // Number of regular Moments completed in this round.
   const [
     completedMoments,
     setCompletedMoments,
@@ -376,12 +407,20 @@ export default function ScenarioScreen() {
     setSessionReady,
   ] = useState(false);
 
+  // Prevents session initialization from running twice.
   const hasInitializedSession =
     useRef(false);
 
   // =====================================================
   // Animations
   // =====================================================
+
+  // Controls the slide transition between regular
+  // Moments.
+  const momentTransitionRef =
+    useRef<MomentTransitionHandle>(
+      null,
+    );
 
   const roastScale = useRef(
     new Animated.Value(1),
@@ -418,6 +457,8 @@ export default function ScenarioScreen() {
 
     const initializeSession =
       async () => {
+        // Load recent Moment history before building a
+        // new deck.
         const loadedRecentIds =
           await loadRecentMomentIds();
 
@@ -429,7 +470,13 @@ export default function ScenarioScreen() {
           loadedRecentIds,
         );
 
-        if (params.mode === "fresh") {
+        // =================================================
+        // Fresh Round
+        // =================================================
+
+        if (
+          params.mode === "fresh"
+        ) {
           await clearGameSession();
 
           if (!isActive) {
@@ -478,6 +525,10 @@ export default function ScenarioScreen() {
           return;
         }
 
+        // =================================================
+        // Continue Saved Session
+        // =================================================
+
         const savedSession =
           await loadGameSession();
 
@@ -494,6 +545,8 @@ export default function ScenarioScreen() {
               savedSession.deckIds,
             );
 
+          // If saved content is no longer available, build
+          // a safe replacement deck.
           const usableDeck =
             restoredDeck.length > 0
               ? restoredDeck
@@ -528,7 +581,9 @@ export default function ScenarioScreen() {
               progress.majorityMatches,
           );
 
-          setMomentDeck(usableDeck);
+          setMomentDeck(
+            usableDeck,
+          );
 
           setMomentIndex(
             getSafeIndex(
@@ -592,20 +647,43 @@ export default function ScenarioScreen() {
                     restoredResumeDeck.length,
                   ),
               });
+            } else {
+              setResumePosition(null);
             }
+          } else {
+            setResumePosition(null);
           }
 
+          // Restored result screens should already be
+          // visible instead of replaying the reveal.
           if (
             savedSession.selectedVote &&
             savedSession.lastVoteResult
           ) {
             resultsOpacity.setValue(1);
             resultsPosition.setValue(0);
+          } else {
+            resultsOpacity.setValue(0);
+            resultsPosition.setValue(18);
+          }
+
+          // If a saved Guess the Crowd Moment no longer
+          // exists, safely return to regular gameplay.
+          if (
+            savedSession.intermissionType ===
+              "guess" &&
+            !restoredGuessMoment
+          ) {
+            setIntermissionType(null);
           }
 
           setSessionReady(true);
           return;
         }
+
+        // =================================================
+        // Safe Fallback
+        // =================================================
 
         setRoundMode(
           requestedRoundMode,
@@ -633,6 +711,17 @@ export default function ScenarioScreen() {
             loadedRecentIds,
           ),
         );
+
+        setMomentIndex(0);
+        setCompletedMoments(0);
+        setSelectedVote(null);
+        setLastVoteResult(null);
+        setIntermissionType(null);
+        setGuessMoment(null);
+        setResumePosition(null);
+
+        resultsOpacity.setValue(0);
+        resultsPosition.setValue(18);
 
         setSessionReady(true);
       };
@@ -760,7 +849,9 @@ export default function ScenarioScreen() {
         roundStartMajorityMatches,
       });
 
-    void saveGameSession(snapshot);
+    void saveGameSession(
+      snapshot,
+    );
   }, [
     sessionReady,
     hasLoadedProgress,
@@ -782,31 +873,48 @@ export default function ScenarioScreen() {
   // Avoid reading category data until a deck exists.
   if (!currentMoment) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingEmoji}>
+      <View
+        style={
+          styles.loadingContainer
+        }
+      >
+        <Text
+          style={
+            styles.loadingEmoji
+          }
+        >
           🔥
         </Text>
 
-        <Text style={styles.loadingTitle}>
+        <Text
+          style={
+            styles.loadingTitle
+          }
+        >
           Finding better takes...
         </Text>
       </View>
     );
   }
 
+  // Category styling for the current Moment.
   const categoryTheme =
     CategoryThemes[
       currentMoment.category as CategoryName
     ] ??
     CategoryThemes["Everyday Life"];
 
+  // Complete configuration for the selected round.
   const roundConfig =
-    getRoundModeConfig(roundMode);
+    getRoundModeConfig(
+      roundMode,
+    );
 
   // =====================================================
   // Navigation
   // =====================================================
 
+  // Saves the exact current state before navigation.
   const saveCurrentSession =
     async () => {
       const snapshot =
@@ -826,21 +934,31 @@ export default function ScenarioScreen() {
           roundStartMajorityMatches,
         });
 
-      await saveGameSession(snapshot);
+      await saveGameSession(
+        snapshot,
+      );
     };
 
   const handleBackPress =
     async () => {
+      triggerNavigationEffect();
+
       await saveCurrentSession();
+
       router.back();
     };
 
   const handleHomePress =
     async () => {
+      triggerNavigationEffect();
+
       await saveCurrentSession();
+
       router.replace("/");
     };
 
+  // Returns from a special screen to the previous regular
+  // result screen.
   const handleBackFromSpecialScreen =
     () => {
       setCompletedMoments(
@@ -860,26 +978,34 @@ export default function ScenarioScreen() {
   // Animation Helpers
   // =====================================================
 
+  // Gives the selected vote button a quick bounce.
   const animateVoteButton = (
     animation: Animated.Value,
   ) => {
     Animated.sequence([
-      Animated.spring(animation, {
-        toValue: 0.96,
-        useNativeDriver: true,
-        speed: 35,
-        bounciness: 2,
-      }),
+      Animated.spring(
+        animation,
+        {
+          toValue: 0.96,
+          useNativeDriver: true,
+          speed: 35,
+          bounciness: 2,
+        },
+      ),
 
-      Animated.spring(animation, {
-        toValue: 1,
-        useNativeDriver: true,
-        speed: 28,
-        bounciness: 7,
-      }),
+      Animated.spring(
+        animation,
+        {
+          toValue: 1,
+          useNativeDriver: true,
+          speed: 28,
+          bounciness: 7,
+        },
+      ),
     ]).start();
   };
 
+  // Reveals results with a fade-and-rise animation.
   const revealResults = () => {
     resultsOpacity.setValue(0);
     resultsPosition.setValue(18);
@@ -907,7 +1033,7 @@ export default function ScenarioScreen() {
   };
 
   // =====================================================
-  // Voting
+  // Regular Voting
   // =====================================================
 
   const recordVote = (
@@ -918,6 +1044,7 @@ export default function ScenarioScreen() {
 
     animation: Animated.Value,
   ) => {
+    // Prevents changing the answer after voting.
     if (selectedVote) {
       return;
     }
@@ -929,6 +1056,8 @@ export default function ScenarioScreen() {
         currentMoment.toastPercentage,
       );
 
+    // Level-up feedback fires shortly after the initial
+    // Roast or Toast haptic.
     if (
       progressResult.leveledUp
     ) {
@@ -938,11 +1067,15 @@ export default function ScenarioScreen() {
     }
 
     setSelectedVote(vote);
+
     setLastVoteResult(
       progressResult,
     );
 
-    animateVoteButton(animation);
+    animateVoteButton(
+      animation,
+    );
+
     revealResults();
   };
 
@@ -965,9 +1098,10 @@ export default function ScenarioScreen() {
   };
 
   // =====================================================
-  // Deck Movement
+  // Regular Deck Movement
   // =====================================================
 
+  // Clears state from the previous regular Moment.
   const resetRegularMoment =
     () => {
       setSelectedVote(null);
@@ -977,6 +1111,7 @@ export default function ScenarioScreen() {
       resultsPosition.setValue(18);
     };
 
+  // Moves to the next regular Moment.
   const moveToNextMoment =
     () => {
       const reachedEndOfDeck =
@@ -991,7 +1126,10 @@ export default function ScenarioScreen() {
             currentMoment.id,
           );
 
-        setMomentDeck(newDeck);
+        setMomentDeck(
+          newDeck,
+        );
+
         setMomentIndex(0);
       } else {
         setMomentIndex(
@@ -1004,9 +1142,11 @@ export default function ScenarioScreen() {
     };
 
   // =====================================================
-  // Guess the Crowd
+  // Guess the Crowd Preparation
   // =====================================================
 
+  // Selects a fresh Moment and stores the location where
+  // regular gameplay should resume afterward.
   const prepareGuessTheCrowd =
     () => {
       const nextIndex =
@@ -1015,6 +1155,7 @@ export default function ScenarioScreen() {
       const indexAfterGuess =
         momentIndex + 2;
 
+      // At least two unused Moments remain.
       if (
         indexAfterGuess <
         momentDeck.length
@@ -1036,6 +1177,7 @@ export default function ScenarioScreen() {
         return;
       }
 
+      // Exactly one unused Moment remains.
       if (
         nextIndex <
         momentDeck.length
@@ -1066,6 +1208,7 @@ export default function ScenarioScreen() {
         return;
       }
 
+      // Current Moment was the final deck item.
       const newDeck =
         buildSmartDeck(
           scenarios,
@@ -1098,6 +1241,7 @@ export default function ScenarioScreen() {
   // Next / Round Completion
   // =====================================================
 
+  // Advances the round after the player presses Next.
   const handleNextMoment = () => {
     const newCompletedTotal =
       completedMoments + 1;
@@ -1106,6 +1250,7 @@ export default function ScenarioScreen() {
       newCompletedTotal,
     );
 
+    // Finite rounds end exactly at their selected limit.
     if (
       roundConfig.momentLimit !== null &&
       newCompletedTotal >=
@@ -1130,19 +1275,30 @@ export default function ScenarioScreen() {
       return;
     }
 
+    // Break 1 = after 5 Moments.
+    // Break 2 = after 10 Moments.
+    // Break 3 = after 15 Moments.
     const breakNumber =
       newCompletedTotal /
       INTERMISSION_FREQUENCY;
 
+    // Repeating rhythm:
+    // 1. Guess the Crowd
+    // 2. Quick Break
+    // 3. Session Check-In
     const eventPosition =
       breakNumber % 3;
 
-    if (eventPosition === 1) {
+    if (
+      eventPosition === 1
+    ) {
       prepareGuessTheCrowd();
       return;
     }
 
-    if (eventPosition === 2) {
+    if (
+      eventPosition === 2
+    ) {
       setIntermissionType(
         "quick",
       );
@@ -1155,18 +1311,44 @@ export default function ScenarioScreen() {
     );
   };
 
+  // Plays the Moment exit animation before advancing.
+  //
+  // Special screens such as Guess the Crowd, Quick
+  // Break, and Round Complete appear after the old
+  // Moment slides away.
+  const handleAnimatedNextMoment =
+    () => {
+      const transition =
+        momentTransitionRef.current;
+
+      // Safe fallback in case the animation component has
+      // not mounted yet.
+      if (!transition) {
+        handleNextMoment();
+        return;
+      }
+
+      transition.playExit(
+        handleNextMoment,
+      );
+    };
+
   // =====================================================
   // Special Event Continuation
   // =====================================================
 
   const handleContinueAfterQuickBreak =
     () => {
+      triggerNavigationEffect();
+
       setIntermissionType(null);
       moveToNextMoment();
     };
 
   const handleContinueAfterRecap =
     () => {
+      triggerNavigationEffect();
+
       setIntermissionType(null);
       moveToNextMoment();
     };
@@ -1219,7 +1401,7 @@ export default function ScenarioScreen() {
     };
 
   // =====================================================
-  // Loading
+  // Loading Screen
   // =====================================================
 
   if (
@@ -1261,8 +1443,12 @@ export default function ScenarioScreen() {
   ) {
     return (
       <RoundCompleteCard
-        roundMode={roundMode}
-        progress={progress}
+        roundMode={
+          roundMode
+        }
+        progress={
+          progress
+        }
         completedMoments={
           completedMoments
         }
@@ -1289,7 +1475,8 @@ export default function ScenarioScreen() {
   }
 
   if (
-    intermissionType === "quick"
+    intermissionType ===
+    "quick"
   ) {
     return (
       <IntermissionCard
@@ -1307,12 +1494,15 @@ export default function ScenarioScreen() {
   }
 
   if (
-    intermissionType === "guess" &&
+    intermissionType ===
+      "guess" &&
     guessMoment
   ) {
     return (
       <GuessTheCrowdCard
-        moment={guessMoment}
+        moment={
+          guessMoment
+        }
         onRecordGuess={
           addCrowdGuess
         }
@@ -1330,11 +1520,14 @@ export default function ScenarioScreen() {
   }
 
   if (
-    intermissionType === "recap"
+    intermissionType ===
+    "recap"
   ) {
     return (
       <SessionRecapCard
-        progress={progress}
+        progress={
+          progress
+        }
         onContinue={
           handleContinueAfterRecap
         }
@@ -1354,6 +1547,7 @@ export default function ScenarioScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Category background word */}
       <View
         style={
           styles.categoryBackdrop
@@ -1373,6 +1567,7 @@ export default function ScenarioScreen() {
         </Text>
       </View>
 
+      {/* Soft category circle */}
       <View
         style={[
           styles.categoryCircle,
@@ -1384,6 +1579,7 @@ export default function ScenarioScreen() {
         ]}
       />
 
+      {/* Roast background decoration */}
       <View
         style={
           styles.roastBackdrop
@@ -1398,6 +1594,7 @@ export default function ScenarioScreen() {
         </Text>
       </View>
 
+      {/* Toast background decoration */}
       <View
         style={
           styles.toastBackdrop
@@ -1412,6 +1609,7 @@ export default function ScenarioScreen() {
         </Text>
       </View>
 
+      {/* Shared Back, brand, and Home navigation */}
       <ScenarioHeader
         accentColor={
           categoryTheme.accent
@@ -1424,104 +1622,129 @@ export default function ScenarioScreen() {
         }
       />
 
+      {/* Main gameplay content */}
       <ScrollView
         showsVerticalScrollIndicator={
           false
         }
-        style={styles.scrollView}
+        style={
+          styles.scrollView
+        }
         contentContainerStyle={
           styles.scrollContent
         }
       >
+        {/* Round progress remains fixed while the Moment
+            content slides between questions. */}
         <RoundProgress
-          roundMode={roundMode}
+          roundMode={
+            roundMode
+          }
           completedMoments={
             completedMoments
           }
         />
 
+        {/* Player progress also remains fixed. */}
         <PlayerBadge
-          progress={progress}
-        />
-
-        <ScenarioCard
-          categoryLabel={
-            categoryTheme.label
-          }
-          categoryAccent={
-            categoryTheme.accent
-          }
-          categorySoft={
-            categoryTheme.soft
-          }
-          question={
-            currentMoment.question
-          }
-          compact={
-            selectedVote !== null
+          progress={
+            progress
           }
         />
 
-        {!selectedVote && (
-          <VoteButtons
-            roastPhrase={
-              currentMoment.roastPhrase
+        {/* Animated regular Moment content */}
+        <MomentTransition
+          ref={
+            momentTransitionRef
+          }
+          transitionKey={
+            currentMoment.id
+          }
+        >
+          {/* Current question */}
+          <ScenarioCard
+            categoryLabel={
+              categoryTheme.label
             }
-            toastPhrase={
-              currentMoment.toastPhrase
+            categoryAccent={
+              categoryTheme.accent
             }
-            roastScale={
-              roastScale
+            categorySoft={
+              categoryTheme.soft
             }
-            toastScale={
-              toastScale
+            question={
+              currentMoment.question
             }
-            onRoastPress={
-              handleRoastVote
-            }
-            onToastPress={
-              handleToastVote
+            compact={
+              selectedVote !== null
             }
           />
-        )}
 
-        {selectedVote &&
-          lastVoteResult && (
-            <ResultsCard
-              moment={
-                currentMoment
+          {/* Vote buttons */}
+          {!selectedVote && (
+            <VoteButtons
+              roastPhrase={
+                currentMoment.roastPhrase
               }
-              selectedVote={
-                selectedVote
+              toastPhrase={
+                currentMoment.toastPhrase
               }
-              categoryAccent={
-                categoryTheme.accent
+              roastScale={
+                roastScale
               }
-              heatEarned={
-                lastVoteResult.heatEarned
+              toastScale={
+                toastScale
               }
-              matchedMajority={
-                lastVoteResult.matchedMajority
+              onRoastPress={
+                handleRoastVote
               }
-              leveledUp={
-                lastVoteResult.leveledUp
+              onToastPress={
+                handleToastVote
               }
-              currentLevel={
-                lastVoteResult
-                  .updatedProgress.level
-              }
-              opacity={
-                resultsOpacity
-              }
-              translateY={
-                resultsPosition
-              }
-              onNextPress={() => {
-                triggerNavigationEffect();
-                handleNextMoment();
-              }}
             />
           )}
+
+          {/* Results */}
+          {selectedVote &&
+            lastVoteResult && (
+              <ResultsCard
+                moment={
+                  currentMoment
+                }
+                selectedVote={
+                  selectedVote
+                }
+                categoryAccent={
+                  categoryTheme.accent
+                }
+                heatEarned={
+                  lastVoteResult.heatEarned
+                }
+                matchedMajority={
+                  lastVoteResult.matchedMajority
+                }
+                leveledUp={
+                  lastVoteResult.leveledUp
+                }
+                currentLevel={
+                  lastVoteResult
+                    .updatedProgress
+                    .level
+                }
+                opacity={
+                  resultsOpacity
+                }
+                translateY={
+                  resultsPosition
+                }
+                onNextPress={() => {
+                  triggerNavigationEffect();
+
+                  handleAnimatedNextMoment();
+                }}
+              />
+            )}
+        </MomentTransition>
       </ScrollView>
     </View>
   );
@@ -1532,6 +1755,7 @@ export default function ScenarioScreen() {
 // =====================================================
 
 const styles = StyleSheet.create({
+  // Main screen.
   container: {
     flex: 1,
 
@@ -1541,6 +1765,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
+  // Session loading screen.
   loadingContainer: {
     flex: 1,
 
@@ -1560,7 +1785,8 @@ const styles = StyleSheet.create({
   },
 
   loadingTitle: {
-    color: Colors.textPrimary,
+    color:
+      Colors.textPrimary,
 
     fontSize: 21,
     fontWeight: "900",
@@ -1568,6 +1794,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
+  // Standard gameplay scroll area.
   scrollView: {
     flex: 1,
     zIndex: 2,
@@ -1576,7 +1803,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
 
-    justifyContent: "center",
+    justifyContent:
+      "center",
 
     paddingHorizontal:
       Spacing.lg,
@@ -1584,6 +1812,10 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 42,
   },
+
+  // =====================================================
+  // Category Decorations
+  // =====================================================
 
   categoryBackdrop: {
     position: "absolute",
@@ -1619,6 +1851,10 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
 
+  // =====================================================
+  // Brand Decorations
+  // =====================================================
+
   roastBackdrop: {
     position: "absolute",
 
@@ -1633,7 +1869,8 @@ const styles = StyleSheet.create({
   },
 
   roastBackdropText: {
-    color: Colors.roast,
+    color:
+      Colors.roast,
 
     fontSize: 70,
     fontWeight: "900",
@@ -1656,7 +1893,8 @@ const styles = StyleSheet.create({
   },
 
   toastBackdropText: {
-    color: Colors.toast,
+    color:
+      Colors.toast,
 
     fontSize: 78,
     fontWeight: "900",

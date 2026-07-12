@@ -6,10 +6,9 @@
 // Toast vote.
 //
 // Animation Sequence:
-// • Card fades into view
-// • Card rises slightly
-// • Heat amount pops larger
-// • Card settles into its normal position
+// • Card fades and rises into view
+// • Heat amount counts from 0 to the earned total
+// • Final Heat number pops slightly
 // • Crowd feedback appears shortly afterward
 //
 // This component remains reusable for future modes such
@@ -21,10 +20,12 @@
 import {
   useEffect,
   useRef,
+  useState,
 } from "react";
 
 import {
   Animated,
+  Easing,
   StyleSheet,
   Text,
   View,
@@ -49,6 +50,18 @@ export default function FloatingHeat({
   heatEarned,
   matchedMajority,
 }: FloatingHeatProps) {
+  // Ensures invalid values cannot break the count-up.
+  const safeHeatEarned = Math.max(
+    Math.round(heatEarned),
+    0,
+  );
+
+  // Stores the Heat number currently shown on screen.
+  const [
+    displayedHeat,
+    setDisplayedHeat,
+  ] = useState(0);
+
   // Controls the visibility of the entire reward card.
   const cardOpacity = useRef(
     new Animated.Value(0),
@@ -59,14 +72,22 @@ export default function FloatingHeat({
     new Animated.Value(18),
   ).current;
 
-  // Gives the entire card a subtle pop.
+  // Gives the entire card a subtle entrance pop.
   const cardScale = useRef(
     new Animated.Value(0.96),
   ).current;
 
-  // Makes the Heat amount briefly grow larger.
+  // Controls the Heat number count-up.
+  //
+  // This moves from 0 to 1. The visible number is
+  // calculated by multiplying the value by heatEarned.
+  const heatCountProgress = useRef(
+    new Animated.Value(0),
+  ).current;
+
+  // Makes the final Heat amount briefly grow larger.
   const heatScale = useRef(
-    new Animated.Value(0.72),
+    new Animated.Value(0.82),
   ).current;
 
   // Controls when the crowd feedback becomes visible.
@@ -80,27 +101,43 @@ export default function FloatingHeat({
   ).current;
 
   useEffect(() => {
-    // Reset every animated value before replaying.
-    //
-    // This allows the reward animation to run again for
-    // every new answer.
+    // ===================================================
+    // Reset Animation State
+    // ===================================================
+
+    cardOpacity.stopAnimation();
+    cardTranslateY.stopAnimation();
+    cardScale.stopAnimation();
+    heatCountProgress.stopAnimation();
+    heatScale.stopAnimation();
+    messageOpacity.stopAnimation();
+    messageTranslateX.stopAnimation();
+
     cardOpacity.setValue(0);
     cardTranslateY.setValue(18);
     cardScale.setValue(0.96);
 
-    heatScale.setValue(0.72);
+    heatCountProgress.setValue(0);
+    heatScale.setValue(0.82);
 
     messageOpacity.setValue(0);
     messageTranslateX.setValue(10);
 
-    // Stop any animation that may still be running from
-    // the previous Moment.
-    cardOpacity.stopAnimation();
-    cardTranslateY.stopAnimation();
-    cardScale.stopAnimation();
-    heatScale.stopAnimation();
-    messageOpacity.stopAnimation();
-    messageTranslateX.stopAnimation();
+    setDisplayedHeat(0);
+
+    // Updates the visible Heat number while the animated
+    // value moves from zero to one.
+    const heatListenerId =
+      heatCountProgress.addListener(
+        ({ value }) => {
+          setDisplayedHeat(
+            Math.round(
+              value *
+                safeHeatEarned,
+            ),
+          );
+        },
+      );
 
     // ===================================================
     // Animation Sequence
@@ -109,66 +146,133 @@ export default function FloatingHeat({
     Animated.sequence([
       // First, reveal and raise the whole reward card.
       Animated.parallel([
-        Animated.timing(cardOpacity, {
-          toValue: 1,
-          duration: 190,
-          useNativeDriver: true,
-        }),
+        Animated.timing(
+          cardOpacity,
+          {
+            toValue: 1,
+            duration: 190,
+            easing:
+              Easing.out(
+                Easing.cubic,
+              ),
+            useNativeDriver: true,
+          },
+        ),
 
-        Animated.spring(cardTranslateY, {
-          toValue: 0,
-          speed: 18,
-          bounciness: 5,
-          useNativeDriver: true,
-        }),
+        Animated.spring(
+          cardTranslateY,
+          {
+            toValue: 0,
+            speed: 18,
+            bounciness: 5,
+            useNativeDriver: true,
+          },
+        ),
 
-        Animated.spring(cardScale, {
-          toValue: 1,
-          speed: 20,
-          bounciness: 5,
-          useNativeDriver: true,
-        }),
+        Animated.spring(
+          cardScale,
+          {
+            toValue: 1,
+            speed: 20,
+            bounciness: 5,
+            useNativeDriver: true,
+          },
+        ),
       ]),
 
-      // Then make the Heat amount pop.
-      Animated.sequence([
-        Animated.spring(heatScale, {
-          toValue: 1.12,
-          speed: 24,
-          bounciness: 8,
-          useNativeDriver: true,
-        }),
-
-        Animated.spring(heatScale, {
+      // Count from zero to the final Heat reward.
+      Animated.timing(
+        heatCountProgress,
+        {
           toValue: 1,
-          speed: 22,
-          bounciness: 4,
-          useNativeDriver: true,
-        }),
+          duration: 520,
+          easing:
+            Easing.out(
+              Easing.cubic,
+            ),
+
+          // The listener updates React text, so this value
+          // cannot use the native driver.
+          useNativeDriver: false,
+        },
+      ),
+
+      // Pop and settle the final Heat number.
+      Animated.sequence([
+        Animated.spring(
+          heatScale,
+          {
+            toValue: 1.14,
+            speed: 25,
+            bounciness: 9,
+            useNativeDriver: true,
+          },
+        ),
+
+        Animated.spring(
+          heatScale,
+          {
+            toValue: 1,
+            speed: 22,
+            bounciness: 4,
+            useNativeDriver: true,
+          },
+        ),
       ]),
 
       // Finally, reveal the crowd feedback.
       Animated.parallel([
-        Animated.timing(messageOpacity, {
-          toValue: 1,
-          duration: 180,
-          useNativeDriver: true,
-        }),
+        Animated.timing(
+          messageOpacity,
+          {
+            toValue: 1,
+            duration: 180,
+            easing:
+              Easing.out(
+                Easing.quad,
+              ),
+            useNativeDriver: true,
+          },
+        ),
 
-        Animated.spring(messageTranslateX, {
-          toValue: 0,
-          speed: 22,
-          bounciness: 4,
-          useNativeDriver: true,
-        }),
+        Animated.spring(
+          messageTranslateX,
+          {
+            toValue: 0,
+            speed: 22,
+            bounciness: 4,
+            useNativeDriver: true,
+          },
+        ),
       ]),
-    ]).start();
+    ]).start(() => {
+      // Guarantees the final amount is exact even if the
+      // animation was interrupted by a small frame delay.
+      setDisplayedHeat(
+        safeHeatEarned,
+      );
+    });
+
+    return () => {
+      heatCountProgress.removeListener(
+        heatListenerId,
+      );
+
+      cardOpacity.stopAnimation();
+      cardTranslateY.stopAnimation();
+      cardScale.stopAnimation();
+      heatCountProgress.stopAnimation();
+      heatScale.stopAnimation();
+      messageOpacity.stopAnimation();
+      messageTranslateX.stopAnimation();
+    };
   }, [
-    heatEarned,
+    safeHeatEarned,
     matchedMajority,
     cardOpacity,
     cardScale,
     cardTranslateY,
+    heatCountProgress,
     heatScale,
     messageOpacity,
     messageTranslateX,
@@ -178,6 +282,7 @@ export default function FloatingHeat({
     <Animated.View
       style={[
         styles.container,
+
         {
           opacity: cardOpacity,
 
@@ -198,6 +303,7 @@ export default function FloatingHeat({
       <Animated.View
         style={[
           styles.rewardContainer,
+
           {
             transform: [
               {
@@ -212,7 +318,7 @@ export default function FloatingHeat({
         </Text>
 
         <Text style={styles.rewardText}>
-          +{heatEarned} Heat
+          +{displayedHeat} Heat
         </Text>
       </Animated.View>
 
@@ -223,8 +329,10 @@ export default function FloatingHeat({
       <Animated.Text
         style={[
           styles.matchText,
+
           {
-            opacity: messageOpacity,
+            opacity:
+              messageOpacity,
 
             transform: [
               {
@@ -283,6 +391,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
 
     flexShrink: 0,
+
+    minWidth: 92,
   },
 
   fireIcon: {
