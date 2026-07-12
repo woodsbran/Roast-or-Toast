@@ -5,11 +5,15 @@
 // Stores Friends category Moments.
 //
 // Content Direction:
-// • Specific friendship behavior
-// • Group-chat drama
-// • Real loyalty
-// • Petty but relatable situations
-// • Choices that should create conversation
+// • Loyalty and boundaries
+// • Group-chat behavior
+// • Money and social plans
+// • Friendship expectations
+// • Specific situations that can genuinely split opinions
+//
+// Important:
+// Existing IDs are preserved so saved sessions remain
+// compatible after this content update.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -21,220 +25,240 @@ export const friendMoments: Moment[] = [
     id: "friends-001",
     category: "Friends",
     question:
-      'Your friend says "I am outside" but has not left home yet.',
-    roastPhrase: "A documented liar.",
-    toastPhrase: "They are manifesting.",
-    roastPercentage: 89,
-    toastPercentage: 11,
-    topComment: "Outside of what? Reality?",
+      'Your friend texts "I am outside" while they are still putting on their shoes at home.',
+    roastPhrase: "That is a documented lie.",
+    toastPhrase: "It creates urgency.",
+    roastPercentage: 86,
+    toastPercentage: 14,
+    topComment:
+      "Outside spiritually. Twenty minutes away physically.",
   },
   {
     id: "friends-002",
     category: "Friends",
     question:
-      "Your friend drives across town to help you move on a Saturday morning.",
-    roastPhrase: "They enjoy suffering.",
-    toastPhrase: "That is a real friend.",
-    roastPercentage: 4,
-    toastPercentage: 96,
-    topComment: "Friendship tested, strained, and officially passed.",
+      "Your friend helps you move but complains about every box the entire time.",
+    roastPhrase: "The help came with a soundtrack.",
+    toastPhrase: "They still showed up.",
+    roastPercentage: 42,
+    toastPercentage: 58,
+    topComment:
+      "Annoying support is still support, unfortunately.",
   },
   {
     id: "friends-003",
     category: "Friends",
     question:
-      "Your friend leaves the party without saying goodbye to anyone.",
-    roastPhrase: "At least say bye.",
-    toastPhrase: "The silent exit is elite.",
-    roastPercentage: 51,
-    toastPercentage: 49,
-    topComment: "One goodbye becomes a 45-minute hostage situation.",
+      "Your friend leaves the party without saying goodbye because every goodbye turns into another hour.",
+    roastPhrase: "At least tell me privately.",
+    toastPhrase: "The silent exit is efficient.",
+    roastPercentage: 47,
+    toastPercentage: 53,
+    topComment:
+      "The Irish goodbye protects both time and battery life.",
   },
   {
     id: "friends-004",
     category: "Friends",
     question:
-      "Your friend remembers the exact snack you like and brings it over after a bad day.",
-    roastPhrase: "What do they want?",
-    toastPhrase: "That is real friendship.",
-    roastPercentage: 5,
-    toastPercentage: 95,
-    topComment: "Emotional support, but make it edible.",
+      "Your friend brings your favorite snack after a bad day but immediately asks for the full story.",
+    roastPhrase: "The snack came with conditions.",
+    toastPhrase: "They are checking on you.",
+    roastPercentage: 34,
+    toastPercentage: 66,
+    topComment:
+      "Emotional support, sponsored by curiosity.",
   },
   {
     id: "friends-005",
     category: "Friends",
     question:
-      "Your friend sends an eight-minute voice note with no warning.",
+      "Your friend sends a nine-minute voice note and begins by saying, “This is quick.”",
     roastPhrase: "Start a podcast.",
-    toastPhrase: "I want the full story.",
-    roastPercentage: 57,
-    toastPercentage: 43,
-    topComment: "That voice note had chapters, footnotes, and a sequel.",
+    toastPhrase: "I want every detail.",
+    roastPercentage: 61,
+    toastPercentage: 39,
+    topComment:
+      "The phrase 'this is quick' has never been more dishonest.",
   },
   {
     id: "friends-006",
     category: "Friends",
     question:
-      "Your friend sends you a TikTok while still ignoring the serious text above it.",
+      "Your friend sends you three TikToks while still ignoring the serious message directly above them.",
     roastPhrase: "Answer the message first.",
-    toastPhrase: "Maybe this is their response.",
-    roastPercentage: 87,
-    toastPercentage: 13,
-    topComment: "The algorithm got a reply before I did.",
+    toastPhrase: "Maybe the videos are their response.",
+    roastPercentage: 82,
+    toastPercentage: 18,
+    topComment:
+      "The algorithm received more emotional availability than I did.",
   },
   {
     id: "friends-007",
     category: "Friends",
     question:
-      "Your friend tells everyone your business because they were worried about you.",
-    roastPhrase: "Concern is not a press release.",
-    toastPhrase: "They needed advice.",
-    roastPercentage: 79,
-    toastPercentage: 21,
-    topComment: "My crisis did not need a marketing campaign.",
+      "Your friend tells one trusted person about your situation because they do not know how to help you alone.",
+    roastPhrase: "My business was not theirs to share.",
+    toastPhrase: "They needed support too.",
+    roastPercentage: 57,
+    toastPercentage: 43,
+    topComment:
+      "Concern explains the disclosure. It does not automatically excuse it.",
   },
   {
     id: "friends-008",
     category: "Friends",
     question:
-      "Your friend tells you the outfit is not working before you leave the house.",
-    roastPhrase: "Let me live.",
-    toastPhrase: "That is loyalty.",
-    roastPercentage: 18,
-    toastPercentage: 82,
-    topComment: "A real friend does not let you become evidence.",
+      "Your friend tells you the outfit looks bad ten minutes before you need to leave.",
+    roastPhrase: "The timing is terrible.",
+    toastPhrase: "Better now than in the pictures.",
+    roastPercentage: 38,
+    toastPercentage: 62,
+    topComment:
+      "Honesty arrived late, but before the evidence was created.",
   },
   {
     id: "friends-009",
     category: "Friends",
     question:
-      "Your friend invites someone you do not like to your birthday dinner.",
-    roastPhrase: "Whose birthday is this?",
-    toastPhrase: "Maybe they want peace.",
-    roastPercentage: 91,
-    toastPercentage: 9,
-    topComment: "This is not the United Nations.",
+      "Your friend invites someone you dislike to your birthday because they are trying to repair the group.",
+    roastPhrase: "Not at my birthday.",
+    toastPhrase: "Maybe peace starts somewhere.",
+    roastPercentage: 71,
+    toastPercentage: 29,
+    topComment:
+      "Conflict resolution should not be disguised as a birthday surprise.",
   },
   {
     id: "friends-010",
     category: "Friends",
     question:
-      "Your friend pays for dinner because they know money is tight for you.",
-    roastPhrase: "Now I owe them.",
-    toastPhrase: "That is love.",
-    roastPercentage: 7,
-    toastPercentage: 93,
-    topComment: "No speech, no embarrassment, just covered. That is a friend.",
+      "Your friend quietly pays for dinner because they know money is tight, then refuses to discuss it.",
+    roastPhrase: "I do not want pity.",
+    toastPhrase: "That is real friendship.",
+    roastPercentage: 13,
+    toastPercentage: 87,
+    topComment:
+      "No speech, no embarrassment, just covered. Elite behavior.",
   },
   {
     id: "friends-011",
     category: "Friends",
     question:
-      "Your friend screenshots your private message and sends it back to you by accident.",
-    roastPhrase: "Investigation immediately.",
-    toastPhrase: "Maybe they were saving it.",
-    roastPercentage: 96,
-    toastPercentage: 4,
-    topComment: "Congratulations, you played yourself and exposed the group chat.",
+      "Your friend accidentally sends you the screenshot they meant to send about your conversation.",
+    roastPhrase: "Trust immediately revoked.",
+    toastPhrase: "At least the truth is out.",
+    roastPercentage: 93,
+    toastPercentage: 7,
+    topComment:
+      "The group chat has identified itself without a warrant.",
   },
   {
     id: "friends-012",
     category: "Friends",
     question:
-      "Your friend disappears when they start dating someone new.",
-    roastPhrase: "See you after the breakup.",
-    toastPhrase: "They are in love.",
-    roastPercentage: 83,
-    toastPercentage: 17,
-    topComment: "Friendship temporarily closed for relationship renovations.",
+      "Your friend disappears when they enter a relationship but returns whenever they have problems.",
+    roastPhrase: "I am not relationship customer service.",
+    toastPhrase: "Friends should still be there.",
+    roastPercentage: 78,
+    toastPercentage: 22,
+    topComment:
+      "The friendship reopens only during emotional emergencies.",
   },
   {
     id: "friends-013",
     category: "Friends",
     question:
-      "Your friend tells you the truth even though they know you will be mad.",
-    roastPhrase: "They could have kept that.",
-    toastPhrase: "That is a real one.",
-    roastPercentage: 12,
-    toastPercentage: 88,
-    topComment: "The truth hurt, but at least it did not come from a stranger.",
+      "Your friend tells you that you were wrong after already defending you in front of everyone else.",
+    roastPhrase: "Do not defend bad behavior.",
+    toastPhrase: "Correct me privately.",
+    roastPercentage: 31,
+    toastPercentage: 69,
+    topComment:
+      "Publicly united. Privately audited.",
   },
   {
     id: "friends-014",
     category: "Friends",
     question:
-      "Your friend always wants separate checks after ordering the most expensive meal.",
-    roastPhrase: "Absolutely separate.",
-    toastPhrase: "Just split it evenly.",
-    roastPercentage: 76,
-    toastPercentage: 24,
-    topComment: "I had water and fries. You discovered fine dining.",
+      "Your friend orders the most expensive meal and still suggests splitting the bill evenly.",
+    roastPhrase: "Separate checks immediately.",
+    toastPhrase: "Friends should not count every dollar.",
+    roastPercentage: 81,
+    toastPercentage: 19,
+    topComment:
+      "I ordered pasta. You financed a tasting menu.",
   },
   {
     id: "friends-015",
     category: "Friends",
     question:
-      "Your friend posts your worst photo because they look good in it.",
-    roastPhrase: "Delete it now.",
-    toastPhrase: "They deserve their moment.",
-    roastPercentage: 88,
-    toastPercentage: 12,
-    topComment: "Friendship ended over slide three.",
+      "Your friend posts a group photo where everyone looks good except you, but tags you anyway.",
+    roastPhrase: "Delete and repost.",
+    toastPhrase: "Not every picture will be perfect.",
+    roastPercentage: 74,
+    toastPercentage: 26,
+    topComment:
+      "The friendship survived. The tag may not.",
   },
   {
     id: "friends-016",
     category: "Friends",
     question:
-      "Your friend calls your ex to defend you after the breakup.",
+      "Your friend messages your ex to defend you after the breakup without telling you first.",
     roastPhrase: "Stay out of it.",
-    toastPhrase: "That is backup.",
-    roastPercentage: 54,
-    toastPercentage: 46,
-    topComment: "Appreciated, but nobody authorized this press conference.",
+    toastPhrase: "That is loyalty.",
+    roastPercentage: 63,
+    toastPercentage: 37,
+    topComment:
+      "The support was appreciated. The unauthorized press conference was not.",
   },
   {
     id: "friends-017",
     category: "Friends",
     question:
-      "Your friend remembers the anniversary of something difficult you went through.",
-    roastPhrase: "Do not make it emotional.",
-    toastPhrase: "That means a lot.",
-    roastPercentage: 3,
-    toastPercentage: 97,
-    topComment: "Being remembered quietly can mean everything.",
+      "Your friend remembers the anniversary of a difficult event and checks in without making you explain.",
+    roastPhrase: "Do not remind me.",
+    toastPhrase: "That means everything.",
+    roastPercentage: 8,
+    toastPercentage: 92,
+    topComment:
+      "Being remembered quietly can feel louder than any speech.",
   },
   {
     id: "friends-018",
     category: "Friends",
     question:
-      "Your friend keeps inviting you out after you cancel three times in a row.",
-    roastPhrase: "Take the hint.",
-    toastPhrase: "They still want me there.",
-    roastPercentage: 32,
-    toastPercentage: 68,
-    topComment: "They have not given up on your social life yet.",
+      "Your friend keeps inviting you out after you have declined four times in a row.",
+    roastPhrase: "Please take the hint.",
+    toastPhrase: "They still want me included.",
+    roastPercentage: 44,
+    toastPercentage: 56,
+    topComment:
+      "Persistence can feel loving right up until it becomes pressure.",
   },
   {
     id: "friends-019",
     category: "Friends",
     question:
-      "Your friend borrows your clothes and returns them freshly cleaned.",
-    roastPhrase: "As they should.",
-    toastPhrase: "That deserves appreciation.",
-    roastPercentage: 19,
-    toastPercentage: 81,
-    topComment: "Returned, cleaned, and not stretched? Rare friendship luxury.",
+      "Your friend borrows your outfit and returns it cleaned, folded, and with a small thank-you gift.",
+    roastPhrase: "That is still my outfit.",
+    toastPhrase: "They handled it perfectly.",
+    roastPercentage: 11,
+    toastPercentage: 89,
+    topComment:
+      "Returned cleaner than it left? Borrowing privileges renewed.",
   },
   {
     id: "friends-020",
     category: "Friends",
     question:
-      "Your friend knows you are wrong but still defends you in public, then corrects you privately.",
-    roastPhrase: "Do not enable me.",
-    toastPhrase: "That is the perfect system.",
-    roastPercentage: 28,
-    toastPercentage: 72,
-    topComment: "United in public, audited in private.",
+      "Your friend tells you they cannot support your decision but promises not to abandon you over it.",
+    roastPhrase: "Support should not be conditional.",
+    toastPhrase: "Honesty and loyalty can coexist.",
+    roastPercentage: 39,
+    toastPercentage: 61,
+    topComment:
+      "Disagreement without abandonment is an underrated friendship skill.",
   },
 ];

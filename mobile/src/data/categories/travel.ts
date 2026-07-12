@@ -2,218 +2,262 @@
 // File: travel.ts
 //
 // Purpose:
-// Stores Travel category moments for Roast or Toast.
+// Stores Travel category Moments.
 //
-// Content Balance:
-// • Annoying travel behavior
-// • Kind travel behavior
-// • Divisive situations that should split opinions
+// Content Direction:
+// • Airport and flight etiquette
+// • Group-trip behavior
+// • Hotels, road trips, and planning
+// • Situations where convenience and consideration clash
+//
+// Important:
+// Existing IDs are preserved so saved sessions remain
+// compatible after this content update.
 //
 // Project: Roast or Toast
 // =====================================================
 
 import type { Moment } from "../types";
 
-// Travel-related moments used in the local prototype.
 export const travelMoments: Moment[] = [
   {
     id: "travel-001",
     category: "Travel",
-    question: "Someone claps when the plane lands.",
+    question:
+      "Someone claps when the plane lands after a flight with heavy turbulence.",
     roastPhrase: "Please remain seated.",
-    toastPhrase: "Let them celebrate.",
-    roastPercentage: 68,
-    toastPercentage: 32,
-    topComment: "The pilot did not ask for an applause review.",
+    toastPhrase: "They survived emotionally.",
+    roastPercentage: 44,
+    toastPercentage: 56,
+    topComment:
+      "Under normal conditions, unnecessary. After that turbulence, understandable.",
   },
   {
     id: "travel-002",
     category: "Travel",
-    question: "Someone stands up before the plane reaches the gate.",
+    question:
+      "Someone stands up as soon as the plane lands even though the door will not open for another ten minutes.",
     roastPhrase: "Sit back down.",
-    toastPhrase: "They are ready to go.",
-    roastPercentage: 91,
-    toastPercentage: 9,
-    topComment: "Standing early has never opened the door faster.",
+    toastPhrase: "They need to stretch.",
+    roastPercentage: 82,
+    toastPercentage: 18,
+    topComment:
+      "Standing early has never convinced the door to open faster.",
   },
   {
     id: "travel-003",
     category: "Travel",
-    question: "Someone gives up their seat so a family can sit together.",
-    roastPhrase: "That is not their problem.",
+    question:
+      "Someone gives up their aisle seat so a parent can sit beside their young child.",
+    roastPhrase: "The airline should fix it.",
     toastPhrase: "That was thoughtful.",
-    roastPercentage: 17,
-    toastPercentage: 83,
-    topComment: "Humanity restored for one flight.",
+    roastPercentage: 22,
+    toastPercentage: 78,
+    topComment:
+      "Not their responsibility, but still a kind thing to do.",
   },
   {
     id: "travel-004",
     category: "Travel",
-    question: "Someone reclines their seat as soon as the plane takes off.",
-    roastPhrase: "Read the room.",
-    toastPhrase: "They paid for the seat.",
-    roastPercentage: 64,
-    toastPercentage: 36,
-    topComment: "My knees have entered the conversation.",
+    question:
+      "Someone reclines their seat on a daytime flight after asking the person behind them first.",
+    roastPhrase: "There is still no room.",
+    toastPhrase: "They asked politely.",
+    roastPercentage: 39,
+    toastPercentage: 61,
+    topComment:
+      "Permission does not create legroom, but it helps.",
   },
   {
     id: "travel-005",
     category: "Travel",
-    question: "Someone takes off their shoes during a flight.",
-    roastPhrase: "Put them back on.",
-    toastPhrase: "Comfort matters.",
-    roastPercentage: 88,
-    toastPercentage: 12,
-    topComment: "This cabin did not agree to that level of comfort.",
+    question:
+      "Someone takes off their shoes during a long flight but keeps clean socks on.",
+    roastPhrase: "Keep the shoes on.",
+    toastPhrase: "Long flights require comfort.",
+    roastPercentage: 56,
+    toastPercentage: 44,
+    topComment:
+      "Clean socks have prevented a stronger public reaction.",
   },
   {
     id: "travel-006",
     category: "Travel",
-    question: "Someone helps a stranger lift a bag into the overhead bin.",
-    roastPhrase: "Mind your own luggage.",
-    toastPhrase: "That was kind.",
-    roastPercentage: 6,
-    toastPercentage: 94,
-    topComment: "A small act that saves an entire boarding process.",
+    question:
+      "Someone helps a stranger lift a heavy bag into the overhead bin, then jokingly asks for a tip.",
+    roastPhrase: "The joke ruined it.",
+    toastPhrase: "They still helped.",
+    roastPercentage: 33,
+    toastPercentage: 67,
+    topComment:
+      "Community service with a brief comedy surcharge.",
   },
   {
     id: "travel-007",
     category: "Travel",
-    question: "Someone saves pool chairs with towels before breakfast.",
-    roastPhrase: "Those chairs are not reserved.",
+    question:
+      "Someone saves pool chairs early in the morning but actually returns within fifteen minutes.",
+    roastPhrase: "A towel is not a reservation.",
     toastPhrase: "They planned ahead.",
-    roastPercentage: 79,
-    toastPercentage: 21,
-    topComment: "The towel is not a legal document.",
+    roastPercentage: 53,
+    toastPercentage: 47,
+    topComment:
+      "Fifteen minutes feels reasonable until every chair has a towel on it.",
   },
   {
     id: "travel-008",
     category: "Travel",
-    question: "Someone uses both armrests in the middle seat.",
+    question:
+      "The person in the middle seat uses both armrests for the entire flight.",
     roastPhrase: "Pick one.",
     toastPhrase: "The middle seat gets both.",
-    roastPercentage: 44,
-    toastPercentage: 56,
-    topComment: "The middle seat deserves at least one victory.",
+    roastPercentage: 42,
+    toastPercentage: 58,
+    topComment:
+      "The middle seat deserves one guaranteed benefit.",
   },
   {
     id: "travel-009",
     category: "Travel",
-    question: "Someone cuts the boarding line because their group is already ahead.",
-    roastPhrase: "Back of the line.",
-    toastPhrase: "They are joining their people.",
-    roastPercentage: 81,
-    toastPercentage: 19,
-    topComment: "Your group boarding does not create diplomatic immunity.",
+    question:
+      "Someone joins their family farther ahead in the boarding line instead of waiting alone.",
+    roastPhrase: "Go to the back.",
+    toastPhrase: "Families board together.",
+    roastPercentage: 57,
+    toastPercentage: 43,
+    topComment:
+      "One person joining feels different from twelve people appearing.",
   },
   {
     id: "travel-010",
     category: "Travel",
-    question: "Someone brings strong-smelling food onto the plane.",
-    roastPhrase: "Air travel violation.",
-    toastPhrase: "They need to eat.",
-    roastPercentage: 73,
-    toastPercentage: 27,
-    topComment: "The entire row is now part of lunch.",
+    question:
+      "Someone brings strong-smelling food onto the plane because the airport had no other affordable options.",
+    roastPhrase: "The cabin did not consent.",
+    toastPhrase: "People need to eat.",
+    roastPercentage: 61,
+    toastPercentage: 39,
+    topComment:
+      "Valid hunger. Unfortunate shared air.",
   },
   {
     id: "travel-011",
     category: "Travel",
-    question: "Someone lets you take the window seat because they know you love it.",
-    roastPhrase: "They probably wanted the aisle.",
+    question:
+      "Your travel partner gives you the window seat both ways because they know flying makes you anxious.",
+    roastPhrase: "They probably prefer the aisle.",
     toastPhrase: "That is considerate.",
     roastPercentage: 8,
     toastPercentage: 92,
-    topComment: "That is premium friendship behavior.",
+    topComment:
+      "Comfort offered without being asked is premium travel behavior.",
   },
   {
     id: "travel-012",
     category: "Travel",
-    question: "Someone puts their bag in an overhead bin far from their seat.",
-    roastPhrase: "Keep it near you.",
+    question:
+      "Someone puts their bag in an overhead bin several rows ahead because the space above their seat is full.",
+    roastPhrase: "Keep it near your seat.",
     toastPhrase: "Space is space.",
-    roastPercentage: 62,
-    toastPercentage: 38,
-    topComment: "Now everyone has to play luggage Tetris.",
+    roastPercentage: 48,
+    toastPercentage: 52,
+    topComment:
+      "Reasonable in theory. Chaotic during deplaning.",
   },
   {
     id: "travel-013",
     category: "Travel",
-    question: "Someone switches seats without asking first.",
+    question:
+      "Someone moves into an empty better seat after boarding without asking a flight attendant.",
     roastPhrase: "Return to your assignment.",
-    toastPhrase: "It is just a seat.",
-    roastPercentage: 84,
-    toastPercentage: 16,
-    topComment: "The seat map was not a suggestion.",
+    toastPhrase: "Nobody was using it.",
+    roastPercentage: 63,
+    toastPercentage: 37,
+    topComment:
+      "The empty seat was available. The permission was not.",
   },
   {
     id: "travel-014",
     category: "Travel",
-    question: "Someone checks on an elderly passenger traveling alone.",
-    roastPhrase: "Do not be nosy.",
-    toastPhrase: "That is a good person.",
-    roastPercentage: 4,
-    toastPercentage: 96,
-    topComment: "Kindness travels well.",
+    question:
+      "Someone checks on an older passenger traveling alone but asks several personal questions while helping.",
+    roastPhrase: "Helpful became nosy.",
+    toastPhrase: "They were being friendly.",
+    roastPercentage: 49,
+    toastPercentage: 51,
+    topComment:
+      "Kindness and interrogation were seated beside each other.",
   },
   {
     id: "travel-015",
     category: "Travel",
-    question: "Someone records the entire plane takeoff on their phone.",
-    roastPhrase: "You will never rewatch that.",
-    toastPhrase: "Let them enjoy the moment.",
-    roastPercentage: 57,
-    toastPercentage: 43,
-    topComment: "That video is headed directly to the camera roll graveyard.",
+    question:
+      "Someone records the plane taking off because it is their first flight.",
+    roastPhrase: "Watch it with your own eyes.",
+    toastPhrase: "That is a big memory.",
+    roastPercentage: 21,
+    toastPercentage: 79,
+    topComment:
+      "The camera roll may actually revisit this one.",
   },
   {
     id: "travel-016",
     category: "Travel",
-    question: "Someone arrives at the airport four hours early.",
+    question:
+      "Someone arrives at the airport four hours early and expects everyone traveling with them to do the same.",
     roastPhrase: "That is excessive.",
-    toastPhrase: "Better early than stressed.",
-    roastPercentage: 35,
-    toastPercentage: 65,
-    topComment: "Peace of mind has a very long boarding window.",
+    toastPhrase: "Missing flights is worse.",
+    roastPercentage: 54,
+    toastPercentage: 46,
+    topComment:
+      "Personal anxiety has become a group itinerary.",
   },
   {
     id: "travel-017",
     category: "Travel",
-    question: "Someone holds up security because they are not prepared.",
-    roastPhrase: "You had time.",
-    toastPhrase: "Travel is stressful.",
-    roastPercentage: 89,
-    toastPercentage: 11,
-    topComment: "The shoes and laptop rules were not announced today.",
+    question:
+      "Someone reaches airport security completely unprepared but apologizes and lets others go ahead.",
+    roastPhrase: "They should have prepared.",
+    toastPhrase: "At least they handled it well.",
+    roastPercentage: 58,
+    toastPercentage: 42,
+    topComment:
+      "Accountability does not speed up the line, but it lowers the temperature.",
   },
   {
     id: "travel-018",
     category: "Travel",
-    question: "Someone offers to take a family photo for strangers.",
-    roastPhrase: "Keep walking.",
-    toastPhrase: "That was sweet.",
-    roastPercentage: 5,
-    toastPercentage: 95,
-    topComment: "A tiny favor and now everyone is in the picture.",
+    question:
+      "Someone offers to take a stranger’s family photo, then suggests several poses.",
+    roastPhrase: "Take the picture and move on.",
+    toastPhrase: "They are making it special.",
+    roastPercentage: 36,
+    toastPercentage: 64,
+    topComment:
+      "The volunteer photographer has entered creative-director mode.",
   },
   {
     id: "travel-019",
     category: "Travel",
-    question: "Someone talks loudly through the entire flight.",
-    roastPhrase: "Indoor voice, please.",
-    toastPhrase: "Conversation passes the time.",
-    roastPercentage: 86,
-    toastPercentage: 14,
-    topComment: "The whole cabin knows the family business now.",
+    question:
+      "Someone talks through most of the flight because the stranger beside them keeps responding enthusiastically.",
+    roastPhrase: "The whole cabin can hear.",
+    toastPhrase: "They are both enjoying it.",
+    roastPercentage: 51,
+    toastPercentage: 49,
+    topComment:
+      "A mutual conversation can still become public programming.",
   },
   {
     id: "travel-020",
     category: "Travel",
-    question: "Someone packs snacks for everyone before a road trip.",
-    roastPhrase: "They are controlling the menu.",
-    toastPhrase: "That is excellent planning.",
-    roastPercentage: 7,
-    toastPercentage: 93,
-    topComment: "Road-trip leadership starts with snacks.",
+    question:
+      "Someone packs snacks for the road trip but chooses everything without asking what anyone else likes.",
+    roastPhrase: "This is not your personal menu.",
+    toastPhrase: "At least they planned.",
+    roastPercentage: 46,
+    toastPercentage: 54,
+    topComment:
+      "Excellent preparation. Questionable snack democracy.",
   },
 ];

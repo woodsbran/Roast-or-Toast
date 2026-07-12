@@ -5,11 +5,15 @@
 // Stores Work category Moments.
 //
 // Content Direction:
-// • Office politics
 // • Remote-work behavior
-// • Meetings and group projects
+// • Meetings and messaging
+// • Credit, boundaries, and office politics
 // • Helpful coworkers
-// • Specific workplace nonsense
+// • Situations that feel specific and familiar
+//
+// Important:
+// Existing IDs are preserved so saved sessions remain
+// compatible after this content update.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -21,220 +25,240 @@ export const workMoments: Moment[] = [
     id: "work-001",
     category: "Work",
     question:
-      'Your coworker replies all just to say "Thanks."',
-    roastPhrase: "Absolutely not.",
+      'Your coworker replies all to a company-wide email just to say, "Thanks!"',
+    roastPhrase: "Revoke Reply All.",
     toastPhrase: "They were being polite.",
-    roastPercentage: 86,
-    toastPercentage: 14,
-    topComment: "Outlook privileges revoked immediately.",
+    roastPercentage: 88,
+    toastPercentage: 12,
+    topComment:
+      "Three thousand inboxes received their gratitude.",
   },
   {
     id: "work-002",
     category: "Work",
     question:
-      "Your boss schedules a meeting that could have been a three-line email.",
-    roastPhrase: "Calendar crime.",
-    toastPhrase: "Maybe it needed discussion.",
-    roastPercentage: 91,
-    toastPercentage: 9,
-    topComment: "Thirty minutes gone for three bullet points.",
+      "Your boss schedules a thirty-minute meeting, reads three bullet points aloud, and ends eight minutes early.",
+    roastPhrase: "Send the email next time.",
+    toastPhrase: "At least it ended early.",
+    roastPercentage: 69,
+    toastPercentage: 31,
+    topComment:
+      "Twenty-two minutes were returned, but the calendar still has questions.",
   },
   {
     id: "work-003",
     category: "Work",
     question:
-      "Your coworker covers your shift when you have a family emergency.",
-    roastPhrase: "They want something.",
-    toastPhrase: "That is a real one.",
-    roastPercentage: 6,
-    toastPercentage: 94,
-    topComment: "Protect that coworker at all costs.",
+      "Your coworker covers your shift during an emergency but reminds everyone about it for weeks.",
+    roastPhrase: "The favor has expired.",
+    toastPhrase: "They still helped.",
+    roastPercentage: 48,
+    toastPercentage: 52,
+    topComment:
+      "Generosity with a recurring announcement is still technically generosity.",
   },
   {
     id: "work-004",
     category: "Work",
     question:
-      "Your coworker gives you credit for your idea in front of leadership.",
-    roastPhrase: "Bare minimum.",
-    toastPhrase: "That deserves respect.",
-    roastPercentage: 12,
-    toastPercentage: 88,
-    topComment: "A rare and beautiful workplace sighting.",
+      "Your coworker gives you credit for your idea in front of leadership even though they helped improve it.",
+    roastPhrase: "They should mention their part too.",
+    toastPhrase: "That shows integrity.",
+    roastPercentage: 15,
+    toastPercentage: 85,
+    topComment:
+      "A coworker who shares credit without being asked is workplace luxury.",
   },
   {
     id: "work-005",
     category: "Work",
     question:
-      'Your coworker sends "???" five minutes after messaging you.',
+      'Your coworker sends "???" five minutes after asking a nonurgent question.',
     roastPhrase: "Blocked on Teams.",
-    toastPhrase: "They need an answer.",
+    toastPhrase: "Maybe they need it quickly.",
     roastPercentage: 84,
     toastPercentage: 16,
-    topComment: "Five minutes is not a service-level agreement.",
+    topComment:
+      "Five minutes is not a service-level agreement.",
   },
   {
     id: "work-006",
     category: "Work",
     question:
-      "Your coworker volunteers the entire team for extra work during a meeting.",
+      "Your coworker volunteers the entire team for an extra project because it could increase visibility.",
     roastPhrase: "Volunteer yourself.",
-    toastPhrase: "Maybe it is a good opportunity.",
-    roastPercentage: 94,
-    toastPercentage: 6,
-    topComment: "We did not elect you spokesperson of our free time.",
+    toastPhrase: "It might help everyone.",
+    roastPercentage: 79,
+    toastPercentage: 21,
+    topComment:
+      "Exposure has once again been assigned without consent.",
   },
   {
     id: "work-007",
     category: "Work",
     question:
-      "Your manager messages you during lunch and asks if you have a quick minute.",
-    roastPhrase: "Lunch is not a minute.",
-    toastPhrase: "It might actually be quick.",
-    roastPercentage: 73,
-    toastPercentage: 27,
-    topComment: "The quickest way to ruin lunch is to call it quick.",
+      'Your manager messages during lunch asking for "a quick favor" that takes twenty minutes.',
+    roastPhrase: "Lunch is not office hours.",
+    toastPhrase: "Some things cannot wait.",
+    roastPercentage: 71,
+    toastPercentage: 29,
+    topComment:
+      "The quickest part was how fast lunch disappeared.",
   },
   {
     id: "work-008",
     category: "Work",
     question:
-      "Your coworker joins every video call with their camera off and never speaks.",
-    roastPhrase: "Are they even there?",
-    toastPhrase: "They are listening.",
-    roastPercentage: 58,
-    toastPercentage: 42,
-    topComment: "A mysterious black square collecting a paycheck.",
+      "Your coworker keeps their camera off in every meeting but consistently contributes and finishes their work.",
+    roastPhrase: "Turn the camera on sometimes.",
+    toastPhrase: "Performance matters more.",
+    roastPercentage: 28,
+    toastPercentage: 72,
+    topComment:
+      "A black square with excellent deliverables is still an excellent coworker.",
   },
   {
     id: "work-009",
     category: "Work",
     question:
-      "Your boss sends an email at midnight but says no response is needed until morning.",
-    roastPhrase: "Schedule send exists.",
-    toastPhrase: "At least they clarified.",
-    roastPercentage: 64,
-    toastPercentage: 36,
-    topComment: "No pressure, just a glowing notification beside your bed.",
+      "Your boss sends emails late at night but schedules them so they arrive the next morning.",
+    roastPhrase: "They should log off too.",
+    toastPhrase: "That respects boundaries.",
+    roastPercentage: 18,
+    toastPercentage: 82,
+    topComment:
+      "Workaholic behavior, responsibly packaged.",
   },
   {
     id: "work-010",
     category: "Work",
     question:
-      "Your coworker brings breakfast for the team after a stressful week.",
-    roastPhrase: "They are campaigning.",
-    toastPhrase: "That is good people.",
-    roastPercentage: 5,
-    toastPercentage: 95,
-    topComment: "Morale has officially been restored by pastries.",
+      "Your coworker brings breakfast for the team but asks everyone to send money afterward.",
+    roastPhrase: "That was not a gift.",
+    toastPhrase: "Breakfast was still organized.",
+    roastPercentage: 74,
+    toastPercentage: 26,
+    topComment:
+      "A surprise invoice is not team morale.",
   },
   {
     id: "work-011",
     category: "Work",
     question:
-      "Your coworker says they are slammed, then spends twenty minutes telling everyone how slammed they are.",
+      "Your coworker says they are overwhelmed, then spends twenty minutes explaining every task they have.",
     roastPhrase: "Use that time to work.",
-    toastPhrase: "They are overwhelmed.",
-    roastPercentage: 87,
-    toastPercentage: 13,
-    topComment: "The status update became the entire workload.",
+    toastPhrase: "They may need support.",
+    roastPercentage: 62,
+    toastPercentage: 38,
+    topComment:
+      "The workload presentation became another item on the workload.",
   },
   {
     id: "work-012",
     category: "Work",
     question:
-      "Your boss praises the team publicly but takes all the credit with executives.",
-    roastPhrase: "Leadership theft.",
+      "Your manager praises the team publicly but describes the success as their own during an executive meeting.",
+    roastPhrase: "That is credit theft.",
     toastPhrase: "They represent the team.",
-    roastPercentage: 95,
-    toastPercentage: 5,
-    topComment: "Our work, their LinkedIn accomplishment.",
+    roastPercentage: 92,
+    toastPercentage: 8,
+    topComment:
+      "Our work has become their leadership story.",
   },
   {
     id: "work-013",
     category: "Work",
     question:
-      "Your coworker fixes a mistake you made without embarrassing you in front of everyone.",
-    roastPhrase: "They should tell me directly.",
+      "Your coworker quietly corrects your mistake, then tells you privately so it does not happen again.",
+    roastPhrase: "They should have asked first.",
     toastPhrase: "That is professional.",
-    roastPercentage: 9,
-    toastPercentage: 91,
-    topComment: "Corrected quietly and protected publicly. Elite coworker.",
+    roastPercentage: 11,
+    toastPercentage: 89,
+    topComment:
+      "Protected publicly, corrected privately. Perfect execution.",
   },
   {
     id: "work-014",
     category: "Work",
     question:
-      "Your coworker marks every email as high importance.",
-    roastPhrase: "Nothing is important now.",
-    toastPhrase: "They want visibility.",
-    roastPercentage: 92,
-    toastPercentage: 8,
-    topComment: "When everything is urgent, nothing is.",
+      "Your coworker marks every email as high importance because they believe their work is always urgent.",
+    roastPhrase: "Nothing is urgent now.",
+    toastPhrase: "At least expectations are clear.",
+    roastPercentage: 89,
+    toastPercentage: 11,
+    topComment:
+      "The red exclamation mark has lost all legal authority.",
   },
   {
     id: "work-015",
     category: "Work",
     question:
-      "Your manager asks for feedback, then argues with every answer.",
+      "Your manager asks for honest feedback, then explains why every criticism is unfair.",
     roastPhrase: "They wanted compliments.",
-    toastPhrase: "They are discussing it.",
-    roastPercentage: 90,
-    toastPercentage: 10,
-    topComment: "This was not a survey. It was a loyalty test.",
+    toastPhrase: "They are allowed to respond.",
+    roastPercentage: 83,
+    toastPercentage: 17,
+    topComment:
+      "This feedback session has become a defense hearing.",
   },
   {
     id: "work-016",
     category: "Work",
     question:
-      "Your coworker leaves right at five while everyone else is still working.",
+      "Your coworker leaves exactly at five while the rest of the team stays late to finish a shared deadline.",
     roastPhrase: "Read the room.",
-    toastPhrase: "Their shift is over.",
-    roastPercentage: 34,
-    toastPercentage: 66,
-    topComment: "A boundary is not a crime just because nobody else has one.",
+    toastPhrase: "Their workday is over.",
+    roastPercentage: 46,
+    toastPercentage: 54,
+    topComment:
+      "A boundary can still feel inconvenient to people without one.",
   },
   {
     id: "work-017",
     category: "Work",
     question:
-      "Your coworker schedules a 7:00 a.m. meeting because it works better for their time zone.",
-    roastPhrase: "Find another time.",
+      "Your coworker schedules an early meeting because every reasonable time conflicts across time zones.",
+    roastPhrase: "Find another solution.",
     toastPhrase: "Someone has to compromise.",
-    roastPercentage: 78,
-    toastPercentage: 22,
-    topComment: "Global collaboration, local suffering.",
+    roastPercentage: 51,
+    toastPercentage: 49,
+    topComment:
+      "Global collaboration means local resentment.",
   },
   {
     id: "work-018",
     category: "Work",
     question:
-      "Your coworker corrects your grammar in a casual team chat.",
-    roastPhrase: "This is not English class.",
-    toastPhrase: "They are helping.",
-    roastPercentage: 88,
-    toastPercentage: 12,
-    topComment: "The message was understood, Professor Teams.",
+      "Your coworker corrects your grammar in a casual message but ignores the actual question.",
+    roastPhrase: "Answer the question.",
+    toastPhrase: "Accuracy matters.",
+    roastPercentage: 91,
+    toastPercentage: 9,
+    topComment:
+      "The sentence is fixed. The problem remains completely untouched.",
   },
   {
     id: "work-019",
     category: "Work",
     question:
-      "Your manager encourages you to take time off and actually leaves you alone while you are gone.",
+      "Your manager encourages you to take vacation and does not contact you once while you are away.",
     roastPhrase: "That should be normal.",
-    toastPhrase: "That is good leadership.",
-    roastPercentage: 8,
-    toastPercentage: 92,
-    topComment: "A manager who respects PTO? Frame the email.",
+    toastPhrase: "That is excellent leadership.",
+    roastPercentage: 9,
+    toastPercentage: 91,
+    topComment:
+      "The bar is low, but this manager brought a ladder.",
   },
   {
     id: "work-020",
     category: "Work",
     question:
-      "Your coworker says they missed the deadline because nobody reminded them.",
+      "Your coworker misses a deadline and says nobody reminded them, even though it was on the shared calendar.",
     roastPhrase: "The deadline was the reminder.",
     toastPhrase: "The team could communicate better.",
-    roastPercentage: 93,
-    toastPercentage: 7,
-    topComment: "The calendar invitation would like a word.",
+    roastPercentage: 87,
+    toastPercentage: 13,
+    topComment:
+      "The calendar invitation would like to enter evidence.",
   },
 ];

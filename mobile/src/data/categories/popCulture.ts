@@ -5,11 +5,14 @@
 // Stores Pop Culture category Moments.
 //
 // Content Direction:
-// • Movies and television
-// • Music and celebrities
-// • Fandom behavior
+// • Movies, television, music, and fandom
 // • Spoilers and streaming etiquette
-// • Current social habits without relying on one trend
+// • Popularity, criticism, and fan behavior
+// • Situations that remain understandable over time
+//
+// Important:
+// Existing IDs are preserved so saved sessions remain
+// compatible after this content update.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -21,220 +24,240 @@ export const popCultureMoments: Moment[] = [
     id: "pop-culture-001",
     category: "Pop Culture",
     question:
-      "Someone says they hate a popular show after watching only ten minutes.",
-    roastPhrase: "Finish one episode first.",
+      "Someone decides a popular show is terrible after watching half of the first episode.",
+    roastPhrase: "Give it one full episode.",
     toastPhrase: "They know what they dislike.",
-    roastPercentage: 71,
-    toastPercentage: 29,
-    topComment: "Ten minutes and suddenly they are a television critic.",
+    roastPercentage: 62,
+    toastPercentage: 38,
+    topComment:
+      "Thirty minutes may be enough for chemistry, but not always for a whole series.",
   },
   {
     id: "pop-culture-002",
     category: "Pop Culture",
     question:
-      "Someone posts a major spoiler the same night a new episode releases.",
-    roastPhrase: "Straight to jail.",
-    toastPhrase: "Stay off social media.",
-    roastPercentage: 92,
-    toastPercentage: 8,
-    topComment: "Some of us have jobs and cannot watch at midnight.",
+      "Someone posts a major spoiler the morning after an episode releases because they believe everyone had enough time.",
+    roastPhrase: "Some people were asleep.",
+    toastPhrase: "Avoid social media.",
+    roastPercentage: 84,
+    toastPercentage: 16,
+    topComment:
+      "The spoiler window cannot be one commute long.",
   },
   {
     id: "pop-culture-003",
     category: "Pop Culture",
     question:
-      "Someone wears a band shirt but cannot name a single song.",
-    roastPhrase: "Name three songs.",
-    toastPhrase: "The shirt is cute.",
-    roastPercentage: 49,
-    toastPercentage: 51,
-    topComment: "Merchandise does not require an entrance exam.",
+      "Someone wears a band shirt because they like the design but has never listened to the band.",
+    roastPhrase: "Learn one song.",
+    toastPhrase: "It is just clothing.",
+    roastPercentage: 43,
+    toastPercentage: 57,
+    topComment:
+      "The shirt is merchandise, not a music certification.",
   },
   {
     id: "pop-culture-004",
     category: "Pop Culture",
     question:
-      "Someone starts a series with you, then watches ahead without telling you.",
-    roastPhrase: "This is betrayal.",
-    toastPhrase: "You were taking too long.",
-    roastPercentage: 84,
-    toastPercentage: 16,
-    topComment: "We made a commitment in episode one.",
+      "Someone watches two episodes ahead in a show you started together but agrees to rewatch them with you.",
+    roastPhrase: "The betrayal already happened.",
+    toastPhrase: "They are willing to rewatch.",
+    roastPercentage: 54,
+    toastPercentage: 46,
+    topComment:
+      "The agreement was broken, but restitution includes snacks.",
   },
   {
     id: "pop-culture-005",
     category: "Pop Culture",
     question:
-      "Someone refuses to watch a movie because it has subtitles.",
-    roastPhrase: "Reading will not hurt.",
-    toastPhrase: "Movies should feel relaxing.",
-    roastPercentage: 76,
-    toastPercentage: 24,
-    topComment: "A whole world of cinema lost to two lines of text.",
+      "Someone refuses to watch a subtitled movie after a long workday because they do not want to read.",
+    roastPhrase: "You are missing great movies.",
+    toastPhrase: "Entertainment should feel easy.",
+    roastPercentage: 51,
+    toastPercentage: 49,
+    topComment:
+      "A fair mood-based decision that becomes questionable as a permanent rule.",
   },
   {
     id: "pop-culture-006",
     category: "Pop Culture",
     question:
-      "Someone records almost an entire concert instead of watching it.",
-    roastPhrase: "Put the phone down.",
-    toastPhrase: "They want the memories.",
-    roastPercentage: 67,
-    toastPercentage: 33,
-    topComment: "The camera roll attended more of the concert than they did.",
+      "Someone records their favorite song at a concert but watches the rest without their phone.",
+    roastPhrase: "Experience it fully.",
+    toastPhrase: "That is a good balance.",
+    roastPercentage: 19,
+    toastPercentage: 81,
+    topComment:
+      "One memory captured. The rest actually lived.",
   },
   {
     id: "pop-culture-007",
     category: "Pop Culture",
     question:
-      "Someone discovers an old song and acts like nobody else has ever heard it.",
-    roastPhrase: "We were there.",
-    toastPhrase: "Let them enjoy it.",
-    roastPercentage: 62,
-    toastPercentage: 38,
-    topComment: "Congratulations on discovering a song with 900 million streams.",
+      "Someone discovers an older song through a viral video and calls it their new favorite.",
+    roastPhrase: "You are late.",
+    toastPhrase: "Good music has no deadline.",
+    roastPercentage: 24,
+    toastPercentage: 76,
+    topComment:
+      "The discovery was late. The enjoyment is still valid.",
   },
   {
     id: "pop-culture-008",
     category: "Pop Culture",
     question:
-      "Someone skips the opening theme of a show every single episode.",
+      "Someone skips the opening theme every episode except the season premiere and finale.",
     roastPhrase: "Respect the intro.",
-    toastPhrase: "Get to the story.",
-    roastPercentage: 46,
-    toastPercentage: 54,
-    topComment: "Some intros are art. Others are a workplace obstacle.",
+    toastPhrase: "That is efficient.",
+    roastPercentage: 39,
+    toastPercentage: 61,
+    topComment:
+      "A reasonable compromise in the ongoing war against theme songs.",
   },
   {
     id: "pop-culture-009",
     category: "Pop Culture",
     question:
-      "Someone rates every movie they watch online before the credits finish.",
-    roastPhrase: "Process the film first.",
-    toastPhrase: "They know their opinion.",
-    roastPercentage: 53,
-    toastPercentage: 47,
-    topComment: "The final scene is still fading and the review is already live.",
+      "Someone rates a movie immediately after leaving the theater, then changes the score the next day.",
+    roastPhrase: "Think before reviewing.",
+    toastPhrase: "Opinions can evolve.",
+    roastPercentage: 37,
+    toastPercentage: 63,
+    topComment:
+      "The first review was emotional. The second had breakfast.",
   },
   {
     id: "pop-culture-010",
     category: "Pop Culture",
     question:
-      "Someone refuses to listen to an artist because their fans are annoying.",
-    roastPhrase: "Judge the music.",
-    toastPhrase: "The fanbase ruins it.",
-    roastPercentage: 58,
-    toastPercentage: 42,
-    topComment: "The songs did not create the group chat behavior.",
+      "Someone avoids an artist because the fanbase makes every conversation exhausting.",
+    roastPhrase: "Judge the music itself.",
+    toastPhrase: "Fandom affects the experience.",
+    roastPercentage: 53,
+    toastPercentage: 47,
+    topComment:
+      "The songs are innocent. The comment section is not.",
   },
   {
     id: "pop-culture-011",
     category: "Pop Culture",
     question:
-      "Someone calls a movie overrated only after it becomes extremely popular.",
-    roastPhrase: "Contrarian behavior.",
-    toastPhrase: "Popularity changes expectations.",
-    roastPercentage: 69,
-    toastPercentage: 31,
-    topComment: "They loved it until everyone else did too.",
+      "Someone calls a movie overrated after enjoying it because they think the praise became excessive.",
+    roastPhrase: "You still liked it.",
+    toastPhrase: "Good can still be overrated.",
+    roastPercentage: 47,
+    toastPercentage: 53,
+    topComment:
+      "Enjoyment and cultural exhaustion can apparently coexist.",
   },
   {
     id: "pop-culture-012",
     category: "Pop Culture",
     question:
-      "Someone talks through a movie because they already saw it.",
-    roastPhrase: "Leave the theater.",
-    toastPhrase: "They are adding context.",
-    roastPercentage: 93,
-    toastPercentage: 7,
-    topComment: "Director commentary was not included with this friendship.",
+      "Someone talks during a movie they have already seen but only to explain details you ask about.",
+    roastPhrase: "Wait until it ends.",
+    toastPhrase: "You asked the question.",
+    roastPercentage: 41,
+    toastPercentage: 59,
+    topComment:
+      "Requested commentary is different from an unsolicited director’s cut.",
   },
   {
     id: "pop-culture-013",
     category: "Pop Culture",
     question:
-      "Someone cries when their favorite celebrity announces a breakup.",
+      "Someone feels genuinely sad when a celebrity couple they followed for years breaks up.",
     roastPhrase: "You do not know them.",
-    toastPhrase: "Let people feel things.",
-    roastPercentage: 64,
-    toastPercentage: 36,
-    topComment: "Their relationship ended and somehow we all need closure.",
+    toastPhrase: "People get emotionally invested.",
+    roastPercentage: 58,
+    toastPercentage: 42,
+    topComment:
+      "Parasocial grief is still grief, just with better publicists.",
   },
   {
     id: "pop-culture-014",
     category: "Pop Culture",
     question:
-      "Someone buys tickets to a movie twice because they fell asleep the first time.",
-    roastPhrase: "That was the review.",
-    toastPhrase: "They deserve another chance.",
-    roastPercentage: 45,
-    toastPercentage: 55,
-    topComment: "The nap was expensive, but the commitment is impressive.",
+      "Someone buys another movie ticket because they slept through part of the first showing.",
+    roastPhrase: "The nap was the review.",
+    toastPhrase: "They deserve a real chance.",
+    roastPercentage: 42,
+    toastPercentage: 58,
+    topComment:
+      "Expensive accountability, but accountability nonetheless.",
   },
   {
     id: "pop-culture-015",
     category: "Pop Culture",
     question:
-      "Someone says the book was better before asking whether the movie was good.",
-    roastPhrase: "We already know.",
-    toastPhrase: "The book usually is better.",
-    roastPercentage: 57,
-    toastPercentage: 43,
-    topComment: "The book people arrived early to remind us.",
+      "Someone says the book was better but still recommends the movie to people who do not like reading.",
+    roastPhrase: "Stop comparing everything.",
+    toastPhrase: "Both can have value.",
+    roastPercentage: 18,
+    toastPercentage: 82,
+    topComment:
+      "A book person displaying restraint and practical judgment.",
   },
   {
     id: "pop-culture-016",
     category: "Pop Culture",
     question:
-      "Someone creates a full costume for a movie premiere.",
-    roastPhrase: "It is just a movie.",
+      "Someone wears a full costume to a movie premiere even though nobody else in their group dresses up.",
+    roastPhrase: "That is doing too much.",
     toastPhrase: "Commit to the experience.",
-    roastPercentage: 24,
-    toastPercentage: 76,
-    topComment: "Main-character energy with advance-ticket planning.",
+    roastPercentage: 29,
+    toastPercentage: 71,
+    topComment:
+      "Being the only one dressed up is either brave or spiritually exhausting.",
   },
   {
     id: "pop-culture-017",
     category: "Pop Culture",
     question:
-      "Someone refuses to watch a classic because it looks too old.",
+      "Someone refuses to watch a classic because the pacing feels too slow by modern standards.",
     roastPhrase: "Give it a chance.",
-    toastPhrase: "Old movies feel slow.",
-    roastPercentage: 72,
-    toastPercentage: 28,
-    topComment: "Cinema existed before high-definition skin texture.",
+    toastPhrase: "Entertainment tastes change.",
+    roastPercentage: 57,
+    toastPercentage: 43,
+    topComment:
+      "Historical importance does not guarantee personal enjoyment.",
   },
   {
     id: "pop-culture-018",
     category: "Pop Culture",
     question:
-      "Someone plays the same album every day for an entire month.",
-    roastPhrase: "Please find new music.",
-    toastPhrase: "They found their album.",
-    roastPercentage: 37,
-    toastPercentage: 63,
-    topComment: "The streaming service is now concerned.",
+      "Someone plays the same album daily for a month because it helps them focus.",
+    roastPhrase: "Find new music.",
+    toastPhrase: "They found what works.",
+    roastPercentage: 27,
+    toastPercentage: 73,
+    topComment:
+      "The album is employed full time now.",
   },
   {
     id: "pop-culture-019",
     category: "Pop Culture",
     question:
-      "Someone makes their favorite celebrity their entire personality.",
-    roastPhrase: "Develop another interest.",
-    toastPhrase: "Fandom makes them happy.",
-    roastPercentage: 78,
-    toastPercentage: 22,
-    topComment: "The celebrity has a career. You need a second topic.",
+      "Someone brings their favorite celebrity into nearly every unrelated conversation.",
+    roastPhrase: "Develop another topic.",
+    toastPhrase: "Let people enjoy things.",
+    roastPercentage: 71,
+    toastPercentage: 29,
+    topComment:
+      "The celebrity has range. The conversation does not.",
   },
   {
     id: "pop-culture-020",
     category: "Pop Culture",
     question:
-      "Someone pauses a documentary every five minutes to look up more information.",
-    roastPhrase: "Let the documentary explain.",
-    toastPhrase: "They are curious.",
-    roastPercentage: 48,
-    toastPercentage: 52,
-    topComment: "The two-hour documentary has become a six-hour research project.",
+      "Someone pauses a documentary repeatedly to verify claims and read more about the topic.",
+    roastPhrase: "Let the documentary finish.",
+    toastPhrase: "Curiosity is a good thing.",
+    roastPercentage: 44,
+    toastPercentage: 56,
+    topComment:
+      "The two-hour documentary has become an independent research course.",
   },
 ];
