@@ -4,17 +4,19 @@
 // Screen: Home
 //
 // Purpose:
-// Introduces the Roast or Toast brand and provides two
-// clear gameplay actions:
+// Introduces Roast or Toast and provides:
 //
-// • Continue Session:
-//   Resumes the exact saved question or special screen.
+// • Continue Session
+// • New Round
+// • My Profile
+// • Settings
 //
-// • New Round:
-//   Opens the round-mode selection screen.
+// A locally saved nickname appears as a subtle greeting.
 //
 // Project: Roast or Toast
 // =====================================================
+
+import { Ionicons } from "@expo/vector-icons";
 
 import {
   router,
@@ -36,6 +38,11 @@ import {
 } from "react-native";
 
 import {
+  DEFAULT_PLAYER_NICKNAME,
+  loadPlayerProfile,
+} from "../game/profileStorage";
+
+import {
   loadGameSession,
 } from "../game/sessionStorage";
 
@@ -46,43 +53,46 @@ import {
 } from "../theme";
 
 export default function HomeScreen() {
-  // Controls the subtle press animation on the primary
-  // action button.
   const buttonScale = useRef(
     new Animated.Value(1),
   ).current;
 
-  // Determines whether a resumable session exists.
   const [
     hasSavedSession,
     setHasSavedSession,
   ] = useState(false);
 
-  // Prevents the wrong Home actions from briefly showing
-  // before local storage is checked.
   const [
     isCheckingSession,
     setIsCheckingSession,
   ] = useState(true);
 
+  const [
+    nickname,
+    setNickname,
+  ] = useState(
+    DEFAULT_PLAYER_NICKNAME,
+  );
+
   // =====================================================
-  // Check for an Active Session
+  // Restore Home Data
   // =====================================================
 
-  // Runs whenever Home becomes the active route.
-  //
-  // This ensures Continue Session appears immediately
-  // after the player returns from gameplay.
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
-      const checkForSavedSession =
+      const restoreHomeData =
         async () => {
           setIsCheckingSession(true);
 
-          const savedSession =
-            await loadGameSession();
+          const [
+            savedSession,
+            savedProfile,
+          ] = await Promise.all([
+            loadGameSession(),
+            loadPlayerProfile(),
+          ]);
 
           if (!isActive) {
             return;
@@ -94,10 +104,14 @@ export default function HomeScreen() {
             ),
           );
 
+          setNickname(
+            savedProfile.nickname,
+          );
+
           setIsCheckingSession(false);
         };
 
-      void checkForSavedSession();
+      void restoreHomeData();
 
       return () => {
         isActive = false;
@@ -110,29 +124,33 @@ export default function HomeScreen() {
   // =====================================================
 
   const handlePressIn = () => {
-    Animated.spring(buttonScale, {
-      toValue: 0.96,
-      useNativeDriver: true,
-      speed: 30,
-      bounciness: 4,
-    }).start();
+    Animated.spring(
+      buttonScale,
+      {
+        toValue: 0.96,
+        useNativeDriver: true,
+        speed: 30,
+        bounciness: 4,
+      },
+    ).start();
   };
 
   const handlePressOut = () => {
-    Animated.spring(buttonScale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 30,
-      bounciness: 5,
-    }).start();
+    Animated.spring(
+      buttonScale,
+      {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 30,
+        bounciness: 5,
+      },
+    ).start();
   };
 
   // =====================================================
-  // Continue Session
+  // Navigation
   // =====================================================
 
-  // Resumes the exact saved question, result screen, or
-  // special gameplay event.
   const handleContinueSession = () => {
     router.push({
       pathname: "/scenario",
@@ -143,17 +161,27 @@ export default function HomeScreen() {
     });
   };
 
-  // =====================================================
-  // New Round
-  // =====================================================
-
-  // Opens the mode-selection screen.
-  //
-  // The selected mode will decide whether the new round
-  // is Quick 10, Standard 20, or Endless.
   const handleNewRound = () => {
-    router.push("/mode-select");
+    router.push(
+      "/mode-select",
+    );
   };
+
+  const handleProfilePress = () => {
+    router.push(
+      "/profile",
+    );
+  };
+
+  const handleSettingsPress = () => {
+    router.push(
+      "/settings",
+    );
+  };
+
+  const hasCustomNickname =
+    nickname !==
+    DEFAULT_PLAYER_NICKNAME;
 
   return (
     <View style={styles.container}>
@@ -161,7 +189,6 @@ export default function HomeScreen() {
           Themed Background
       ================================================= */}
 
-      {/* Roast backdrop */}
       <View style={styles.roastBackdrop}>
         <Text style={styles.roastSymbol}>
           🔥
@@ -172,7 +199,6 @@ export default function HomeScreen() {
         </Text>
       </View>
 
-      {/* Toast backdrop */}
       <View style={styles.toastBackdrop}>
         <Text style={styles.toastBackdropText}>
           TOAST
@@ -183,7 +209,6 @@ export default function HomeScreen() {
         </Text>
       </View>
 
-      {/* Decorative debate labels */}
       <View style={styles.hotTakeBadge}>
         <Text style={styles.hotTakeText}>
           HOT TAKE
@@ -197,11 +222,64 @@ export default function HomeScreen() {
       </View>
 
       {/* =================================================
+          Top Navigation
+      ================================================= */}
+
+      <View style={styles.topActions}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open player profile"
+          onPress={
+            handleProfilePress
+          }
+          style={({ pressed }) => [
+            styles.profileButton,
+
+            pressed &&
+              styles.topButtonPressed,
+          ]}
+        >
+          <Ionicons
+            name="person-outline"
+            size={18}
+            color={
+              Colors.textPrimary
+            }
+          />
+
+          <Text style={styles.profileButtonText}>
+            My Profile
+          </Text>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open Settings"
+          onPress={
+            handleSettingsPress
+          }
+          style={({ pressed }) => [
+            styles.settingsButton,
+
+            pressed &&
+              styles.topButtonPressed,
+          ]}
+        >
+          <Ionicons
+            name="settings-outline"
+            size={20}
+            color={
+              Colors.textPrimary
+            }
+          />
+        </Pressable>
+      </View>
+
+      {/* =================================================
           Main Content
       ================================================= */}
 
       <View style={styles.content}>
-        {/* Main brand title */}
         <View style={styles.logoContainer}>
           <Text style={styles.logoPrimary}>
             Roast
@@ -218,8 +296,13 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Conversational greeting */}
         <View style={styles.taglineContainer}>
+          {hasCustomNickname && (
+            <Text style={styles.nicknameGreeting}>
+              Welcome back, {nickname}.
+            </Text>
+          )}
+
           <Text style={styles.tagline}>
             Alright...
           </Text>
@@ -229,16 +312,11 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Brief storage check */}
         {isCheckingSession && (
           <Text style={styles.loadingText}>
             Checking your last round...
           </Text>
         )}
-
-        {/* =================================================
-            No Active Session
-        ================================================= */}
 
         {!isCheckingSession &&
           !hasSavedSession && (
@@ -249,7 +327,8 @@ export default function HomeScreen() {
                 {
                   transform: [
                     {
-                      scale: buttonScale,
+                      scale:
+                        buttonScale,
                     },
                   ],
                 },
@@ -258,9 +337,15 @@ export default function HomeScreen() {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Choose a new Roast or Toast round"
-                onPress={handleNewRound}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
+                onPress={
+                  handleNewRound
+                }
+                onPressIn={
+                  handlePressIn
+                }
+                onPressOut={
+                  handlePressOut
+                }
                 style={({ pressed }) => [
                   styles.primaryButton,
 
@@ -279,14 +364,9 @@ export default function HomeScreen() {
             </Animated.View>
           )}
 
-        {/* =================================================
-            Active Session Available
-        ================================================= */}
-
         {!isCheckingSession &&
           hasSavedSession && (
             <View style={styles.sessionActions}>
-              {/* Primary action: Resume gameplay */}
               <Animated.View
                 style={[
                   styles.fullWidthButtonWrapper,
@@ -294,7 +374,8 @@ export default function HomeScreen() {
                   {
                     transform: [
                       {
-                        scale: buttonScale,
+                        scale:
+                          buttonScale,
                       },
                     ],
                   },
@@ -303,9 +384,15 @@ export default function HomeScreen() {
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Continue saved game session"
-                  onPress={handleContinueSession}
-                  onPressIn={handlePressIn}
-                  onPressOut={handlePressOut}
+                  onPress={
+                    handleContinueSession
+                  }
+                  onPressIn={
+                    handlePressIn
+                  }
+                  onPressOut={
+                    handlePressOut
+                  }
                   style={({ pressed }) => [
                     styles.primaryButton,
                     styles.fullWidthButton,
@@ -319,11 +406,7 @@ export default function HomeScreen() {
                       Continue Session
                     </Text>
 
-                    <Text
-                      style={
-                        styles.primaryButtonSubtext
-                      }
-                    >
+                    <Text style={styles.primaryButtonSubtext}>
                       Pick up where you left off.
                     </Text>
                   </View>
@@ -334,11 +417,12 @@ export default function HomeScreen() {
                 </Pressable>
               </Animated.View>
 
-              {/* Secondary action: Choose a new mode */}
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Choose a new round"
-                onPress={handleNewRound}
+                onPress={
+                  handleNewRound
+                }
                 style={({ pressed }) => [
                   styles.newRoundButton,
 
@@ -351,11 +435,7 @@ export default function HomeScreen() {
                     New Round
                   </Text>
 
-                  <Text
-                    style={
-                      styles.newRoundButtonSubtext
-                    }
-                  >
+                  <Text style={styles.newRoundButtonSubtext}>
                     Choose Quick 10, Standard 20, or Endless.
                   </Text>
                 </View>
@@ -378,25 +458,140 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-    paddingHorizontal: Spacing.lg,
+
+    backgroundColor:
+      Colors.background,
+
+    paddingHorizontal:
+      Spacing.lg,
+
     overflow: "hidden",
   },
 
   content: {
     flex: 1,
+
     justifyContent: "center",
+
     zIndex: 2,
   },
+
+  // =====================================================
+  // Top Navigation
+  // =====================================================
+
+  topActions: {
+    position: "absolute",
+
+    top: 60,
+    right:
+      Spacing.lg,
+
+    zIndex: 10,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    gap: 9,
+  },
+
+  profileButton: {
+    minHeight: 42,
+
+    backgroundColor:
+      Colors.surface,
+
+    borderColor:
+      Colors.border,
+
+    borderWidth: 1,
+    borderRadius:
+      Radius.pill,
+
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    shadowColor: "#1D1D1F",
+
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+
+    shadowOpacity: 0.08,
+    shadowRadius: 9,
+
+    elevation: 2,
+  },
+
+  profileButtonText: {
+    color:
+      Colors.textPrimary,
+
+    fontSize: 12,
+    fontWeight: "900",
+
+    marginLeft: 6,
+  },
+
+  settingsButton: {
+    width: 42,
+    height: 42,
+
+    backgroundColor:
+      Colors.surface,
+
+    borderColor:
+      Colors.border,
+
+    borderWidth: 1,
+    borderRadius:
+      Radius.pill,
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    shadowColor: "#1D1D1F",
+
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+
+    shadowOpacity: 0.08,
+    shadowRadius: 9,
+
+    elevation: 2,
+  },
+
+  topButtonPressed: {
+    opacity: 0.68,
+
+    transform: [
+      {
+        scale: 0.96,
+      },
+    ],
+  },
+
+  // =====================================================
+  // Logo
+  // =====================================================
 
   logoContainer: {
     marginBottom: 52,
   },
 
   logoPrimary: {
-    color: Colors.textPrimary,
+    color:
+      Colors.textPrimary,
+
     fontSize: 66,
     fontWeight: "900",
+
     letterSpacing: -3,
     lineHeight: 69,
   },
@@ -404,47 +599,80 @@ const styles = StyleSheet.create({
   logoSecondLine: {
     flexDirection: "row",
     alignItems: "baseline",
+
     marginLeft: 52,
   },
 
   logoOr: {
-    color: Colors.roast,
+    color:
+      Colors.roast,
+
     fontSize: 27,
     fontWeight: "800",
+
     marginRight: 9,
   },
 
   logoSecondary: {
-    color: Colors.textPrimary,
+    color:
+      Colors.textPrimary,
+
     fontSize: 52,
     fontWeight: "850",
+
     letterSpacing: -2.5,
     lineHeight: 57,
   },
+
+  // =====================================================
+  // Greeting
+  // =====================================================
 
   taglineContainer: {
     marginBottom: 34,
   },
 
+  nicknameGreeting: {
+    color:
+      Colors.roast,
+
+    fontSize: 13,
+    fontWeight: "900",
+
+    marginBottom: 8,
+  },
+
   tagline: {
-    color: Colors.textSecondary,
+    color:
+      Colors.textSecondary,
+
     fontSize: 25,
     fontWeight: "500",
+
     lineHeight: 34,
   },
 
   taglineEmphasis: {
-    color: Colors.textPrimary,
+    color:
+      Colors.textPrimary,
+
     fontSize: 31,
     fontWeight: "800",
+
     lineHeight: 41,
   },
 
   loadingText: {
-    color: Colors.textSecondary,
+    color:
+      Colors.textSecondary,
+
     fontSize: 14,
     fontWeight: "700",
   },
+
+  // =====================================================
+  // Gameplay Actions
+  // =====================================================
 
   sessionActions: {
     width: "100%",
@@ -470,8 +698,12 @@ const styles = StyleSheet.create({
 
   primaryButton: {
     minWidth: 188,
-    backgroundColor: Colors.textPrimary,
-    borderRadius: Radius.pill,
+
+    backgroundColor:
+      Colors.textPrimary,
+
+    borderRadius:
+      Radius.pill,
 
     paddingVertical: 17,
     paddingHorizontal: 27,
@@ -489,40 +721,55 @@ const styles = StyleSheet.create({
 
     shadowOpacity: 0.17,
     shadowRadius: 16,
+
     elevation: 6,
   },
 
   primaryButtonPressed: {
-    backgroundColor: Colors.roast,
+    backgroundColor:
+      Colors.roast,
   },
 
   primaryButtonText: {
-    color: Colors.white,
+    color:
+      Colors.white,
+
     fontSize: 18,
     fontWeight: "900",
   },
 
   primaryButtonSubtext: {
     color: "#CFCFCF",
+
     fontSize: 12,
     fontWeight: "600",
+
     marginTop: 3,
   },
 
   primaryButtonArrow: {
-    color: Colors.white,
+    color:
+      Colors.white,
+
     fontSize: 24,
     fontWeight: "600",
-    marginLeft: Spacing.xl,
+
+    marginLeft:
+      Spacing.xl,
   },
 
   newRoundButton: {
     width: "100%",
-    backgroundColor: Colors.surface,
 
-    borderColor: Colors.border,
+    backgroundColor:
+      Colors.surface,
+
+    borderColor:
+      Colors.border,
+
     borderWidth: 1.5,
-    borderRadius: Radius.lg,
+    borderRadius:
+      Radius.lg,
 
     paddingVertical: 15,
     paddingHorizontal: 20,
@@ -533,120 +780,186 @@ const styles = StyleSheet.create({
   },
 
   newRoundButtonText: {
-    color: Colors.textPrimary,
+    color:
+      Colors.textPrimary,
+
     fontSize: 17,
     fontWeight: "900",
   },
 
   newRoundButtonSubtext: {
-    color: Colors.textSecondary,
+    color:
+      Colors.textSecondary,
+
     fontSize: 12,
     fontWeight: "600",
+
     marginTop: 3,
   },
 
   newRoundButtonArrow: {
-    color: Colors.roast,
+    color:
+      Colors.roast,
+
     fontSize: 23,
     fontWeight: "800",
   },
 
   secondaryButtonPressed: {
     opacity: 0.68,
-    transform: [{ scale: 0.985 }],
+
+    transform: [
+      {
+        scale: 0.985,
+      },
+    ],
   },
+
+  // =====================================================
+  // Background Decorations
+  // =====================================================
 
   roastBackdrop: {
     position: "absolute",
+
     top: 72,
     right: -47,
-    transform: [{ rotate: "8deg" }],
+
+    transform: [
+      {
+        rotate: "8deg",
+      },
+    ],
+
     alignItems: "flex-end",
   },
 
   roastBackdropText: {
-    color: Colors.roast,
+    color:
+      Colors.roast,
+
     fontSize: 96,
     fontWeight: "900",
+
     letterSpacing: -5,
     opacity: 0.09,
   },
 
   roastSymbol: {
     fontSize: 46,
+
     opacity: 0.15,
+
     marginRight: 54,
     marginBottom: -20,
   },
 
   toastBackdrop: {
     position: "absolute",
+
     bottom: 68,
     left: -42,
-    transform: [{ rotate: "-8deg" }],
+
+    transform: [
+      {
+        rotate: "-8deg",
+      },
+    ],
+
     flexDirection: "row",
     alignItems: "center",
   },
 
   toastBackdropText: {
-    color: Colors.toast,
+    color:
+      Colors.toast,
+
     fontSize: 94,
     fontWeight: "900",
+
     letterSpacing: -5,
     opacity: 0.09,
   },
 
   toastSymbol: {
-    color: Colors.toast,
+    color:
+      Colors.toast,
+
     fontSize: 53,
     fontWeight: "900",
+
     opacity: 0.15,
+
     marginLeft: 10,
   },
 
   hotTakeBadge: {
     position: "absolute",
+
     top: 205,
     left: -18,
 
-    borderColor: Colors.roast,
+    borderColor:
+      Colors.roast,
+
     borderWidth: 1.5,
-    borderRadius: Radius.pill,
+    borderRadius:
+      Radius.pill,
 
     paddingVertical: 7,
     paddingHorizontal: 16,
 
     opacity: 0.28,
-    transform: [{ rotate: "-8deg" }],
+
+    transform: [
+      {
+        rotate: "-8deg",
+      },
+    ],
   },
 
   hotTakeText: {
-    color: Colors.roast,
+    color:
+      Colors.roast,
+
     fontSize: 11,
     fontWeight: "900",
+
     letterSpacing: 1.7,
   },
 
   verdictBadge: {
     position: "absolute",
+
     bottom: 215,
     right: -24,
 
-    borderColor: Colors.toast,
+    borderColor:
+      Colors.toast,
+
     borderWidth: 1.5,
-    borderRadius: Radius.pill,
+    borderRadius:
+      Radius.pill,
 
     paddingVertical: 7,
     paddingHorizontal: 16,
 
     opacity: 0.3,
-    transform: [{ rotate: "7deg" }],
+
+    transform: [
+      {
+        rotate: "7deg",
+      },
+    ],
   },
 
   verdictText: {
-    color: Colors.toast,
+    color:
+      Colors.toast,
+
     fontSize: 11,
     fontWeight: "900",
+
     letterSpacing: 1.5,
   },
 });

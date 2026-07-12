@@ -19,6 +19,12 @@ export default function RootLayout() {
       {/* Home */}
       <Stack.Screen name="index" />
 
+      {/* Player profile and lifetime statistics */}
+      <Stack.Screen name="profile" />
+
+      {/* Local app preferences and reset controls */}
+      <Stack.Screen name="settings" />
+
       {/* Round-mode selection */}
       <Stack.Screen name="mode-select" />
 

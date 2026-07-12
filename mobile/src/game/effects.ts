@@ -2,22 +2,20 @@
 // File: effects.ts
 //
 // Purpose:
-// Coordinates the feedback effects used throughout
+// Coordinates feedback effects used throughout
 // Roast or Toast.
 //
 // Current Effects:
 // • Haptics
+//
+// Every haptic checks the player's local Settings before
+// running.
 //
 // Future Effects:
 // • Sounds
 // • Floating Heat animations
 // • Confetti
 // • Fire and heart particles
-// • Screen transitions
-//
-// Gameplay components call these functions instead of
-// directly calling Expo Haptics. This keeps effects
-// centralized and easier to change later.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -31,69 +29,83 @@ import {
   playToastHaptic,
 } from "./haptics";
 
+import {
+  areHapticsEnabled,
+} from "./settingsStorage";
+
+// Runs one haptic only when the player has haptics
+// enabled in Settings.
+async function runHaptic(
+  hapticFunction: () => Promise<void>,
+): Promise<void> {
+  const hapticsEnabled =
+    await areHapticsEnabled();
+
+  if (!hapticsEnabled) {
+    return;
+  }
+
+  await hapticFunction();
+}
+
 // =====================================================
 // Vote Effects
 // =====================================================
 
-// Runs when the player chooses Roast.
-//
-// Later, this can also trigger:
-// • Fire particles
-// • Roast sound
-// • Stronger button animation
 export function triggerRoastEffect(): void {
-  void playRoastHaptic();
+  void runHaptic(
+    playRoastHaptic,
+  );
 }
 
-// Runs when the player chooses Toast.
-//
-// Later, this can also trigger:
-// • Heart particles
-// • Toast sound
-// • Softer button animation
 export function triggerToastEffect(): void {
-  void playToastHaptic();
+  void runHaptic(
+    playToastHaptic,
+  );
 }
 
 // =====================================================
 // Guess the Crowd Effects
 // =====================================================
 
-// Gives light feedback when the player locks in their
-// crowd prediction.
 export function triggerCrowdPredictionEffect(): void {
-  void playNavigationHaptic();
+  void runHaptic(
+    playNavigationHaptic,
+  );
 }
 
-// Runs after the Guess the Crowd prediction is scored.
 export function triggerCrowdResultEffect(
   guessedCorrectly: boolean,
 ): void {
   if (guessedCorrectly) {
-    void playCrowdCorrectHaptic();
+    void runHaptic(
+      playCrowdCorrectHaptic,
+    );
+
     return;
   }
 
-  void playCrowdWrongHaptic();
+  void runHaptic(
+    playCrowdWrongHaptic,
+  );
 }
 
 // =====================================================
 // Level Effects
 // =====================================================
 
-// Runs when the player reaches a new level.
-//
-// Later, this will also trigger confetti and a larger
-// title-unlock animation.
 export function triggerLevelUpEffect(): void {
-  void playLevelUpHaptic();
+  void runHaptic(
+    playLevelUpHaptic,
+  );
 }
 
 // =====================================================
 // Navigation Effects
 // =====================================================
 
-// Used by Next, Continue, Back, and Home controls.
 export function triggerNavigationEffect(): void {
-  void playNavigationHaptic();
+  void runHaptic(
+    playNavigationHaptic,
+  );
 }
