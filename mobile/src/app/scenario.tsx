@@ -8,10 +8,11 @@
 //
 // Current Features:
 // • Quick 10, Standard 20, and Endless modes
+// • Smart category-balanced Moment deck
+// • Recently seen Moment avoidance
 // • Saved and restored round mode
 // • Round progress counter
 // • Round completion screen
-// • Shuffled question deck
 // • Heat, levels, streaks, and titles
 // • Guess the Crowd
 // • Quick Break
@@ -59,6 +60,10 @@ import { scenarios } from "../data/scenarios";
 import type { Moment } from "../data/types";
 
 import {
+  buildSmartDeck,
+} from "../game/deckBuilder";
+
+import {
   triggerLevelUpEffect,
   triggerNavigationEffect,
   triggerRoastEffect,
@@ -68,6 +73,11 @@ import {
 import type {
   VoteProgressResult,
 } from "../game/progressTypes";
+
+import {
+  loadRecentMomentIds,
+  rememberMomentId,
+} from "../game/recentMomentsStorage";
 
 import {
   getRoundMode,
@@ -103,58 +113,6 @@ type ResumePosition = {
   deck: Moment[];
   index: number;
 };
-
-// =====================================================
-// Shuffle Helpers
-// =====================================================
-
-function shuffleMoments(
-  moments: Moment[],
-): Moment[] {
-  const shuffledMoments = [...moments];
-
-  for (
-    let currentIndex =
-      shuffledMoments.length - 1;
-    currentIndex > 0;
-    currentIndex -= 1
-  ) {
-    const randomIndex = Math.floor(
-      Math.random() *
-        (currentIndex + 1),
-    );
-
-    [
-      shuffledMoments[currentIndex],
-      shuffledMoments[randomIndex],
-    ] = [
-      shuffledMoments[randomIndex],
-      shuffledMoments[currentIndex],
-    ];
-  }
-
-  return shuffledMoments;
-}
-
-function createFreshDeck(
-  lastMomentId?: string,
-): Moment[] {
-  const newDeck =
-    shuffleMoments(scenarios);
-
-  if (
-    lastMomentId &&
-    newDeck.length > 1 &&
-    newDeck[0].id === lastMomentId
-  ) {
-    [newDeck[0], newDeck[1]] = [
-      newDeck[1],
-      newDeck[0],
-    ];
-  }
-
-  return newDeck;
-}
 
 // =====================================================
 // Saved Session Helpers
@@ -304,6 +262,17 @@ export default function ScenarioScreen() {
   } = usePlayerProgress();
 
   // =====================================================
+  // Recent-History State
+  // =====================================================
+
+  // Kept in memory so Endless mode can build another
+  // smart deck without repeatedly loading storage.
+  const [
+    recentMomentIds,
+    setRecentMomentIds,
+  ] = useState<string[]>([]);
+
+  // =====================================================
   // Round State
   // =====================================================
 
@@ -350,7 +319,10 @@ export default function ScenarioScreen() {
     momentDeck,
     setMomentDeck,
   ] = useState<Moment[]>(() =>
-    createFreshDeck(),
+    buildSmartDeck(
+      scenarios,
+      [],
+    ),
   );
 
   const [
@@ -446,6 +418,17 @@ export default function ScenarioScreen() {
 
     const initializeSession =
       async () => {
+        const loadedRecentIds =
+          await loadRecentMomentIds();
+
+        if (!isActive) {
+          return;
+        }
+
+        setRecentMomentIds(
+          loadedRecentIds,
+        );
+
         if (params.mode === "fresh") {
           await clearGameSession();
 
@@ -474,7 +457,10 @@ export default function ScenarioScreen() {
           );
 
           setMomentDeck(
-            createFreshDeck(),
+            buildSmartDeck(
+              scenarios,
+              loadedRecentIds,
+            ),
           );
 
           setMomentIndex(0);
@@ -511,7 +497,10 @@ export default function ScenarioScreen() {
           const usableDeck =
             restoredDeck.length > 0
               ? restoredDeck
-              : createFreshDeck();
+              : buildSmartDeck(
+                  scenarios,
+                  loadedRecentIds,
+                );
 
           setRoundMode(
             savedSession.roundMode ??
@@ -638,6 +627,13 @@ export default function ScenarioScreen() {
           progress.majorityMatches,
         );
 
+        setMomentDeck(
+          buildSmartDeck(
+            scenarios,
+            loadedRecentIds,
+          ),
+        );
+
         setSessionReady(true);
       };
 
@@ -653,6 +649,86 @@ export default function ScenarioScreen() {
     requestedRoundMode,
     resultsOpacity,
     resultsPosition,
+  ]);
+
+  // =====================================================
+  // Current Moment
+  // =====================================================
+
+  const currentMoment =
+    momentDeck[momentIndex];
+
+  // Remember every regular Moment once it is displayed.
+  useEffect(() => {
+    if (
+      !sessionReady ||
+      !currentMoment
+    ) {
+      return;
+    }
+
+    let isActive = true;
+
+    const rememberCurrentMoment =
+      async () => {
+        const updatedHistory =
+          await rememberMomentId(
+            currentMoment.id,
+          );
+
+        if (isActive) {
+          setRecentMomentIds(
+            updatedHistory,
+          );
+        }
+      };
+
+    void rememberCurrentMoment();
+
+    return () => {
+      isActive = false;
+    };
+  }, [
+    sessionReady,
+    currentMoment?.id,
+  ]);
+
+  // Guess the Crowd uses a separate Moment, so remember
+  // that content too.
+  useEffect(() => {
+    if (
+      !sessionReady ||
+      intermissionType !== "guess" ||
+      !guessMoment
+    ) {
+      return;
+    }
+
+    let isActive = true;
+
+    const rememberGuessMoment =
+      async () => {
+        const updatedHistory =
+          await rememberMomentId(
+            guessMoment.id,
+          );
+
+        if (isActive) {
+          setRecentMomentIds(
+            updatedHistory,
+          );
+        }
+      };
+
+    void rememberGuessMoment();
+
+    return () => {
+      isActive = false;
+    };
+  }, [
+    sessionReady,
+    intermissionType,
+    guessMoment?.id,
   ]);
 
   // =====================================================
@@ -703,8 +779,20 @@ export default function ScenarioScreen() {
     roundStartMajorityMatches,
   ]);
 
-  const currentMoment =
-    momentDeck[momentIndex];
+  // Avoid reading category data until a deck exists.
+  if (!currentMoment) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingEmoji}>
+          🔥
+        </Text>
+
+        <Text style={styles.loadingTitle}>
+          Finding better takes...
+        </Text>
+      </View>
+    );
+  }
 
   const categoryTheme =
     CategoryThemes[
@@ -896,12 +984,14 @@ export default function ScenarioScreen() {
         momentDeck.length - 1;
 
       if (reachedEndOfDeck) {
-        setMomentDeck(
-          createFreshDeck(
+        const newDeck =
+          buildSmartDeck(
+            scenarios,
+            recentMomentIds,
             currentMoment.id,
-          ),
-        );
+          );
 
+        setMomentDeck(newDeck);
         setMomentIndex(0);
       } else {
         setMomentIndex(
@@ -954,7 +1044,9 @@ export default function ScenarioScreen() {
           momentDeck[nextIndex];
 
         const newDeck =
-          createFreshDeck(
+          buildSmartDeck(
+            scenarios,
+            recentMomentIds,
             specialMoment.id,
           );
 
@@ -975,7 +1067,9 @@ export default function ScenarioScreen() {
       }
 
       const newDeck =
-        createFreshDeck(
+        buildSmartDeck(
+          scenarios,
+          recentMomentIds,
           currentMoment.id,
         );
 
@@ -1012,7 +1106,6 @@ export default function ScenarioScreen() {
       newCompletedTotal,
     );
 
-    // Finite rounds end exactly at their selected limit.
     if (
       roundConfig.momentLimit !== null &&
       newCompletedTotal >=
