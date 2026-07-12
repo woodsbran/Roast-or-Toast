@@ -11,8 +11,18 @@ import { Stack } from "expo-router";
 
 export default function RootLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      {/* Home */}
       <Stack.Screen name="index" />
+
+      {/* Round-mode selection */}
+      <Stack.Screen name="mode-select" />
+
+      {/* Main gameplay */}
       <Stack.Screen name="scenario" />
     </Stack>
   );

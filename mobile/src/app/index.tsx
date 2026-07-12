@@ -11,11 +11,7 @@
 //   Resumes the exact saved question or special screen.
 //
 // • New Round:
-//   Starts a new shuffled round while keeping permanent
-//   Heat, level, totals, and best streak.
-//
-// Reset Progress will eventually live inside Settings,
-// away from the primary gameplay actions.
+//   Opens the round-mode selection screen.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -40,11 +36,6 @@ import {
 } from "react-native";
 
 import {
-  resetSavedCurrentStreak,
-} from "../game/progressStorage";
-
-import {
-  clearGameSession,
   loadGameSession,
 } from "../game/sessionStorage";
 
@@ -156,32 +147,12 @@ export default function HomeScreen() {
   // New Round
   // =====================================================
 
-  // Starts a new shuffled gameplay round.
+  // Opens the mode-selection screen.
   //
-  // Keeps:
-  // • Total Heat
-  // • Level
-  // • Best streak
-  // • Lifetime Roast and Toast counts
-  // • Guess the Crowd statistics
-  //
-  // Resets:
-  // • Current question deck
-  // • Current session position
-  // • Current streak
-  const handleNewRound = async () => {
-    await clearGameSession();
-    await resetSavedCurrentStreak();
-
-    setHasSavedSession(false);
-
-    router.push({
-      pathname: "/scenario",
-
-      params: {
-        mode: "fresh",
-      },
-    });
+  // The selected mode will decide whether the new round
+  // is Quick 10, Standard 20, or Endless.
+  const handleNewRound = () => {
+    router.push("/mode-select");
   };
 
   return (
@@ -286,7 +257,7 @@ export default function HomeScreen() {
             >
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Start a new Roast or Toast round"
+                accessibilityLabel="Choose a new Roast or Toast round"
                 onPress={handleNewRound}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
@@ -363,10 +334,10 @@ export default function HomeScreen() {
                 </Pressable>
               </Animated.View>
 
-              {/* Secondary action: Begin new questions */}
+              {/* Secondary action: Choose a new mode */}
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Start a new round"
+                accessibilityLabel="Choose a new round"
                 onPress={handleNewRound}
                 style={({ pressed }) => [
                   styles.newRoundButton,
@@ -385,12 +356,12 @@ export default function HomeScreen() {
                       styles.newRoundButtonSubtext
                     }
                   >
-                    New questions. Same Heat and level.
+                    Choose Quick 10, Standard 20, or Endless.
                   </Text>
                 </View>
 
                 <Text style={styles.newRoundButtonArrow}>
-                  ↻
+                  →
                 </Text>
               </Pressable>
             </View>
@@ -417,10 +388,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 2,
   },
-
-  // =====================================================
-  // Logo
-  // =====================================================
 
   logoContainer: {
     marginBottom: 52,
@@ -455,10 +422,6 @@ const styles = StyleSheet.create({
     lineHeight: 57,
   },
 
-  // =====================================================
-  // Greeting
-  // =====================================================
-
   taglineContainer: {
     marginBottom: 34,
   },
@@ -483,10 +446,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  // =====================================================
-  // Action Layout
-  // =====================================================
-
   sessionActions: {
     width: "100%",
     gap: 14,
@@ -508,10 +467,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 12,
   },
-
-  // =====================================================
-  // Primary Button
-  // =====================================================
 
   primaryButton: {
     minWidth: 188,
@@ -561,10 +516,6 @@ const styles = StyleSheet.create({
     marginLeft: Spacing.xl,
   },
 
-  // =====================================================
-  // New Round Button
-  // =====================================================
-
   newRoundButton: {
     width: "100%",
     backgroundColor: Colors.surface,
@@ -596,35 +547,20 @@ const styles = StyleSheet.create({
 
   newRoundButtonArrow: {
     color: Colors.roast,
-    fontSize: 25,
+    fontSize: 23,
     fontWeight: "800",
   },
 
   secondaryButtonPressed: {
     opacity: 0.68,
-
-    transform: [
-      {
-        scale: 0.985,
-      },
-    ],
+    transform: [{ scale: 0.985 }],
   },
-
-  // =====================================================
-  // Roast Backdrop
-  // =====================================================
 
   roastBackdrop: {
     position: "absolute",
     top: 72,
     right: -47,
-
-    transform: [
-      {
-        rotate: "8deg",
-      },
-    ],
-
+    transform: [{ rotate: "8deg" }],
     alignItems: "flex-end",
   },
 
@@ -643,21 +579,11 @@ const styles = StyleSheet.create({
     marginBottom: -20,
   },
 
-  // =====================================================
-  // Toast Backdrop
-  // =====================================================
-
   toastBackdrop: {
     position: "absolute",
     bottom: 68,
     left: -42,
-
-    transform: [
-      {
-        rotate: "-8deg",
-      },
-    ],
-
+    transform: [{ rotate: "-8deg" }],
     flexDirection: "row",
     alignItems: "center",
   },
@@ -678,10 +604,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
 
-  // =====================================================
-  // Decorative Labels
-  // =====================================================
-
   hotTakeBadge: {
     position: "absolute",
     top: 205,
@@ -695,12 +617,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
 
     opacity: 0.28,
-
-    transform: [
-      {
-        rotate: "-8deg",
-      },
-    ],
+    transform: [{ rotate: "-8deg" }],
   },
 
   hotTakeText: {
@@ -723,12 +640,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
 
     opacity: 0.3,
-
-    transform: [
-      {
-        rotate: "7deg",
-      },
-    ],
+    transform: [{ rotate: "7deg" }],
   },
 
   verdictText: {
