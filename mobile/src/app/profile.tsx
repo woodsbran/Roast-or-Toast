@@ -5,25 +5,23 @@
 //
 // Purpose:
 // Displays the player's local Roast or Toast identity,
-// lifetime statistics, and unlocked achievements.
+// lifetime statistics, daily return streak, achievements,
+// and future community features.
 //
 // Current Features:
 // • Editable nickname
 // • Current title and level
 // • Heat progress
+// • Daily return streak
 // • Lifetime gameplay statistics
 // • Achievement badges
-//
-// This profile is stored locally for the current
-// TestFlight version.
-//
-// Real accounts and Supabase cloud saving will be added
-// after initial tester feedback.
+// • Suggest a Moment preview
 //
 // Project: Roast or Toast
 // =====================================================
 
 import { Ionicons } from "@expo/vector-icons";
+
 import {
   router,
   useFocusEffect,
@@ -61,6 +59,10 @@ import {
 } from "../game/titles";
 
 import {
+  useDailyStreak,
+} from "../hooks/useDailyStreak";
+
+import {
   usePlayerProgress,
 } from "../hooks/usePlayerProgress";
 
@@ -69,10 +71,6 @@ import {
   Radius,
   Spacing,
 } from "../theme";
-
-// =====================================================
-// Achievement Types
-// =====================================================
 
 type Achievement = {
   id: string;
@@ -88,7 +86,11 @@ export default function ProfileScreen() {
     hasLoadedProgress,
   } = usePlayerProgress();
 
-  // Nickname currently displayed and saved.
+  const {
+    dailyStreak,
+    hasLoadedDailyStreak,
+  } = useDailyStreak();
+
   const [
     nickname,
     setNickname,
@@ -96,7 +98,6 @@ export default function ProfileScreen() {
     DEFAULT_PLAYER_NICKNAME,
   );
 
-  // Text currently being edited.
   const [
     nicknameDraft,
     setNicknameDraft,
@@ -104,14 +105,11 @@ export default function ProfileScreen() {
     DEFAULT_PLAYER_NICKNAME,
   );
 
-  // Controls whether the nickname editor is visible.
   const [
     isEditingNickname,
     setIsEditingNickname,
   ] = useState(false);
 
-  // Prevents the Save button from being pressed multiple
-  // times while AsyncStorage is updating.
   const [
     isSavingNickname,
     setIsSavingNickname,
@@ -212,10 +210,6 @@ export default function ProfileScreen() {
       progress.level,
     );
 
-  // =====================================================
-  // Achievements
-  // =====================================================
-
   const achievements =
     useMemo(
       () =>
@@ -294,11 +288,10 @@ export default function ProfileScreen() {
       setIsSavingNickname(false);
     };
 
-  // =====================================================
-  // Loading Screen
-  // =====================================================
-
-  if (!hasLoadedProgress) {
+  if (
+    !hasLoadedProgress ||
+    !hasLoadedDailyStreak
+  ) {
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingEmoji}>
@@ -321,7 +314,6 @@ export default function ProfileScreen() {
           : undefined
       }
     >
-      {/* Decorative background words */}
       <Text style={styles.roastBackdrop}>
         ROAST
       </Text>
@@ -330,10 +322,6 @@ export default function ProfileScreen() {
         TOAST
       </Text>
 
-      {/* =================================================
-          Header
-      ================================================= */}
-
       <View style={styles.header}>
         <Pressable
           accessibilityRole="button"
@@ -341,6 +329,7 @@ export default function ProfileScreen() {
           onPress={handleBackPress}
           style={({ pressed }) => [
             styles.headerButton,
+
             pressed &&
               styles.buttonPressed,
           ]}
@@ -364,6 +353,7 @@ export default function ProfileScreen() {
           onPress={handleHomePress}
           style={({ pressed }) => [
             styles.headerButton,
+
             pressed &&
               styles.buttonPressed,
           ]}
@@ -378,10 +368,6 @@ export default function ProfileScreen() {
         </Pressable>
       </View>
 
-      {/* =================================================
-          Profile Content
-      ================================================= */}
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -389,7 +375,6 @@ export default function ProfileScreen() {
           styles.scrollContent
         }
       >
-        {/* Profile introduction */}
         <View style={styles.introBadge}>
           <Text style={styles.introBadgeText}>
             YOUR OPINION HISTORY
@@ -492,11 +477,7 @@ export default function ProfileScreen() {
                           styles.smallButtonPressed,
                       ]}
                     >
-                      <Text
-                        style={
-                          styles.cancelButtonText
-                        }
-                      >
+                      <Text style={styles.cancelButtonText}>
                         Cancel
                       </Text>
                     </Pressable>
@@ -520,11 +501,7 @@ export default function ProfileScreen() {
                           styles.disabledButton,
                       ]}
                     >
-                      <Text
-                        style={
-                          styles.saveButtonText
-                        }
-                      >
+                      <Text style={styles.saveButtonText}>
                         {isSavingNickname
                           ? "Saving..."
                           : "Save"}
@@ -573,6 +550,42 @@ export default function ProfileScreen() {
         </View>
 
         {/* =================================================
+            Daily Streak
+        ================================================= */}
+
+        <Text style={styles.sectionTitle}>
+          Daily Streak
+        </Text>
+
+        <View style={styles.dailyStreakCard}>
+          <View style={styles.dailyStreakIcon}>
+            <Text style={styles.dailyStreakEmoji}>
+              🔥
+            </Text>
+          </View>
+
+          <View style={styles.dailyStreakText}>
+            <Text style={styles.dailyStreakValue}>
+              Day {dailyStreak.currentStreak}
+            </Text>
+
+            <Text style={styles.dailyStreakDescription}>
+              Come back tomorrow to keep the Heat going.
+            </Text>
+          </View>
+
+          <View style={styles.dailyBest}>
+            <Text style={styles.dailyBestValue}>
+              {dailyStreak.bestStreak}
+            </Text>
+
+            <Text style={styles.dailyBestLabel}>
+              BEST
+            </Text>
+          </View>
+        </View>
+
+        {/* =================================================
             Main Statistics
         ================================================= */}
 
@@ -608,7 +621,7 @@ export default function ProfileScreen() {
             value={
               progress.bestStreak
             }
-            label="Best streak"
+            label="Best match streak"
           />
         </View>
 
@@ -680,19 +693,11 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.crowdAccuracy}>
-            <Text
-              style={
-                styles.crowdAccuracyValue
-              }
-            >
+            <Text style={styles.crowdAccuracyValue}>
               {crowdGuessAccuracy}%
             </Text>
 
-            <Text
-              style={
-                styles.crowdAccuracyLabel
-              }
-            >
+            <Text style={styles.crowdAccuracyLabel}>
               ACCURACY
             </Text>
           </View>
@@ -707,11 +712,7 @@ export default function ProfileScreen() {
             Achievements
           </Text>
 
-          <Text
-            style={
-              styles.achievementCount
-            }
-          >
+          <Text style={styles.achievementCount}>
             {unlockedAchievements}
             {" / "}
             {achievements.length}
@@ -731,6 +732,77 @@ export default function ProfileScreen() {
               />
             ),
           )}
+        </View>
+
+        {/* =================================================
+            Community Feature Preview
+        ================================================= */}
+
+        <Text style={styles.communitySectionTitle}>
+          Community
+        </Text>
+
+        <View style={styles.suggestionCard}>
+          <View style={styles.suggestionTopRow}>
+            <View style={styles.suggestionIcon}>
+              <Ionicons
+                name="bulb-outline"
+                size={24}
+                color={
+                  Colors.roast
+                }
+              />
+            </View>
+
+            <View style={styles.comingSoonBadge}>
+              <Text style={styles.comingSoonText}>
+                COMING SOON
+              </Text>
+            </View>
+          </View>
+
+          <Text style={styles.suggestionTitle}>
+            Got a better take?
+          </Text>
+
+          <Text style={styles.suggestionDescription}>
+            Soon you&apos;ll be able to submit your own Roast or Toast Moment. Community favorites can be featured in the game, with the winning creator getting credit.
+          </Text>
+
+          <View style={styles.weeklyWinnerPreview}>
+            <Text style={styles.weeklyWinnerEmoji}>
+              🏆
+            </Text>
+
+            <View style={styles.weeklyWinnerText}>
+              <Text style={styles.weeklyWinnerTitle}>
+                Moment of the Week
+              </Text>
+
+              <Text style={styles.weeklyWinnerDescription}>
+                One featured community submission each week.
+              </Text>
+            </View>
+          </View>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Suggest a Moment feature coming soon"
+            disabled
+            style={styles.disabledSuggestionButton}
+          >
+            <Text style={styles.disabledSuggestionButtonText}>
+              Suggest a Moment
+            </Text>
+
+            <Ionicons
+              name="lock-closed-outline"
+              size={16}
+              color={
+                Colors.textSecondary
+              }
+            />
+          </Pressable>
         </View>
 
         <Text style={styles.footerText}>
@@ -869,11 +941,7 @@ function AchievementCard({
 
         {achievement.unlocked && (
           <View style={styles.unlockedBadge}>
-            <Text
-              style={
-                styles.unlockedBadgeText
-              }
-            >
+            <Text style={styles.unlockedBadgeText}>
               UNLOCKED
             </Text>
           </View>
@@ -1002,6 +1070,7 @@ function getAchievements(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+
     backgroundColor:
       Colors.background,
   },
@@ -1022,7 +1091,9 @@ const styles = StyleSheet.create({
   },
 
   loadingText: {
-    color: Colors.textPrimary,
+    color:
+      Colors.textPrimary,
+
     fontSize: 19,
     fontWeight: "900",
   },
@@ -1097,7 +1168,8 @@ const styles = StyleSheet.create({
   },
 
   introBadgeText: {
-    color: Colors.roast,
+    color:
+      Colors.roast,
 
     fontSize: 10,
     fontWeight: "900",
@@ -1169,7 +1241,8 @@ const styles = StyleSheet.create({
   },
 
   nickname: {
-    color: Colors.white,
+    color:
+      Colors.white,
 
     fontSize: 22,
     fontWeight: "900",
@@ -1185,7 +1258,8 @@ const styles = StyleSheet.create({
   },
 
   editNicknameText: {
-    color: Colors.roast,
+    color:
+      Colors.roast,
 
     fontSize: 11,
     fontWeight: "800",
@@ -1208,7 +1282,8 @@ const styles = StyleSheet.create({
     borderRadius:
       Radius.lg,
 
-    color: Colors.white,
+    color:
+      Colors.white,
 
     fontSize: 16,
     fontWeight: "800",
@@ -1250,7 +1325,8 @@ const styles = StyleSheet.create({
   },
 
   saveButtonText: {
-    color: Colors.white,
+    color:
+      Colors.white,
 
     fontSize: 12,
     fontWeight: "900",
@@ -1299,7 +1375,8 @@ const styles = StyleSheet.create({
   },
 
   levelText: {
-    color: Colors.white,
+    color:
+      Colors.white,
 
     fontSize: 13,
     fontWeight: "800",
@@ -1343,6 +1420,98 @@ const styles = StyleSheet.create({
 
     marginBottom: 13,
   },
+
+  // =====================================================
+  // Daily Streak
+  // =====================================================
+
+  dailyStreakCard: {
+    backgroundColor:
+      "#FFF1EC",
+
+    borderColor:
+      "#F4C9BE",
+
+    borderWidth: 1,
+    borderRadius:
+      Radius.lg,
+
+    padding: 16,
+    marginBottom: 27,
+
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  dailyStreakIcon: {
+    width: 48,
+    height: 48,
+
+    backgroundColor:
+      Colors.white,
+
+    borderRadius: 24,
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    marginRight: 12,
+  },
+
+  dailyStreakEmoji: {
+    fontSize: 25,
+  },
+
+  dailyStreakText: {
+    flex: 1,
+  },
+
+  dailyStreakValue: {
+    color:
+      Colors.textPrimary,
+
+    fontSize: 20,
+    fontWeight: "900",
+  },
+
+  dailyStreakDescription: {
+    color:
+      Colors.textSecondary,
+
+    fontSize: 10,
+    fontWeight: "700",
+    lineHeight: 15,
+
+    marginTop: 3,
+  },
+
+  dailyBest: {
+    alignItems: "flex-end",
+
+    marginLeft: 10,
+  },
+
+  dailyBestValue: {
+    color:
+      Colors.roast,
+
+    fontSize: 21,
+    fontWeight: "900",
+  },
+
+  dailyBestLabel: {
+    color:
+      Colors.textSecondary,
+
+    fontSize: 8,
+    fontWeight: "900",
+
+    letterSpacing: 0.8,
+  },
+
+  // =====================================================
+  // Stats
+  // =====================================================
 
   statsGrid: {
     flexDirection: "row",
@@ -1565,6 +1734,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 
+  // =====================================================
+  // Achievements
+  // =====================================================
+
   achievementHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -1674,6 +1847,161 @@ const styles = StyleSheet.create({
 
   lockedAchievementDescription: {
     opacity: 0.55,
+  },
+
+  // =====================================================
+  // Community Preview
+  // =====================================================
+
+  communitySectionTitle: {
+    color:
+      Colors.textPrimary,
+
+    fontSize: 18,
+    fontWeight: "900",
+
+    marginTop: 28,
+    marginBottom: 13,
+  },
+
+  suggestionCard: {
+    backgroundColor:
+      Colors.textPrimary,
+
+    borderRadius:
+      Radius.lg,
+
+    padding: 19,
+
+    overflow: "hidden",
+  },
+
+  suggestionTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+
+    marginBottom: 15,
+  },
+
+  suggestionIcon: {
+    width: 45,
+    height: 45,
+
+    backgroundColor:
+      "#3A2724",
+
+    borderRadius: 23,
+
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  comingSoonBadge: {
+    borderColor:
+      Colors.toast,
+
+    borderWidth: 1,
+    borderRadius:
+      Radius.pill,
+
+    paddingVertical: 5,
+    paddingHorizontal: 9,
+  },
+
+  comingSoonText: {
+    color:
+      Colors.toast,
+
+    fontSize: 8,
+    fontWeight: "900",
+
+    letterSpacing: 1,
+  },
+
+  suggestionTitle: {
+    color:
+      Colors.white,
+
+    fontSize: 23,
+    fontWeight: "900",
+
+    marginBottom: 7,
+  },
+
+  suggestionDescription: {
+    color: "#CFCFCF",
+
+    fontSize: 11,
+    fontWeight: "600",
+    lineHeight: 18,
+
+    marginBottom: 16,
+  },
+
+  weeklyWinnerPreview: {
+    backgroundColor:
+      "#303034",
+
+    borderRadius:
+      Radius.lg,
+
+    padding: 13,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    marginBottom: 14,
+  },
+
+  weeklyWinnerEmoji: {
+    fontSize: 22,
+    marginRight: 10,
+  },
+
+  weeklyWinnerText: {
+    flex: 1,
+  },
+
+  weeklyWinnerTitle: {
+    color:
+      Colors.white,
+
+    fontSize: 12,
+    fontWeight: "900",
+  },
+
+  weeklyWinnerDescription: {
+    color: "#AFAFB4",
+
+    fontSize: 9,
+    fontWeight: "600",
+
+    marginTop: 3,
+  },
+
+  disabledSuggestionButton: {
+    backgroundColor:
+      "#3A3A3E",
+
+    borderRadius:
+      Radius.pill,
+
+    paddingVertical: 13,
+    paddingHorizontal: 17,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+
+    opacity: 0.75,
+  },
+
+  disabledSuggestionButtonText: {
+    color: "#AFAFB4",
+
+    fontSize: 13,
+    fontWeight: "900",
   },
 
   footerText: {

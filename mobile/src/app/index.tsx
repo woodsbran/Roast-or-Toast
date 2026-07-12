@@ -10,6 +10,7 @@
 // • New Round
 // • My Profile
 // • Settings
+// • Daily return streak
 //
 // A locally saved nickname appears as a subtle greeting.
 //
@@ -47,6 +48,10 @@ import {
 } from "../game/sessionStorage";
 
 import {
+  useDailyStreak,
+} from "../hooks/useDailyStreak";
+
+import {
   Colors,
   Radius,
   Spacing,
@@ -73,6 +78,12 @@ export default function HomeScreen() {
   ] = useState(
     DEFAULT_PLAYER_NICKNAME,
   );
+
+  // Daily return streak stored locally.
+  const {
+    dailyStreak,
+    hasLoadedDailyStreak,
+  } = useDailyStreak();
 
   // =====================================================
   // Restore Home Data
@@ -312,6 +323,37 @@ export default function HomeScreen() {
           </Text>
         </View>
 
+        {/* Daily return streak */}
+        {hasLoadedDailyStreak && (
+          <View style={styles.dailyStreakCard}>
+            <View style={styles.dailyStreakIcon}>
+              <Text style={styles.dailyStreakEmoji}>
+                🔥
+              </Text>
+            </View>
+
+            <View style={styles.dailyStreakText}>
+              <Text style={styles.dailyStreakValue}>
+                Day {dailyStreak.currentStreak}
+              </Text>
+
+              <Text style={styles.dailyStreakLabel}>
+                Daily opinion streak
+              </Text>
+            </View>
+
+            <View style={styles.bestStreakContainer}>
+              <Text style={styles.bestStreakValue}>
+                {dailyStreak.bestStreak}
+              </Text>
+
+              <Text style={styles.bestStreakLabel}>
+                BEST
+              </Text>
+            </View>
+          </View>
+        )}
+
         {isCheckingSession && (
           <Text style={styles.loadingText}>
             Checking your last round...
@@ -484,8 +526,7 @@ const styles = StyleSheet.create({
     position: "absolute",
 
     top: 60,
-    right:
-      Spacing.lg,
+    right: Spacing.lg,
 
     zIndex: 10,
 
@@ -582,7 +623,7 @@ const styles = StyleSheet.create({
   // =====================================================
 
   logoContainer: {
-    marginBottom: 52,
+    marginBottom: 38,
   },
 
   logoPrimary: {
@@ -629,7 +670,7 @@ const styles = StyleSheet.create({
   // =====================================================
 
   taglineContainer: {
-    marginBottom: 34,
+    marginBottom: 22,
   },
 
   nicknameGreeting: {
@@ -668,6 +709,93 @@ const styles = StyleSheet.create({
 
     fontSize: 14,
     fontWeight: "700",
+  },
+
+  // =====================================================
+  // Daily Streak
+  // =====================================================
+
+  dailyStreakCard: {
+    backgroundColor:
+      "#FFF1EC",
+
+    borderColor:
+      "#F4C9BE",
+
+    borderWidth: 1,
+    borderRadius:
+      Radius.lg,
+
+    paddingVertical: 11,
+    paddingHorizontal: 13,
+
+    marginBottom: 18,
+
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  dailyStreakIcon: {
+    width: 40,
+    height: 40,
+
+    backgroundColor:
+      Colors.white,
+
+    borderRadius: 20,
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    marginRight: 11,
+  },
+
+  dailyStreakEmoji: {
+    fontSize: 21,
+  },
+
+  dailyStreakText: {
+    flex: 1,
+  },
+
+  dailyStreakValue: {
+    color:
+      Colors.textPrimary,
+
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  dailyStreakLabel: {
+    color:
+      Colors.textSecondary,
+
+    fontSize: 10,
+    fontWeight: "700",
+
+    marginTop: 2,
+  },
+
+  bestStreakContainer: {
+    alignItems: "flex-end",
+  },
+
+  bestStreakValue: {
+    color:
+      Colors.roast,
+
+    fontSize: 17,
+    fontWeight: "900",
+  },
+
+  bestStreakLabel: {
+    color:
+      Colors.textSecondary,
+
+    fontSize: 8,
+    fontWeight: "900",
+
+    letterSpacing: 0.8,
   },
 
   // =====================================================

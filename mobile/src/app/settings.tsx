@@ -10,7 +10,7 @@
 // Current Controls:
 // • Turn haptics on or off
 // • Clear recently seen Moment history
-// • Reset all player data
+// • Reset all player data and daily streak
 // • View app version and local-storage information
 //
 // Project: Roast or Toast
@@ -34,6 +34,10 @@ import {
   Text,
   View,
 } from "react-native";
+
+import {
+  clearDailyStreak,
+} from "../game/dailyStreakStorage";
 
 import {
   clearGameSession,
@@ -79,7 +83,6 @@ export default function SettingsScreen() {
     setIsResetting,
   ] = useState(false);
 
-  // Uses the configured app version when available.
   const appVersion =
     Constants.expoConfig?.version ??
     "1.0.0";
@@ -139,7 +142,8 @@ export default function SettingsScreen() {
       );
 
       await saveAppSettings({
-        hapticsEnabled: enabled,
+        hapticsEnabled:
+          enabled,
       });
     };
 
@@ -151,7 +155,7 @@ export default function SettingsScreen() {
     () => {
       Alert.alert(
         "Refresh Moment History?",
-        "This clears the list of recently seen Moments. Your Heat, level, achievements, nickname, and active session will stay saved.",
+        "This clears the list of recently seen Moments. Your Heat, level, achievements, nickname, daily streak, and active session will stay saved.",
         [
           {
             text: "Cancel",
@@ -160,6 +164,7 @@ export default function SettingsScreen() {
 
           {
             text: "Clear History",
+
             onPress: async () => {
               await clearRecentMomentHistory();
 
@@ -181,7 +186,7 @@ export default function SettingsScreen() {
     () => {
       Alert.alert(
         "Reset All Progress?",
-        "This permanently clears your Heat, level, stats, achievements, nickname, recent Moment history, and active session from this device.",
+        "This permanently clears your Heat, level, stats, achievements, nickname, daily streak, recent Moment history, and active session from this device.",
         [
           {
             text: "Cancel",
@@ -201,10 +206,9 @@ export default function SettingsScreen() {
                   clearSavedPlayerProgress(),
                   clearPlayerProfile(),
                   clearRecentMomentHistory(),
+                  clearDailyStreak(),
                 ]);
 
-                // Keep app preferences but restore their
-                // normal defaults.
                 await saveAppSettings(
                   createDefaultSettings(),
                 );
@@ -251,7 +255,6 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Decorative background */}
       <Text style={styles.roastBackdrop}>
         ROAST
       </Text>
@@ -259,10 +262,6 @@ export default function SettingsScreen() {
       <Text style={styles.toastBackdrop}>
         TOAST
       </Text>
-
-      {/* =================================================
-          Header
-      ================================================= */}
 
       <View style={styles.header}>
         <Pressable
@@ -330,10 +329,6 @@ export default function SettingsScreen() {
           Your settings.
         </Text>
 
-        {/* =================================================
-            Feedback
-        ================================================= */}
-
         <Text style={styles.sectionTitle}>
           Feedback
         </Text>
@@ -376,10 +371,6 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
-
-        {/* =================================================
-            Content
-        ================================================= */}
 
         <Text style={styles.sectionTitle}>
           Content
@@ -427,10 +418,6 @@ export default function SettingsScreen() {
           />
         </Pressable>
 
-        {/* =================================================
-            About
-        ================================================= */}
-
         <Text style={styles.sectionTitle}>
           About
         </Text>
@@ -471,10 +458,6 @@ export default function SettingsScreen() {
           </Text>
         </View>
 
-        {/* =================================================
-            Danger Zone
-        ================================================= */}
-
         <Text style={styles.dangerSectionTitle}>
           Danger Zone
         </Text>
@@ -514,7 +497,7 @@ export default function SettingsScreen() {
             </Text>
 
             <Text style={styles.resetDescription}>
-              Clear Heat, level, stats, nickname, achievements, and the active session.
+              Clear Heat, level, stats, nickname, daily streak, achievements, and the active session.
             </Text>
           </View>
         </Pressable>
