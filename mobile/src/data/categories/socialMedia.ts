@@ -420,4 +420,203 @@ export const socialMediaMoments: Moment[] = [
     topComment:
       "They do not care what people think after the seventh draft.",
   },
+    {
+      id: "social-021",
+      category: "Social Media",
+
+      question:
+        "Someone treats the group chat like a personal feed, posting selfies and updates all day, but disappears whenever anyone else shares something important.",
+
+      roastPhrase:
+        "They want an audience.",
+
+      toastPhrase:
+        "That may just be how they connect.",
+
+      roastPercentage: 74,
+      toastPercentage: 26,
+
+      topComment:
+        "They joined the group conversation and launched a one-person channel.",
+    },
+
+    {
+      id: "social-022",
+      category: "Social Media",
+
+      question:
+        "Your friend supports your project before anyone else notices it, shares it without being asked, and checks back later to see how it is going.",
+
+      roastPhrase:
+        "They are doing promotional work.",
+
+      toastPhrase:
+        "That is genuine support.",
+
+      roastPercentage: 4,
+      toastPercentage: 96,
+
+      topComment:
+        "Support before the applause tells you who was really paying attention.",
+    },
+
+    {
+      id: "social-023",
+      category: "Social Media",
+
+      question:
+        "Someone posts every family event as if everyone is extremely close, even though most of the people in the pictures barely communicate afterward.",
+
+      roastPhrase:
+        "The closeness is for the camera.",
+
+      toastPhrase:
+        "The memories are still real.",
+
+      roastPercentage: 58,
+      toastPercentage: 42,
+
+      topComment:
+        "The photo album looks warmer than the relationships.",
+    },
+
+    {
+      id: "social-024",
+      category: "Social Media",
+
+      question:
+        "A friend never checks on you privately but leaves affectionate comments under every post so everyone can see how supportive they are.",
+
+      roastPhrase:
+        "Public support is easier.",
+
+      toastPhrase:
+        "They may not know what to say privately.",
+
+      roastPercentage: 63,
+      toastPercentage: 37,
+
+      topComment:
+        "The comment section knows they care. I am still waiting to feel it.",
+    },
+
+    {
+      id: "social-025",
+      category: "Social Media",
+
+      question:
+        "Someone sees that your post is not getting much attention and leaves a thoughtful comment instead of only liking it silently.",
+
+      roastPhrase:
+        "They are helping the algorithm.",
+
+      toastPhrase:
+        "They wanted you to feel supported.",
+
+      roastPercentage: 8,
+      toastPercentage: 92,
+
+      topComment:
+        "A real sentence hits differently when everyone else only taps a heart.",
+    },
+
+    {
+      id: "social-026",
+      category: "Social Media",
+
+      question:
+        "A person posts a serious message about privacy, then shares screenshots of someone else's private conversation ten minutes later.",
+
+      roastPhrase:
+        "The values expired quickly.",
+
+      toastPhrase:
+        "The situations may be different.",
+
+      roastPercentage: 87,
+      toastPercentage: 13,
+
+      topComment:
+        "Privacy apparently applies most strongly to their own information.",
+    },
+
+    {
+      id: "social-027",
+      category: "Social Media",
+
+      question:
+        "Your friend notices you have been posting less and checks on you privately instead of publicly asking what is wrong.",
+
+      roastPhrase:
+        "They were monitoring too closely.",
+
+      toastPhrase:
+        "That was thoughtful.",
+
+      roastPercentage: 9,
+      toastPercentage: 91,
+
+      topComment:
+        "They noticed the silence without turning it into content.",
+    },
+
+    {
+      id: "social-028",
+      category: "Social Media",
+
+      question:
+        "Someone deletes a post because it did not get enough likes, then reposts the exact same picture two days later at a better time.",
+
+      roastPhrase:
+        "The validation strategy is obvious.",
+
+      toastPhrase:
+        "Timing affects engagement.",
+
+      roastPercentage: 54,
+      toastPercentage: 46,
+
+      topComment:
+        "The picture did not change. The marketing plan did.",
+    },
+
+    {
+      id: "social-029",
+      category: "Social Media",
+
+      question:
+        "A friend sends you a funny video at exactly the right moment because they know you need a distraction from a difficult day.",
+
+      roastPhrase:
+        "They avoided the serious conversation.",
+
+      toastPhrase:
+        "They knew what would make you smile.",
+
+      roastPercentage: 20,
+      toastPercentage: 80,
+
+      topComment:
+        "Sometimes support looks like making someone laugh before they are ready to talk.",
+    },
+
+    {
+      id: "social-030",
+      category: "Social Media",
+
+      question:
+        "Someone announces a major personal update online before telling the close friends and family who expected to hear it directly.",
+
+      roastPhrase:
+        "The timeline found out first.",
+
+      toastPhrase:
+        "It was their news to share.",
+
+      roastPercentage: 52,
+      toastPercentage: 48,
+
+      topComment:
+        "Nothing makes you question closeness like learning important news with the general public.",
+    },
 ];

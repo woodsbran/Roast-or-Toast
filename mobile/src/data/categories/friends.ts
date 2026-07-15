@@ -420,4 +420,203 @@ export const friendMoments: Moment[] = [
     topComment:
       "They want permanent loyalty with temporary accountability.",
   },
+    {
+      id: "friends-021",
+      category: "Friends",
+
+      question:
+        "Your friend remembers an important appointment you mentioned weeks ago and checks in afterward without needing a reminder.",
+
+      roastPhrase:
+        "They are keeping detailed records.",
+
+      toastPhrase:
+        "They genuinely pay attention.",
+
+      roastPercentage: 5,
+      toastPercentage: 95,
+
+      topComment:
+        "The follow-up question is where real care usually shows up.",
+    },
+
+    {
+      id: "friends-022",
+      category: "Friends",
+
+      question:
+        "A friend sees people overlooking your accomplishment and celebrates you loudly before anyone else decides it is impressive.",
+
+      roastPhrase:
+        "They are doing too much.",
+
+      toastPhrase:
+        "That is genuine support.",
+
+      roastPercentage: 6,
+      toastPercentage: 94,
+
+      topComment:
+        "Support before popularity is the kind you remember.",
+    },
+
+    {
+      id: "friends-023",
+      category: "Friends",
+
+      question:
+        "Your friend knows you do not want advice, so they bring food, sit with you, and let you complain without trying to fix everything.",
+
+      roastPhrase:
+        "They encouraged the complaining.",
+
+      toastPhrase:
+        "They gave you what you needed.",
+
+      roastPercentage: 8,
+      toastPercentage: 92,
+
+      topComment:
+        "Sometimes the best advice is knowing not to give any.",
+    },
+
+    {
+      id: "friends-024",
+      category: "Friends",
+
+      question:
+        "A friend sends you an eight-minute voice note, apologizes for how long it is, then sends another six-minute voice note with one detail they forgot.",
+
+      roastPhrase:
+        "Start a podcast already.",
+
+      toastPhrase:
+        "I wanted the full story.",
+
+      roastPercentage: 52,
+      toastPercentage: 48,
+
+      topComment:
+        "The voice note had a sequel before I finished the original.",
+    },
+
+    {
+      id: "friends-025",
+      category: "Friends",
+
+      question:
+        "Your friend tells you privately that you were wrong in an argument, but still refuses to embarrass you in front of everyone else.",
+
+      roastPhrase:
+        "They should have defended me.",
+
+      toastPhrase:
+        "That is honest loyalty.",
+
+      roastPercentage: 24,
+      toastPercentage: 76,
+
+      topComment:
+        "A real friend can protect your dignity without protecting your mistake.",
+    },
+
+    {
+      id: "friends-026",
+      category: "Friends",
+
+      question:
+        "A friend borrows your charger every time you see them and somehow still never brings one of their own.",
+
+      roastPhrase:
+        "The charging station is closed.",
+
+      toastPhrase:
+        "Friends share resources.",
+
+      roastPercentage: 68,
+      toastPercentage: 32,
+
+      topComment:
+        "At this point the charger is in a long-distance relationship.",
+    },
+
+    {
+      id: "friends-027",
+      category: "Friends",
+
+      question:
+        "Your friend quietly removes you from an uncomfortable situation after noticing you were trying to leave without making a scene.",
+
+      roastPhrase:
+        "They were being dramatic.",
+
+      toastPhrase:
+        "That is a real friend.",
+
+      roastPercentage: 5,
+      toastPercentage: 95,
+
+      topComment:
+        "The best rescue missions do not require an explanation until later.",
+    },
+
+    {
+      id: "friends-028",
+      category: "Friends",
+
+      question:
+        "A friend tells you they cannot support your decision, but promises they will still support you if the outcome becomes difficult.",
+
+      roastPhrase:
+        "Support should not come with judgment.",
+
+      toastPhrase:
+        "That is honest friendship.",
+
+      roastPercentage: 39,
+      toastPercentage: 61,
+
+      topComment:
+        "They disagreed with the choice without abandoning the person.",
+    },
+
+    {
+      id: "friends-029",
+      category: "Friends",
+
+      question:
+        "Your friend volunteers to take your pictures, finds good lighting, and keeps going until you finally get one you actually like.",
+
+      roastPhrase:
+        "They turned it into a production.",
+
+      toastPhrase:
+        "That is friendship and patience.",
+
+      roastPercentage: 10,
+      toastPercentage: 90,
+
+      topComment:
+        "Some friendships are held together by honesty and forty-seven camera attempts.",
+    },
+
+    {
+      id: "friends-030",
+      category: "Friends",
+
+      question:
+        "A friend notices they have been dominating every conversation lately and asks how you are doing before talking about themselves again.",
+
+      roastPhrase:
+        "The self-awareness arrived late.",
+
+      toastPhrase:
+        "At least they noticed and adjusted.",
+
+      roastPercentage: 27,
+      toastPercentage: 73,
+
+      topComment:
+        "Growth sometimes begins with realizing the conversation has another person in it.",
+    },
 ];

@@ -520,4 +520,203 @@ export const datingMoments: Moment[] = [
     topComment:
       "Research is normal. Mentioning my 2009 haircut at dinner is where it got strange.",
   },
+    {
+      id: "dating-026",
+      category: "Dating",
+
+      question:
+        "You are active on several dating apps saying you want a serious relationship, but months pass and every conversation stays trapped in small talk.",
+
+      roastPhrase:
+        "You may be addicted to looking.",
+
+      toastPhrase:
+        "Dating takes time.",
+
+      roastPercentage: 57,
+      toastPercentage: 43,
+
+      topComment:
+        "At some point the search itself becomes the relationship.",
+    },
+
+    {
+      id: "dating-027",
+      category: "Dating",
+
+      question:
+        "The same person tries to match with you on three different dating apps after you already passed on them each time.",
+
+      roastPhrase:
+        "The answer crossed platforms.",
+
+      toastPhrase:
+        "Persistence can be attractive.",
+
+      roastPercentage: 76,
+      toastPercentage: 24,
+
+      topComment:
+        "Changing apps did not change my interest.",
+    },
+
+    {
+      id: "dating-028",
+      category: "Dating",
+
+      question:
+        "Someone complains that dating apps never work, but keeps matching with people they already know they would never seriously date.",
+
+      roastPhrase:
+        "They are entertaining themselves.",
+
+      toastPhrase:
+        "They may still be exploring.",
+
+      roastPercentage: 68,
+      toastPercentage: 32,
+
+      topComment:
+        "The problem may not be the app anymore.",
+    },
+
+    {
+      id: "dating-029",
+      category: "Dating",
+
+      question:
+        "You match with someone who asks thoughtful questions, makes a real plan, confirms the date, and follows through without playing games.",
+
+      roastPhrase:
+        "Why does this feel suspicious?",
+
+      toastPhrase:
+        "That is what dating should feel like.",
+
+      roastPercentage: 6,
+      toastPercentage: 94,
+
+      topComment:
+        "Consistency feels rare enough to look like a plot twist.",
+    },
+
+    {
+      id: "dating-030",
+      category: "Dating",
+
+      question:
+        "Someone you are dating admits they handled something badly, apologizes without making excuses, and changes the behavior afterward.",
+
+      roastPhrase:
+        "Let us see if it lasts.",
+
+      toastPhrase:
+        "That is real accountability.",
+
+      roastPercentage: 12,
+      toastPercentage: 88,
+
+      topComment:
+        "The changed behavior did more than the apology ever could.",
+    },
+
+    {
+      id: "dating-031",
+      category: "Dating",
+
+      question:
+        "Your date notices you are nervous and quietly changes the subject instead of making you feel embarrassed in front of everyone.",
+
+      roastPhrase:
+        "They were paying too much attention.",
+
+      toastPhrase:
+        "That was emotionally intelligent.",
+
+      roastPercentage: 5,
+      toastPercentage: 95,
+
+      topComment:
+        "They protected the moment without announcing that it needed protection.",
+    },
+
+    {
+      id: "dating-032",
+      category: "Dating",
+
+      question:
+        "Someone says they are looking for something serious on every dating app, but disappears whenever a conversation becomes emotionally meaningful.",
+
+      roastPhrase:
+        "They want the idea, not the work.",
+
+      toastPhrase:
+        "Vulnerability can be difficult.",
+
+      roastPercentage: 72,
+      toastPercentage: 28,
+
+      topComment:
+        "They want commitment until the conversation requires honesty.",
+    },
+
+    {
+      id: "dating-033",
+      category: "Dating",
+
+      question:
+        "You go on a date with someone who looks very different from their profile pictures, but they are honest, funny, and make you feel completely comfortable.",
+
+      roastPhrase:
+        "The pictures were misleading.",
+
+      toastPhrase:
+        "The real connection matters more.",
+
+      roastPercentage: 49,
+      toastPercentage: 51,
+
+      topComment:
+        "The profile started the date. The personality may have saved it.",
+    },
+
+    {
+      id: "dating-034",
+      category: "Dating",
+
+      question:
+        "Your date remembers that you mentioned loving a certain dessert and finds a place nearby that serves it after dinner.",
+
+      roastPhrase:
+        "That is suspiciously prepared.",
+
+      toastPhrase:
+        "They actually listened.",
+
+      roastPercentage: 4,
+      toastPercentage: 96,
+
+      topComment:
+        "The dessert was good. Being remembered was better.",
+    },
+
+    {
+      id: "dating-035",
+      category: "Dating",
+
+      question:
+        "You both say you want a relationship, but neither person wants to text first, make the next plan, or risk looking more interested.",
+
+      roastPhrase:
+        "Pride is dating both of you.",
+
+      toastPhrase:
+        "Nobody wants to get hurt.",
+
+      roastPercentage: 64,
+      toastPercentage: 36,
+
+      topComment:
+        "Two interested people can create one completely inactive relationship.",
+    },
 ];

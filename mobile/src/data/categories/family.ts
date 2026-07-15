@@ -420,4 +420,203 @@ export const familyMoments: Moment[] = [
     topComment:
       "Their speeches about loyalty are much more consistent than their presence.",
   },
+    {
+      id: "family-021",
+      category: "Family",
+
+      question:
+        "Everyone shows up to the family function, but the whole night is spent drinking, taking pictures, and having surface-level conversations. Nobody really knows what is happening in anyone else's life.",
+
+      roastPhrase:
+        "We are related, not connected.",
+
+      toastPhrase:
+        "Not every gathering has to be deep.",
+
+      roastPercentage: 57,
+      toastPercentage: 43,
+
+      topComment:
+        "Everybody knows what I wore, but nobody knows how I am doing.",
+    },
+
+    {
+      id: "family-022",
+      category: "Family",
+
+      question:
+        "The family group chat feels more like social media. Everyone posts updates hoping for reactions, but very few people check on each other privately.",
+
+      roastPhrase:
+        "Attention is not connection.",
+
+      toastPhrase:
+        "At least everyone stays in touch.",
+
+      roastPercentage: 61,
+      toastPercentage: 39,
+
+      topComment:
+        "A heart reaction is not the same as a real conversation.",
+    },
+
+    {
+      id: "family-023",
+      category: "Family",
+
+      question:
+        "Your sibling knows you have been overwhelmed and quietly handles one of your responsibilities without making a big announcement about it.",
+
+      roastPhrase:
+        "Now I owe them.",
+
+      toastPhrase:
+        "That is real support.",
+
+      roastPercentage: 5,
+      toastPercentage: 95,
+
+      topComment:
+        "The help mattered even more because it did not come with a speech.",
+    },
+
+    {
+      id: "family-024",
+      category: "Family",
+
+      question:
+        "A relative barely speaks during the family gathering, but makes sure you leave with food because they remembered you have had a difficult week.",
+
+      roastPhrase:
+        "Food cannot replace communication.",
+
+      toastPhrase:
+        "That is still a form of love.",
+
+      roastPercentage: 22,
+      toastPercentage: 78,
+
+      topComment:
+        "They may not know how to talk, but they packed the plate with care.",
+    },
+
+    {
+      id: "family-025",
+      category: "Family",
+
+      question:
+        "After you explain that something hurt you, a family member apologizes without arguing and actually changes how they treat you afterward.",
+
+      roastPhrase:
+        "That should be normal.",
+
+      toastPhrase:
+        "That is real accountability.",
+
+      roastPercentage: 7,
+      toastPercentage: 93,
+
+      topComment:
+        "The changed behavior made the apology believable.",
+    },
+
+    {
+      id: "family-026",
+      category: "Family",
+
+      question:
+        "Your family spends forty minutes trying to take one perfect group picture while everyone slowly becomes irritated with each other.",
+
+      roastPhrase:
+        "The memory is now stressful.",
+
+      toastPhrase:
+        "One good picture is worth it.",
+
+      roastPercentage: 49,
+      toastPercentage: 51,
+
+      topComment:
+        "The final photo looks loving because it cannot record the argument behind it.",
+    },
+
+    {
+      id: "family-027",
+      category: "Family",
+
+      question:
+        "A relative notices you are being left out of the conversation and intentionally brings you in without making the moment awkward.",
+
+      roastPhrase:
+        "They were doing too much.",
+
+      toastPhrase:
+        "That was emotionally aware.",
+
+      roastPercentage: 6,
+      toastPercentage: 94,
+
+      topComment:
+        "Small acts of inclusion can change the whole night.",
+    },
+
+    {
+      id: "family-028",
+      category: "Family",
+
+      question:
+        "Your sibling sends you an old childhood picture just to make you laugh after noticing you have been quiet all day.",
+
+      roastPhrase:
+        "They chose the worst picture.",
+
+      toastPhrase:
+        "They knew exactly what would help.",
+
+      roastPercentage: 16,
+      toastPercentage: 84,
+
+      topComment:
+        "The picture was disrespectful. The timing was perfect.",
+    },
+
+    {
+      id: "family-029",
+      category: "Family",
+
+      question:
+        "A family member expects everyone to attend their events but regularly says they are too busy when someone else has something important happening.",
+
+      roastPhrase:
+        "Support is not one-directional.",
+
+      toastPhrase:
+        "Schedules do not always align.",
+
+      roastPercentage: 82,
+      toastPercentage: 18,
+
+      topComment:
+        "Their calendar only becomes flexible when they are being celebrated.",
+    },
+
+    {
+      id: "family-030",
+      category: "Family",
+
+      question:
+        "Your family may not talk about feelings much, but when something serious happens, everyone quietly shows up and handles what needs to be done.",
+
+      roastPhrase:
+        "They should communicate more.",
+
+      toastPhrase:
+        "Actions still speak loudly.",
+
+      roastPercentage: 25,
+      toastPercentage: 75,
+
+      topComment:
+        "They struggle with the words, but nobody has to face the hard moments alone.",
+    },
 ];
