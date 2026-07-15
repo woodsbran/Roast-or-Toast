@@ -8,6 +8,10 @@
 // Category colors should remain subtle. Roast and Toast
 // voting colors stay consistent across every screen.
 //
+// Every new playable category should be added here so
+// the app can display the proper badge, accent color,
+// and background throughout the experience.
+//
 // Project: Roast or Toast
 // =====================================================
 
@@ -71,6 +75,26 @@ export const CategoryThemes = {
     soft: "#F6EFD9",
     label: "POP CULTURE",
   },
+
+  // =====================================================
+  // New Category
+  //
+  // Moral Dilemmas focuses on difficult decisions,
+  // ethical situations, accountability, and gray areas.
+  //
+  // The muted plum palette gives the category a more
+  // thoughtful personality while still fitting Roast or
+  // Toast's premium aesthetic.
+  // =====================================================
+
+  "Moral Dilemmas": {
+    accent: "#7A5C86",
+    soft: "#EFE7F2",
+    label: "MORAL DILEMMAS",
+  },
 } as const;
 
+// Every playable category name is automatically inferred
+// from the keys above. Adding a new category to
+// CategoryThemes automatically updates this type.
 export type CategoryName = keyof typeof CategoryThemes;

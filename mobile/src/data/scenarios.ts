@@ -12,9 +12,9 @@
 // • Imported below
 // • Added to the scenarios array
 //
-// The smart deck builder controls the order shown during
+// The Smart Deck builder controls the order shown during
 // gameplay. The order of the arrays below does not decide
-// which question appears first.
+// which Moment appears first.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -25,6 +25,7 @@ import { everydayLifeMoments } from "./categories/everydayLife";
 import { familyMoments } from "./categories/family";
 import { foodMoments } from "./categories/food";
 import { friendMoments } from "./categories/friends";
+import { moralDilemmaMoments } from "./categories/moralDilemmas";
 import { popCultureMoments } from "./categories/popCulture";
 import { socialMediaMoments } from "./categories/socialMedia";
 import { travelMoments } from "./categories/travel";
@@ -44,18 +45,20 @@ import type { Moment } from "./types";
 // • Family
 // • Food
 // • Friends
+// • Moral Dilemmas
 // • Pop Culture
 // • Social Media
 // • Travel
 // • Work
 //
-// The smart shuffle system will:
+// The Smart Deck system:
 //
-// • Prioritize recently unseen Moments
-// • Mix categories throughout the round
-// • Avoid excessive category repetition
-// • Push recently displayed Moments toward the end
-// • Preserve the exact deck when Continue Session is used
+// • Shuffles every individual Moment
+// • Prioritizes recently unseen Moments
+// • Mixes categories throughout the round
+// • Avoids excessive category repetition
+// • Pushes recently displayed Moments toward the end
+// • Preserves the exact deck for Continue Session
 // =====================================================
 
 export const scenarios: Moment[] = [
@@ -65,6 +68,7 @@ export const scenarios: Moment[] = [
   ...familyMoments,
   ...foodMoments,
   ...friendMoments,
+  ...moralDilemmaMoments,
   ...popCultureMoments,
   ...socialMediaMoments,
   ...travelMoments,

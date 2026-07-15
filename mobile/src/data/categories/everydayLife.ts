@@ -420,4 +420,203 @@ export const everydayLifeMoments: Moment[] = [
     topComment:
       "Words introduce the character. Patterns finish the story.",
   },
+    {
+      id: "everyday-021",
+      category: "Everyday Life",
+
+      question:
+        "Someone notices you are carrying too much, takes a few bags without being asked, and keeps walking like it is no big deal.",
+
+      roastPhrase:
+        "I could have handled it.",
+
+      toastPhrase:
+        "That is quiet kindness.",
+
+      roastPercentage: 6,
+      toastPercentage: 94,
+
+      topComment:
+        "The smallest help often feels biggest when you did not have to ask.",
+    },
+
+    {
+      id: "everyday-022",
+      category: "Everyday Life",
+
+      question:
+        "A person holds the elevator for you even though you are far enough away that you now have to perform the awkward elevator jog.",
+
+      roastPhrase:
+        "They created unnecessary pressure.",
+
+      toastPhrase:
+        "They were trying to be kind.",
+
+      roastPercentage: 43,
+      toastPercentage: 57,
+
+      topComment:
+        "The kindness was appreciated. The little run was humiliating.",
+    },
+
+    {
+      id: "everyday-023",
+      category: "Everyday Life",
+
+      question:
+        "Someone says 'We should hang out soon' every time they see you, but neither of you has made an actual plan in three years.",
+
+      roastPhrase:
+        "That sentence means nothing.",
+
+      toastPhrase:
+        "The intention may be genuine.",
+
+      roastPercentage: 65,
+      toastPercentage: 35,
+
+      topComment:
+        "The friendship exists mainly in future tense.",
+    },
+
+    {
+      id: "everyday-024",
+      category: "Everyday Life",
+
+      question:
+        "A stranger quietly tells you that your shirt is inside out instead of letting you walk around like that all day.",
+
+      roastPhrase:
+        "They should mind their business.",
+
+      toastPhrase:
+        "They saved you from embarrassment.",
+
+      roastPercentage: 9,
+      toastPercentage: 91,
+
+      topComment:
+        "Temporary embarrassment prevented a full day of photographic evidence.",
+    },
+
+    {
+      id: "everyday-025",
+      category: "Everyday Life",
+
+      question:
+        "Someone puts an empty container back in the refrigerator because they do not want to be the person who finishes it.",
+
+      roastPhrase:
+        "Throw it away.",
+
+      toastPhrase:
+        "Technically, something was left.",
+
+      roastPercentage: 94,
+      toastPercentage: 6,
+
+      topComment:
+        "That final teaspoon was left as an emotional responsibility.",
+    },
+
+    {
+      id: "everyday-026",
+      category: "Everyday Life",
+
+      question:
+        "A person realizes they misunderstood you, apologizes immediately, and asks what you actually meant instead of defending their first reaction.",
+
+      roastPhrase:
+        "They reacted too quickly.",
+
+      toastPhrase:
+        "That is healthy communication.",
+
+      roastPercentage: 12,
+      toastPercentage: 88,
+
+      topComment:
+        "The conversation survived because being right was not more important than understanding.",
+    },
+
+    {
+      id: "everyday-027",
+      category: "Everyday Life",
+
+      question:
+        "Someone walks slowly in the middle of a crowded sidewalk while looking at their phone, making everyone else move around them.",
+
+      roastPhrase:
+        "Choose a lane.",
+
+      toastPhrase:
+        "They may not realize it.",
+
+      roastPercentage: 88,
+      toastPercentage: 12,
+
+      topComment:
+        "The sidewalk became their private loading screen.",
+    },
+
+    {
+      id: "everyday-028",
+      category: "Everyday Life",
+
+      question:
+        "A neighbor brings in your package before it rains and leaves it safely by your door without expecting anything in return.",
+
+      roastPhrase:
+        "They touched my package.",
+
+      toastPhrase:
+        "That was considerate.",
+
+      roastPercentage: 7,
+      toastPercentage: 93,
+
+      topComment:
+        "Community is sometimes just somebody noticing the weather before you do.",
+    },
+
+    {
+      id: "everyday-029",
+      category: "Everyday Life",
+
+      question:
+        "Someone arrives at a crowded checkout with a full cart and lets you go first because you only have one item.",
+
+      roastPhrase:
+        "They want praise for thirty seconds.",
+
+      toastPhrase:
+        "Small kindness still counts.",
+
+      roastPercentage: 5,
+      toastPercentage: 95,
+
+      topComment:
+        "They gave up almost nothing and somehow improved my entire mood.",
+    },
+
+    {
+      id: "everyday-030",
+      category: "Everyday Life",
+
+      question:
+        "A person says they are five minutes away while they are still standing at home deciding what to wear.",
+
+      roastPhrase:
+        "That is a fictional location.",
+
+      toastPhrase:
+        "They are mentally on the way.",
+
+      roastPercentage: 85,
+      toastPercentage: 15,
+
+      topComment:
+        "Five minutes away spiritually. Twenty-five minutes away geographically.",
+    },
 ];

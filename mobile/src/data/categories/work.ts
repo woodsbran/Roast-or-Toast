@@ -420,4 +420,203 @@ export const workMoments: Moment[] = [
     topComment:
       "We are family when they need sacrifice and employees when we need understanding.",
   },
+    {
+      id: "work-021",
+      category: "Work",
+
+      question:
+        "Your manager notices the team is overwhelmed and removes unnecessary work instead of scheduling another meeting about managing stress.",
+
+      roastPhrase:
+        "They finally did their job.",
+
+      toastPhrase:
+        "That is actual leadership.",
+
+      roastPercentage: 9,
+      toastPercentage: 91,
+
+      topComment:
+        "Nothing improves morale like solving the problem instead of presenting slides about it.",
+    },
+
+    {
+      id: "work-022",
+      category: "Work",
+
+      question:
+        "A coworker realizes you were left out of an important email chain and fills you in before the missing information can make you look unprepared.",
+
+      roastPhrase:
+        "Someone should have included me.",
+
+      toastPhrase:
+        "That coworker had your back.",
+
+      roastPercentage: 8,
+      toastPercentage: 92,
+
+      topComment:
+        "They fixed the problem before it became an embarrassing meeting surprise.",
+    },
+
+    {
+      id: "work-023",
+      category: "Work",
+
+      question:
+        "Your boss schedules a meeting to discuss why the team has too many meetings.",
+
+      roastPhrase:
+        "The irony booked a conference room.",
+
+      toastPhrase:
+        "At least they are addressing it.",
+
+      roastPercentage: 86,
+      toastPercentage: 14,
+
+      topComment:
+        "This meeting could have been the cancellation of another meeting.",
+    },
+
+    {
+      id: "work-024",
+      category: "Work",
+
+      question:
+        "Your manager admits their instructions were unclear and takes responsibility instead of blaming the employee who misunderstood them.",
+
+      roastPhrase:
+        "That should be normal.",
+
+      toastPhrase:
+        "That is accountable leadership.",
+
+      roastPercentage: 7,
+      toastPercentage: 93,
+
+      topComment:
+        "A manager admitting fault should not feel like a rare workplace event.",
+    },
+
+    {
+      id: "work-025",
+      category: "Work",
+
+      question:
+        "A coworker always says they are available to help, but replies with 'Have you checked the folder?' whenever anyone actually asks.",
+
+      roastPhrase:
+        "That is not help.",
+
+      toastPhrase:
+        "The answer may be in the folder.",
+
+      roastPercentage: 68,
+      toastPercentage: 32,
+
+      topComment:
+        "Their support comes with a scavenger hunt.",
+    },
+
+    {
+      id: "work-026",
+      category: "Work",
+
+      question:
+        "Your boss encourages you to take your vacation, does not contact you while you are away, and makes sure someone covers your work.",
+
+      roastPhrase:
+        "They want credit for basic boundaries.",
+
+      toastPhrase:
+        "That is a healthy workplace.",
+
+      roastPercentage: 11,
+      toastPercentage: 89,
+
+      topComment:
+        "Real time off begins when nobody texts 'quick question.'",
+    },
+
+    {
+      id: "work-027",
+      category: "Work",
+
+      question:
+        "A coworker keeps their camera off during every virtual meeting but suddenly turns it on when leadership joins.",
+
+      roastPhrase:
+        "The performance has begun.",
+
+      toastPhrase:
+        "Maybe they wanted to look engaged.",
+
+      roastPercentage: 62,
+      toastPercentage: 38,
+
+      topComment:
+        "Their camera follows the organizational chart.",
+    },
+
+    {
+      id: "work-028",
+      category: "Work",
+
+      question:
+        "Your manager gives you credit for solving a difficult problem even though they could have easily presented the solution as their own.",
+
+      roastPhrase:
+        "That is the minimum.",
+
+      toastPhrase:
+        "Good leaders share credit.",
+
+      roastPercentage: 13,
+      toastPercentage: 87,
+
+      topComment:
+        "Recognition feels different when someone had the power to take it and chose not to.",
+    },
+
+    {
+      id: "work-029",
+      category: "Work",
+
+      question:
+        "Leadership asks everyone to complete an anonymous survey, then spends the next meeting trying to figure out who wrote each comment.",
+
+      roastPhrase:
+        "They missed the point entirely.",
+
+      toastPhrase:
+        "They want more context.",
+
+      roastPercentage: 91,
+      toastPercentage: 9,
+
+      topComment:
+        "The anonymous survey has entered witness protection.",
+    },
+
+    {
+      id: "work-030",
+      category: "Work",
+
+      question:
+        "A coworker notices you are struggling during a presentation and smoothly steps in without making it obvious that they are rescuing you.",
+
+      roastPhrase:
+        "They took over my moment.",
+
+      toastPhrase:
+        "That was graceful teamwork.",
+
+      roastPercentage: 15,
+      toastPercentage: 85,
+
+      topComment:
+        "The best save is the one the room barely notices.",
+    },
 ];
