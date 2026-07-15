@@ -260,4 +260,403 @@ export const popCultureMoments: Moment[] = [
     topComment:
       "The two-hour documentary has become an independent research course.",
   },
+    {
+      id: "popculture-021",
+      category: "Pop Culture",
+
+      question:
+        "Someone refuses to watch a popular show because too many people keep telling them they have to see it.",
+
+      roastPhrase:
+        "They are missing out to be different.",
+
+      toastPhrase:
+        "The hype became annoying.",
+
+      roastPercentage: 48,
+      toastPercentage: 52,
+
+      topComment:
+        "Nothing kills curiosity faster than receiving homework from the entire internet.",
+    },
+
+    {
+      id: "popculture-022",
+      category: "Pop Culture",
+
+      question:
+        "Your friend starts a show without you after you both agreed to watch every episode together.",
+
+      roastPhrase:
+        "That is streaming betrayal.",
+
+      toastPhrase:
+        "They could not wait.",
+
+      roastPercentage: 81,
+      toastPercentage: 19,
+
+      topComment:
+        "The relationship may recover. The shared watch history will not.",
+    },
+
+    {
+      id: "popculture-023",
+      category: "Pop Culture",
+
+      question:
+        "Someone says they hate celebrity gossip but knows every detail before anyone else does.",
+
+      roastPhrase:
+        "They are secretly subscribed.",
+
+      toastPhrase:
+        "The news is impossible to avoid.",
+
+      roastPercentage: 72,
+      toastPercentage: 28,
+
+      topComment:
+        "They hate gossip with an impressive amount of supporting evidence.",
+    },
+
+    {
+      id: "popculture-024",
+      category: "Pop Culture",
+
+      question:
+        "A person stops supporting an artist completely after learning the artist did something they strongly disagree with.",
+
+      roastPhrase:
+        "Separate the art from the artist.",
+
+      toastPhrase:
+        "Support is still a choice.",
+
+      roastPercentage: 45,
+      toastPercentage: 55,
+
+      topComment:
+        "The playlist became an ethics exam.",
+    },
+
+    {
+      id: "popculture-025",
+      category: "Pop Culture",
+
+      question:
+        "Someone claims a musician only became good after the rest of the internet started praising them.",
+
+      roastPhrase:
+        "They needed permission to like it.",
+
+      toastPhrase:
+        "Sometimes music grows on you.",
+
+      roastPercentage: 59,
+      toastPercentage: 41,
+
+      topComment:
+        "The song improved dramatically once it became socially approved.",
+    },
+
+    {
+      id: "popculture-026",
+      category: "Pop Culture",
+
+      question:
+        "Your friend sends you a song because the lyrics reminded them of something you are going through.",
+
+      roastPhrase:
+        "Now I have to be emotional.",
+
+      toastPhrase:
+        "That is a thoughtful way to connect.",
+
+      roastPercentage: 5,
+      toastPercentage: 95,
+
+      topComment:
+        "Sometimes a song knows what your friend could not find the words to say.",
+    },
+
+    {
+      id: "popculture-027",
+      category: "Pop Culture",
+
+      question:
+        "Someone records themselves reacting to a movie while everyone else is trying to watch it quietly.",
+
+      roastPhrase:
+        "The movie already has actors.",
+
+      toastPhrase:
+        "Their reaction is part of the fun.",
+
+      roastPercentage: 78,
+      toastPercentage: 22,
+
+      topComment:
+        "I bought a ticket for the film, not their live commentary track.",
+    },
+
+    {
+      id: "popculture-028",
+      category: "Pop Culture",
+
+      question:
+        "A person wears merchandise from a band but cannot name a single song when someone asks.",
+
+      roastPhrase:
+        "They are wearing a costume.",
+
+      toastPhrase:
+        "They liked the design.",
+
+      roastPercentage: 51,
+      toastPercentage: 49,
+
+      topComment:
+        "The shirt looked good. The surprise music exam was unnecessary.",
+    },
+
+    {
+      id: "popculture-029",
+      category: "Pop Culture",
+
+      question:
+        "Your friend remembers the movie you loved as a child and surprises you with tickets to a special screening.",
+
+      roastPhrase:
+        "That is suspiciously thoughtful.",
+
+      toastPhrase:
+        "They really pay attention.",
+
+      roastPercentage: 4,
+      toastPercentage: 96,
+
+      topComment:
+        "Nostalgia feels different when someone remembers it for you.",
+    },
+
+    {
+      id: "popculture-030",
+      category: "Pop Culture",
+
+      question:
+        "Someone decides an entire movie is terrible after watching only ten minutes while scrolling on their phone.",
+
+      roastPhrase:
+        "They did not actually watch it.",
+
+      toastPhrase:
+        "Ten minutes can be enough.",
+
+      roastPercentage: 76,
+      toastPercentage: 24,
+
+      topComment:
+        "The movie failed to compete with three apps and a group chat.",
+    },
+
+    {
+      id: "popculture-031",
+      category: "Pop Culture",
+
+      question:
+        "A person complains that every new movie is a remake, but refuses to watch anything that is not already familiar.",
+
+      roastPhrase:
+        "They are creating the problem.",
+
+      toastPhrase:
+        "Familiar stories are comforting.",
+
+      roastPercentage: 67,
+      toastPercentage: 33,
+
+      topComment:
+        "They demand originality and purchase nostalgia.",
+    },
+
+    {
+      id: "popculture-032",
+      category: "Pop Culture",
+
+      question:
+        "Someone spends hundreds of dollars on a concert, then watches most of it through their phone screen.",
+
+      roastPhrase:
+        "Put the phone down.",
+
+      toastPhrase:
+        "They want to keep the memory.",
+
+      roastPercentage: 71,
+      toastPercentage: 29,
+
+      topComment:
+        "The memory now includes forty minutes of shaky vertical video.",
+    },
+
+    {
+      id: "popculture-033",
+      category: "Pop Culture",
+
+      question:
+        "Your friend listens to an album you recommended, then calls you because they genuinely want to discuss it.",
+
+      roastPhrase:
+        "This became a music seminar.",
+
+      toastPhrase:
+        "That is real engagement.",
+
+      roastPercentage: 8,
+      toastPercentage: 92,
+
+      topComment:
+        "They did not just say they would listen. They came back with notes.",
+    },
+
+    {
+      id: "popculture-034",
+      category: "Pop Culture",
+
+      question:
+        "Someone changes their entire opinion of a celebrity because of one carefully edited interview clip.",
+
+      roastPhrase:
+        "They need more context.",
+
+      toastPhrase:
+        "The clip still revealed something.",
+
+      roastPercentage: 62,
+      toastPercentage: 38,
+
+      topComment:
+        "A twelve-second clip just completed a full character investigation.",
+    },
+
+    {
+      id: "popculture-035",
+      category: "Pop Culture",
+
+      question:
+        "A person says an artist has sold out because their music became popular outside the original fan base.",
+
+      roastPhrase:
+        "Success is not betrayal.",
+
+      toastPhrase:
+        "The music may have changed.",
+
+      roastPercentage: 57,
+      toastPercentage: 43,
+
+      topComment:
+        "They supported the dream until other people discovered it.",
+    },
+
+    {
+      id: "popculture-036",
+      category: "Pop Culture",
+
+      question:
+        "Your friend spoils the ending of a show, then says you had plenty of time to watch it.",
+
+      roastPhrase:
+        "Spoilers still count.",
+
+      toastPhrase:
+        "The episode has been out for months.",
+
+      roastPercentage: 68,
+      toastPercentage: 32,
+
+      topComment:
+        "The statute of limitations on spoilers remains under debate.",
+    },
+
+    {
+      id: "popculture-037",
+      category: "Pop Culture",
+
+      question:
+        "Someone admits they were wrong about a performer and gives their work another honest chance.",
+
+      roastPhrase:
+        "They should have listened earlier.",
+
+      toastPhrase:
+        "Changing your mind is healthy.",
+
+      roastPercentage: 10,
+      toastPercentage: 90,
+
+      topComment:
+        "Growth sometimes sounds like finally adding the song to your playlist.",
+    },
+
+    {
+      id: "popculture-038",
+      category: "Pop Culture",
+
+      question:
+        "A person makes liking one artist, show, or franchise their entire personality.",
+
+      roastPhrase:
+        "There has to be more.",
+
+      toastPhrase:
+        "Let people enjoy things deeply.",
+
+      roastPercentage: 55,
+      toastPercentage: 45,
+
+      topComment:
+        "The interest is fine. The full-time brand partnership is where questions begin.",
+    },
+
+    {
+      id: "popculture-039",
+      category: "Pop Culture",
+
+      question:
+        "Someone refuses to admit they enjoyed a movie because critics and social media said it was bad.",
+
+      roastPhrase:
+        "Form your own opinion.",
+
+      toastPhrase:
+        "Reviews can change the experience.",
+
+      roastPercentage: 73,
+      toastPercentage: 27,
+
+      topComment:
+        "They had fun until the internet informed them they did not.",
+    },
+
+    {
+      id: "popculture-040",
+      category: "Pop Culture",
+
+      question:
+        "Your friend makes you a playlist for a specific mood instead of sending a random collection of songs.",
+
+      roastPhrase:
+        "They had too much time.",
+
+      toastPhrase:
+        "That is personal and thoughtful.",
+
+      roastPercentage: 6,
+      toastPercentage: 94,
+
+      topComment:
+        "A carefully made playlist is a letter written in songs.",
+    },
 ];

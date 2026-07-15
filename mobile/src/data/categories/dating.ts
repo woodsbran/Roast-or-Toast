@@ -5,259 +5,519 @@
 // Stores Dating category Moments for Roast or Toast.
 //
 // Content Direction:
-// • Specific modern dating behavior
-// • Texting and app etiquette
-// • Boundaries and mixed signals
-// • Situations that can genuinely split the room
-//
-// Important:
-// Existing IDs are preserved so saved sessions remain
-// compatible after this content update.
+// • Realistic modern dating situations
+// • Messy but believable behavior
+// • Strong conversation starters
+// • Fewer obvious answers
+// • Relatable moments players may have experienced
 //
 // Project: Roast or Toast
 // =====================================================
 
 import type { Moment } from "../types";
 
+// =====================================================
+// Dating Moments
+// =====================================================
+
 export const datingMoments: Moment[] = [
   {
     id: "dating-001",
     category: "Dating",
+
     question:
-      "Your date chooses the restaurant, orders for both of you, and says they know what you will like.",
-    roastPhrase: "Please hand me the menu.",
-    toastPhrase: "Confidence can be attractive.",
-    roastPercentage: 72,
-    toastPercentage: 28,
+      "You have been talking every day for two months, but they still have not asked you on an actual date.",
+
+    roastPhrase:
+      "They are wasting your time.",
+
+    toastPhrase:
+      "Some people move slowly.",
+
+    roastPercentage: 78,
+    toastPercentage: 22,
+
     topComment:
-      "Planning the date was thoughtful. Taking away my vote was not.",
+      "Daily conversations with no date is starting to feel like unpaid customer service.",
   },
+
   {
     id: "dating-002",
     category: "Dating",
+
     question:
-      "Someone remembers a tiny detail from your dating profile that you forgot you wrote.",
-    roastPhrase: "They studied the assignment.",
-    toastPhrase: "They actually paid attention.",
-    roastPercentage: 18,
-    toastPercentage: 82,
+      "Your date keeps turning their phone facedown every time it lights up.",
+
+    roastPhrase:
+      "What are they hiding?",
+
+    toastPhrase:
+      "Maybe they are being present.",
+
+    roastPercentage: 64,
+    toastPercentage: 36,
+
     topComment:
-      "Reading the profile already puts them ahead of half the app.",
+      "Being present is cute. The panic flip is what concerns me.",
   },
+
   {
     id: "dating-003",
     category: "Dating",
+
     question:
-      "Your date is thirty minutes late but texted updates the entire time and arrives with your favorite snack.",
-    roastPhrase: "Late is still late.",
-    toastPhrase: "The communication matters.",
-    roastPercentage: 54,
-    toastPercentage: 46,
+      "Someone says they do not believe in labels, but gets jealous when you talk to anyone else.",
+
+    roastPhrase:
+      "Pick a side.",
+
+    toastPhrase:
+      "They are figuring it out.",
+
+    roastPercentage: 88,
+    toastPercentage: 12,
+
     topComment:
-      "The snack softened the crime, but the clock remembers.",
+      "No label, but somehow I still have relationship rules?",
   },
+
   {
     id: "dating-004",
     category: "Dating",
+
     question:
-      "Your date asks to split the bill after they chose a much more expensive restaurant.",
-    roastPhrase: "You picked this place.",
-    toastPhrase: "Splitting is still fair.",
-    roastPercentage: 64,
-    toastPercentage: 36,
+      "Your date is forty minutes late, but arrives with your favorite food and a real apology.",
+
+    roastPhrase:
+      "Respect my time.",
+
+    toastPhrase:
+      "The recovery was strong.",
+
+    roastPercentage: 51,
+    toastPercentage: 49,
+
     topComment:
-      "Equality arrived with a reservation I did not request.",
+      "I am still annoyed, but unfortunately they brought the right order.",
   },
+
   {
     id: "dating-005",
     category: "Dating",
+
     question:
-      "Someone double-texts because their second message actually adds something to the conversation.",
-    roastPhrase: "Let the first text breathe.",
-    toastPhrase: "That is normal communication.",
-    roastPercentage: 37,
-    toastPercentage: 63,
+      "They disappear for three weeks, then text you 'Hey stranger' like nothing happened.",
+
+    roastPhrase:
+      "Stay a stranger.",
+
+    toastPhrase:
+      "Life gets complicated.",
+
+    roastPercentage: 91,
+    toastPercentage: 9,
+
     topComment:
-      "Two texts are not a crisis. Twelve might be.",
+      "You created the stranger. Please enjoy your work.",
   },
+
   {
     id: "dating-006",
     category: "Dating",
+
     question:
-      "Your date walks you to your car, waits until you drive away, and texts to make sure you got home.",
-    roastPhrase: "That is a lot after one date.",
-    toastPhrase: "That is considerate.",
-    roastPercentage: 14,
-    toastPercentage: 86,
+      "Your partner still has several romantic pictures with their ex on Instagram.",
+
+    roastPhrase:
+      "Those need to go.",
+
+    toastPhrase:
+      "The past still happened.",
+
+    roastPercentage: 58,
+    toastPercentage: 42,
+
     topComment:
-      "Safety without pressure is actually attractive.",
+      "I do not need the archives deleted, but why is the anniversary post still pinned?",
   },
+
   {
     id: "dating-007",
     category: "Dating",
+
     question:
-      "Your date keeps their phone face down all night but checks it every time you go to the restroom.",
-    roastPhrase: "Something feels off.",
-    toastPhrase: "At least they were present.",
-    roastPercentage: 57,
-    toastPercentage: 43,
+      "Someone asks for your streaming password after only two dates.",
+
+    roastPhrase:
+      "Access denied.",
+
+    toastPhrase:
+      "Sharing is caring.",
+
+    roastPercentage: 71,
+    toastPercentage: 29,
+
     topComment:
-      "Respectful behavior or excellent timing? The jury is out.",
+      "You have not earned premium household privileges yet.",
   },
+
   {
     id: "dating-008",
     category: "Dating",
+
     question:
-      "After two dates, someone asks to share locations only when either of you is traveling home late.",
-    roastPhrase: "Still too much access.",
-    toastPhrase: "That is a safety thing.",
-    roastPercentage: 46,
-    toastPercentage: 54,
+      "Your date says every single one of their exes was crazy.",
+
+    roastPhrase:
+      "There is one common denominator.",
+
+    toastPhrase:
+      "Maybe they had bad luck.",
+
+    roastPercentage: 87,
+    toastPercentage: 13,
+
     topComment:
-      "Temporary safety sharing is not the same as lifetime tracking.",
+      "At some point we have to review the casting director.",
   },
+
   {
     id: "dating-009",
     category: "Dating",
+
     question:
-      "Someone says they are bad at texting, but they always make concrete plans and follow through.",
-    roastPhrase: "Communication still matters.",
-    toastPhrase: "Actions speak louder.",
-    roastPercentage: 42,
-    toastPercentage: 58,
+      "You find out the person you are dating still shares their location with an ex.",
+
+    roastPhrase:
+      "That is suspicious.",
+
+    toastPhrase:
+      "There may be a reason.",
+
+    roastPercentage: 82,
+    toastPercentage: 18,
+
     topComment:
-      "A dry texter with a confirmed reservation might still be a keeper.",
+      "I am going to need the full history behind this active subscription.",
   },
+
   {
     id: "dating-010",
     category: "Dating",
+
     question:
-      "Your date brings a friend because they felt nervous meeting someone from an app.",
-    roastPhrase: "That should have been disclosed.",
-    toastPhrase: "Safety comes first.",
-    roastPercentage: 61,
-    toastPercentage: 39,
+      "They text you all day, flirt constantly, and act interested, but never make actual plans.",
+
+    roastPhrase:
+      "Pen-pal behavior.",
+
+    toastPhrase:
+      "They enjoy taking it slow.",
+
+    roastPercentage: 83,
+    toastPercentage: 17,
+
     topComment:
-      "Valid concern. Terrible surprise.",
+      "My screen time is increasing, but the relationship is not.",
   },
+
   {
     id: "dating-011",
     category: "Dating",
+
     question:
-      "Someone says they are close friends with one ex and their current partners have always known about it.",
-    roastPhrase: "That chapter should be closed.",
-    toastPhrase: "Healthy friendships exist.",
-    roastPercentage: 49,
-    toastPercentage: 51,
+      "Your date checks in to make sure you got home safely, then remembers to ask about your big meeting the next morning.",
+
+    roastPhrase:
+      "The bar is underground.",
+
+    toastPhrase:
+      "They actually listened.",
+
+    roastPercentage: 7,
+    toastPercentage: 93,
+
     topComment:
-      "One ex with boundaries is different from a reunion tour.",
+      "Remembering the follow-up question is where the real points were earned.",
   },
+
   {
     id: "dating-012",
     category: "Dating",
+
     question:
-      "Your date plans an entire evening around things you casually mentioned weeks ago.",
-    roastPhrase: "That is intense.",
-    toastPhrase: "That is real effort.",
-    roastPercentage: 16,
-    toastPercentage: 84,
+      "Your partner gets upset that you did not post them for their birthday.",
+
+    roastPhrase:
+      "Love is not a Story post.",
+
+    toastPhrase:
+      "Public appreciation matters.",
+
+    roastPercentage: 57,
+    toastPercentage: 43,
+
     topComment:
-      "Listening, planning, and remembering? Suspiciously competent.",
+      "I planned dinner, bought a gift, and somehow Instagram is still the final exam.",
   },
+
   {
     id: "dating-013",
     category: "Dating",
+
     question:
-      "Someone wants to post a photo with you after the second date but agrees not to tag you.",
-    roastPhrase: "Why are we posting already?",
-    toastPhrase: "It is just a picture.",
-    roastPercentage: 58,
-    toastPercentage: 42,
+      "They tell you they are not ready for a relationship, then start dating someone else two weeks later.",
+
+    roastPhrase:
+      "They meant not with you.",
+
+    toastPhrase:
+      "Feelings can change.",
+
+    roastPercentage: 79,
+    toastPercentage: 21,
+
     topComment:
-      "Soft launching someone you barely know is still launching.",
+      "The honesty arrived late, but the message is now very clear.",
   },
+
   {
     id: "dating-014",
     category: "Dating",
+
     question:
-      "Your date tells the restaurant it is your birthday so you can both get free dessert.",
-    roastPhrase: "Do not lie for cake.",
-    toastPhrase: "Free dessert is free dessert.",
-    roastPercentage: 44,
-    toastPercentage: 56,
+      "Your date brings up how much money you make before the appetizers arrive.",
+
+    roastPhrase:
+      "This is an interview.",
+
+    toastPhrase:
+      "Financial compatibility matters.",
+
+    roastPercentage: 73,
+    toastPercentage: 27,
+
     topComment:
-      "My morals get noticeably quieter around complimentary cheesecake.",
+      "Can we at least order drinks before the background check begins?",
   },
+
   {
     id: "dating-015",
     category: "Dating",
+
     question:
-      "Someone keeps a note in their phone with your favorite snacks, allergies, and coffee order.",
-    roastPhrase: "That feels like a file.",
-    toastPhrase: "That is thoughtful.",
-    roastPercentage: 31,
-    toastPercentage: 69,
+      "Someone double-texts because they are excited to talk to you, not because they are demanding an answer.",
+
+    roastPhrase:
+      "Play it cooler.",
+
+    toastPhrase:
+      "Interest should not be embarrassing.",
+
+    roastPercentage: 24,
+    toastPercentage: 76,
+
     topComment:
-      "Organized affection is still affection.",
+      "We begged people to communicate and now we are punishing enthusiasm.",
   },
+
   {
     id: "dating-016",
     category: "Dating",
+
     question:
-      "Before becoming exclusive, someone asks how you handle money, debt, and spending.",
-    roastPhrase: "That is too personal too soon.",
-    toastPhrase: "Finances matter.",
-    roastPercentage: 47,
-    toastPercentage: 53,
+      "You notice your date is rude to the server but extremely charming with you.",
+
+    roastPhrase:
+      "That is the real personality.",
+
+    toastPhrase:
+      "Maybe they had a bad moment.",
+
+    roastPercentage: 95,
+    toastPercentage: 5,
+
     topComment:
-      "Romance is cute, but financial chaos also comes to dinner.",
+      "How they treat people they do not need tells me everything.",
   },
+
   {
     id: "dating-017",
     category: "Dating",
+
     question:
-      "Someone intentionally waits hours to reply even though they saw your message immediately.",
-    roastPhrase: "Please grow up.",
-    toastPhrase: "Nobody needs instant access.",
-    roastPercentage: 73,
-    toastPercentage: 27,
+      "Your partner wants your phone password, but refuses to give you theirs.",
+
+    roastPhrase:
+      "Absolutely not.",
+
+    toastPhrase:
+      "Privacy can be different.",
+
+    roastPercentage: 93,
+    toastPercentage: 7,
+
     topComment:
-      "Having boundaries is fine. Performing disinterest is exhausting.",
+      "Transparency cannot be a one-person subscription.",
   },
+
   {
     id: "dating-018",
     category: "Dating",
+
     question:
-      "Your date offers you the last bite of dessert, then looks disappointed when you actually take it.",
-    roastPhrase: "Do not offer what you want.",
-    toastPhrase: "The gesture still counts.",
-    roastPercentage: 68,
-    toastPercentage: 32,
+      "Your date plans the entire evening around small things you mentioned weeks ago.",
+
+    roastPhrase:
+      "That is a lot of research.",
+
+    toastPhrase:
+      "They were paying attention.",
+
+    roastPercentage: 6,
+    toastPercentage: 94,
+
     topComment:
-      "That was not generosity. That was a loyalty test.",
+      "Listening, planning, and following through? Suspiciously impressive.",
   },
+
   {
     id: "dating-019",
     category: "Dating",
+
     question:
-      "Your date mentions their ex several times but only to explain what they learned from the relationship.",
-    roastPhrase: "The ex is still at dinner.",
-    toastPhrase: "Self-awareness is good.",
-    roastPercentage: 52,
-    toastPercentage: 48,
+      "The person you are dating says they are still best friends with the ex they dated for six years.",
+
+    roastPhrase:
+      "That door is still open.",
+
+    toastPhrase:
+      "Adults can stay friends.",
+
+    roastPercentage: 61,
+    toastPercentage: 39,
+
     topComment:
-      "Growth is attractive. A full documentary is not.",
+      "Friendship is possible, but six years deserves a few follow-up questions.",
   },
+
   {
     id: "dating-020",
     category: "Dating",
+
     question:
-      "Someone calls instead of texting because they want to ask you out clearly and avoid mixed signals.",
-    roastPhrase: "A text would have worked.",
-    toastPhrase: "That takes confidence.",
-    roastPercentage: 34,
-    toastPercentage: 66,
+      "Your partner likes every attractive person's thirst trap but says social media likes mean nothing.",
+
+    roastPhrase:
+      "Then stop doing it.",
+
+    toastPhrase:
+      "A like is just a like.",
+
+    roastPercentage: 69,
+    toastPercentage: 31,
+
     topComment:
-      "The phone call was terrifying, but at least the intention was clear.",
+      "If it means nothing, giving it up should also mean nothing.",
+  },
+
+  {
+    id: "dating-021",
+    category: "Dating",
+
+    question:
+      "You have gone on several dates, but they still introduce you as their friend whenever someone asks.",
+
+    roastPhrase:
+      "That is intentional.",
+
+    toastPhrase:
+      "Maybe it is still early.",
+
+    roastPercentage: 67,
+    toastPercentage: 33,
+
+    topComment:
+      "We have kissed too many times for this networking introduction.",
+  },
+
+  {
+    id: "dating-022",
+    category: "Dating",
+
+    question:
+      "They cancel your date because they are exhausted, but later post themselves out with friends.",
+
+    roastPhrase:
+      "The lie is the problem.",
+
+    toastPhrase:
+      "Maybe they changed their mind.",
+
+    roastPercentage: 92,
+    toastPercentage: 8,
+
+    topComment:
+      "You were allowed to change plans. You were not required to produce a documentary.",
+  },
+
+  {
+    id: "dating-023",
+    category: "Dating",
+
+    question:
+      "Your partner reads your message, does not respond for hours, but sends you several funny videos during that time.",
+
+    roastPhrase:
+      "Answer the message.",
+
+    toastPhrase:
+      "That is how they connect.",
+
+    roastPercentage: 63,
+    toastPercentage: 37,
+
+    topComment:
+      "You had time to send six videos but not answer one question?",
+  },
+
+  {
+    id: "dating-024",
+    category: "Dating",
+
+    question:
+      "Someone tells you they want to keep things casual, but expects daily calls, exclusivity, and constant updates.",
+
+    roastPhrase:
+      "That is a relationship.",
+
+    toastPhrase:
+      "Casual means different things.",
+
+    roastPercentage: 86,
+    toastPercentage: 14,
+
+    topComment:
+      "They removed the title but kept the entire job description.",
+  },
+
+  {
+    id: "dating-025",
+    category: "Dating",
+
+    question:
+      "Your date admits they looked through your social media all the way back to high school before meeting you.",
+
+    roastPhrase:
+      "That is an investigation.",
+
+    toastPhrase:
+      "Everyone does a little research.",
+
+    roastPercentage: 47,
+    toastPercentage: 53,
+
+    topComment:
+      "Research is normal. Mentioning my 2009 haircut at dinner is where it got strange.",
   },
 ];

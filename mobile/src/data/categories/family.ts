@@ -2,263 +2,422 @@
 // File: family.ts
 //
 // Purpose:
-// Stores Family category Moments.
+// Stores Family category Moments for Roast or Toast.
 //
 // Content Direction:
-// • Boundaries
-// • Sibling behavior
-// • Family gatherings
-// • Loyalty and support
-// • Situations where love and irritation overlap
-//
-// Important:
-// Existing IDs are preserved so saved sessions remain
-// compatible after this content update.
+// • Love compared with actual effort
+// • Family loyalty and emotional neglect
+// • Gaslighting and selective accountability
+// • Support that exists only in words
+// • Realistic situations that create deeper debate
 //
 // Project: Roast or Toast
 // =====================================================
 
 import type { Moment } from "../types";
 
+// =====================================================
+// Family Moments
+// =====================================================
+
 export const familyMoments: Moment[] = [
   {
     id: "family-001",
     category: "Family",
+
     question:
-      "Your sibling borrows your clothes without asking but washes and returns them before you notice.",
-    roastPhrase: "Ask before touching my things.",
-    toastPhrase: "No harm was done.",
-    roastPercentage: 56,
-    toastPercentage: 44,
+      "Your brother is visiting nearby for an entire week, says he is going to come see you, and leaves town without ever showing up.",
+
+    roastPhrase:
+      "The effort tells the truth.",
+
+    toastPhrase:
+      "Trips can get busy.",
+
+    roastPercentage: 82,
+    toastPercentage: 18,
+
     topComment:
-      "A well-executed crime is still a crime.",
+      "Being nearby for seven days and finding zero time feels like a decision.",
   },
+
   {
     id: "family-002",
     category: "Family",
+
     question:
-      "Your parent sends you home with enough food for three days even after you say your refrigerator is full.",
-    roastPhrase: "I have nowhere to put this.",
-    toastPhrase: "That is how they show love.",
-    roastPercentage: 16,
-    toastPercentage: 84,
+      "You share something you created in the family group chat, nobody acknowledges it, and the conversation continues like you never said anything.",
+
+    roastPhrase:
+      "That silence was loud.",
+
+    toastPhrase:
+      "Maybe they missed it.",
+
+    roastPercentage: 84,
+    toastPercentage: 16,
+
     topComment:
-      "You may decline the food. The containers are still entering your car.",
+      "They saw the next six messages, but somehow skipped the one asking for support.",
   },
+
   {
     id: "family-003",
     category: "Family",
+
     question:
-      "Your sibling pays you back early, then asks to borrow more money the following week.",
-    roastPhrase: "That payment was bait.",
-    toastPhrase: "At least they proved they repay.",
-    roastPercentage: 58,
-    toastPercentage: 42,
+      "Your family constantly says they love and support you, but rarely shows up when you actually need encouragement.",
+
+    roastPhrase:
+      "Words are not enough.",
+
+    toastPhrase:
+      "People show love differently.",
+
+    roastPercentage: 76,
+    toastPercentage: 24,
+
     topComment:
-      "Excellent credit history. Suspicious timing.",
+      "Love without effort starts sounding like a slogan.",
   },
+
   {
     id: "family-004",
     category: "Family",
+
     question:
-      "A relative asks why you are still single, then offers to introduce you to someone they know.",
-    roastPhrase: "Mind your business.",
-    toastPhrase: "They are trying to help.",
-    roastPercentage: 64,
-    toastPercentage: 36,
+      "A relative ignores your accomplishments but expects everyone to celebrate theirs immediately.",
+
+    roastPhrase:
+      "Support should go both ways.",
+
+    toastPhrase:
+      "Maybe they feel overlooked too.",
+
+    roastPercentage: 88,
+    toastPercentage: 12,
+
     topComment:
-      "The family gathering has quietly become a recruitment event.",
+      "Interesting how celebration becomes urgent when the spotlight moves to them.",
   },
+
   {
     id: "family-005",
     category: "Family",
+
     question:
-      "Your family starts packing leftovers and turning off lights while guests are still talking.",
-    roastPhrase: "That is rude.",
-    toastPhrase: "The message is clear.",
-    roastPercentage: 48,
-    toastPercentage: 52,
+      "Your sibling only calls when they need advice, money, or a favor, but is always unavailable when you need them.",
+
+    roastPhrase:
+      "That is not a relationship.",
+
+    toastPhrase:
+      "Family still helps family.",
+
+    roastPercentage: 87,
+    toastPercentage: 13,
+
     topComment:
-      "Once the foil appears, the evening has entered its final act.",
+      "I am apparently family when there is a problem to solve.",
   },
+
   {
     id: "family-006",
     category: "Family",
+
     question:
-      "Your sibling answers your late-night call but begins the conversation by asking whether this is actually an emergency.",
-    roastPhrase: "Just listen first.",
-    toastPhrase: "That is a fair question.",
-    roastPercentage: 39,
-    toastPercentage: 61,
+      "A relative hurts you, then says you are being dramatic when you explain why it bothered you.",
+
+    roastPhrase:
+      "That is gaslighting.",
+
+    toastPhrase:
+      "Maybe they see it differently.",
+
+    roastPercentage: 91,
+    toastPercentage: 9,
+
     topComment:
-      "Support is available, but triage begins immediately.",
+      "Disagreeing with my feelings does not erase what happened.",
   },
+
   {
     id: "family-007",
     category: "Family",
+
     question:
-      "A relative posts a childhood photo of you on your birthday but lets you approve it first.",
-    roastPhrase: "The photo should stay buried.",
-    toastPhrase: "Approval makes it fair.",
-    roastPercentage: 31,
-    toastPercentage: 69,
+      "Your family expects you to forgive repeated behavior because 'that is just how they are.'",
+
+    roastPhrase:
+      "That is not accountability.",
+
+    toastPhrase:
+      "Family requires patience.",
+
+    roastPercentage: 85,
+    toastPercentage: 15,
+
     topComment:
-      "Embarrassment with consent is technically celebration.",
+      "Why does their personality become my permanent responsibility?",
   },
+
   {
     id: "family-008",
     category: "Family",
+
     question:
-      "Your parent calls several times after you miss one message, then says they were only checking in.",
-    roastPhrase: "One missed text is not an emergency.",
-    toastPhrase: "They worry because they care.",
-    roastPercentage: 61,
-    toastPercentage: 39,
+      "A family member tells everyone your private business, then acts offended when you stop sharing things with them.",
+
+    roastPhrase:
+      "Trust was already broken.",
+
+    toastPhrase:
+      "Maybe they were concerned.",
+
+    roastPercentage: 90,
+    toastPercentage: 10,
+
     topComment:
-      "The search party was formed before the phone finished charging.",
+      "You cannot leak the information and complain when the source dries up.",
   },
+
   {
     id: "family-009",
     category: "Family",
+
     question:
-      "Your family saves you a plate but gives your favorite item to someone who arrived first.",
-    roastPhrase: "That plate was incomplete.",
-    toastPhrase: "At least they saved something.",
-    roastPercentage: 53,
-    toastPercentage: 47,
+      "Your relatives criticize you for creating distance, but never ask what caused you to pull away.",
+
+    roastPhrase:
+      "They only noticed the boundary.",
+
+    toastPhrase:
+      "They may not understand.",
+
+    roastPercentage: 79,
+    toastPercentage: 21,
+
     topComment:
-      "A saved plate without the best part is emotional paperwork.",
+      "They noticed I left, but somehow missed everything that pushed me out.",
   },
+
   {
     id: "family-010",
     category: "Family",
+
     question:
-      "Your sibling tells your parents something private because they genuinely believe you need help.",
-    roastPhrase: "That was not theirs to share.",
-    toastPhrase: "Concern can override secrecy.",
-    roastPercentage: 57,
-    toastPercentage: 43,
+      "Your sibling says they miss you, but repeatedly visits your city without making any real effort to see you.",
+
+    roastPhrase:
+      "Missing me requires action.",
+
+    toastPhrase:
+      "Timing can be difficult.",
+
+    roastPercentage: 81,
+    toastPercentage: 19,
+
     topComment:
-      "Good intentions do not automatically restore confidentiality.",
+      "At some point, 'I miss you' needs to appear on the calendar.",
   },
+
   {
     id: "family-011",
     category: "Family",
+
     question:
-      "Your family takes an hour to say goodbye because every new topic starts another conversation.",
-    roastPhrase: "Leave when you say goodbye.",
-    toastPhrase: "That is part of the gathering.",
-    roastPercentage: 45,
-    toastPercentage: 55,
+      "A relative apologizes only after you stop speaking to them, but still never admits what they actually did.",
+
+    roastPhrase:
+      "That is damage control.",
+
+    toastPhrase:
+      "At least they reached out.",
+
+    roastPercentage: 77,
+    toastPercentage: 23,
+
     topComment:
-      "The first goodbye happened indoors. The fourth is beside the car.",
+      "They are sorry about the consequence, not the behavior.",
   },
+
   {
     id: "family-012",
     category: "Family",
+
     question:
-      "A relative quietly cleans the kitchen during the party but misses most of the conversation.",
-    roastPhrase: "Sit down and enjoy yourself.",
-    toastPhrase: "They are helping the host.",
-    roastPercentage: 23,
-    toastPercentage: 77,
+      "Your family expects you to attend every gathering, even though they rarely make the same effort for your important events.",
+
+    roastPhrase:
+      "The expectation is one-sided.",
+
+    toastPhrase:
+      "Family traditions matter.",
+
+    roastPercentage: 68,
+    toastPercentage: 32,
+
     topComment:
-      "The person washing dishes is always remembered by the host.",
+      "Tradition somehow always requires my attendance and never theirs.",
   },
+
   {
     id: "family-013",
     category: "Family",
+
     question:
-      "Your family expects you to attend every gathering because you live nearby.",
-    roastPhrase: "Living close is not a contract.",
-    toastPhrase: "Family time matters.",
-    roastPercentage: 62,
-    toastPercentage: 38,
+      "A parent brings up everything they sacrificed for you whenever you disagree with them as an adult.",
+
+    roastPhrase:
+      "That is emotional leverage.",
+
+    toastPhrase:
+      "Their sacrifices were real.",
+
+    roastPercentage: 74,
+    toastPercentage: 26,
+
     topComment:
-      "Apparently proximity comes with mandatory attendance.",
+      "Providing for a child should not become lifetime ownership.",
   },
+
   {
     id: "family-014",
     category: "Family",
+
     question:
-      "Your sibling uses a family group chat to ask you a question they could have sent privately.",
-    roastPhrase: "Why is there an audience?",
-    toastPhrase: "The family might need to know.",
-    roastPercentage: 68,
-    toastPercentage: 32,
+      "Your sibling says you have changed because you stopped accepting behavior that used to hurt you.",
+
+    roastPhrase:
+      "That change was necessary.",
+
+    toastPhrase:
+      "Maybe the distance feels sudden.",
+
+    roastPercentage: 86,
+    toastPercentage: 14,
+
     topComment:
-      "A private matter has been upgraded to a panel discussion.",
+      "I changed because the old version of me kept tolerating too much.",
   },
+
   {
     id: "family-015",
     category: "Family",
+
     question:
-      "A relative gives you unsolicited career advice but also sends you a job opportunity afterward.",
-    roastPhrase: "Keep the lecture.",
-    toastPhrase: "They are trying to help.",
-    roastPercentage: 41,
-    toastPercentage: 59,
+      "Your family asks why you never come around, but barely speaks to you when you do.",
+
+    roastPhrase:
+      "They miss access, not connection.",
+
+    toastPhrase:
+      "Some families are just quiet.",
+
+    roastPercentage: 73,
+    toastPercentage: 27,
+
     topComment:
-      "The delivery was irritating. The link was useful.",
+      "You cannot complain about distance while doing nothing with my presence.",
   },
+
   {
     id: "family-016",
     category: "Family",
+
     question:
-      "Your parent keeps items from your childhood and gets upset when you suggest donating them.",
-    roastPhrase: "It is just clutter.",
-    toastPhrase: "Those memories matter to them.",
-    roastPercentage: 44,
-    toastPercentage: 56,
+      "A relative makes a disrespectful comment, then says it was only a joke when you react.",
+
+    roastPhrase:
+      "The joke was disrespectful.",
+
+    toastPhrase:
+      "Maybe they meant no harm.",
+
+    roastPercentage: 89,
+    toastPercentage: 11,
+
     topComment:
-      "Your old school project has become a protected historical artifact.",
+      "Calling it a joke does not magically make it funny.",
   },
+
   {
     id: "family-017",
     category: "Family",
+
     question:
-      "Your sibling jokes about you in front of relatives but becomes defensive if anyone else joins in.",
-    roastPhrase: "Do not start what others cannot finish.",
-    toastPhrase: "Only siblings get that privilege.",
-    roastPercentage: 51,
-    toastPercentage: 49,
+      "Your sibling remembers every mistake you made years ago but avoids discussing anything they did to hurt you.",
+
+    roastPhrase:
+      "That memory is very selective.",
+
+    toastPhrase:
+      "Old wounds can last.",
+
+    roastPercentage: 83,
+    toastPercentage: 17,
+
     topComment:
-      "The roast is apparently protected intellectual property.",
+      "Their evidence folder is full, but their mirror is missing.",
   },
+
   {
     id: "family-018",
     category: "Family",
+
     question:
-      "A relative lends you money but regularly asks for updates on how you are spending it.",
-    roastPhrase: "The money came with surveillance.",
-    toastPhrase: "They have a right to know.",
-    roastPercentage: 55,
-    toastPercentage: 45,
+      "A family member tells you to move on from something they never apologized for or helped repair.",
+
+    roastPhrase:
+      "Healing is not an order.",
+
+    toastPhrase:
+      "Holding on can hurt you too.",
+
+    roastPercentage: 80,
+    toastPercentage: 20,
+
     topComment:
-      "It was a loan, not a financial guardianship.",
+      "They want peace without participating in the repair.",
   },
+
   {
     id: "family-019",
     category: "Family",
+
     question:
-      "Your family invites your ex to an event because they still consider them part of the family.",
-    roastPhrase: "That relationship ended.",
-    toastPhrase: "Their relationships are separate.",
-    roastPercentage: 73,
-    toastPercentage: 27,
+      "Your family celebrates the version of you that stayed quiet, but calls you difficult now that you speak up.",
+
+    roastPhrase:
+      "They preferred your silence.",
+
+    toastPhrase:
+      "Your communication may feel different.",
+
+    roastPercentage: 85,
+    toastPercentage: 15,
+
     topComment:
-      "The breakup apparently did not update the family mailing list.",
+      "I was easier to love when I had no boundaries.",
   },
+
   {
     id: "family-020",
     category: "Family",
+
     question:
-      "Your sibling tells you the family gossip but makes you promise to act surprised later.",
-    roastPhrase: "Leave me out of the performance.",
-    toastPhrase: "That is sibling teamwork.",
-    roastPercentage: 34,
-    toastPercentage: 66,
+      "A relative gives you advice about loyalty while repeatedly disappearing whenever life gets difficult.",
+
+    roastPhrase:
+      "Practice what you preach.",
+
+    toastPhrase:
+      "Everyone has limitations.",
+
+    roastPercentage: 78,
+    toastPercentage: 22,
+
     topComment:
-      "Information received. Surprise face scheduled.",
+      "Their speeches about loyalty are much more consistent than their presence.",
   },
 ];

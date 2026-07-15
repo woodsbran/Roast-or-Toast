@@ -5,259 +5,419 @@
 // Stores Everyday Life category Moments.
 //
 // Content Direction:
-// • Public etiquette
-// • Household habits
-// • Small behaviors people judge immediately
-// • Specific situations with room for disagreement
-//
-// Important:
-// Existing IDs are preserved so saved sessions remain
-// compatible after this content update.
+// • Boundaries and emotional labor
+// • Small behaviors that reveal bigger patterns
+// • Everyday manipulation and inconsiderate habits
+// • Realistic situations people have actually lived
+// • A mix of funny, irritating, and revealing Moments
 //
 // Project: Roast or Toast
 // =====================================================
 
 import type { Moment } from "../types";
 
+// =====================================================
+// Everyday Life Moments
+// =====================================================
+
 export const everydayLifeMoments: Moment[] = [
   {
     id: "everyday-001",
     category: "Everyday Life",
+
     question:
-      "Someone leaves exactly one sip in the juice bottle so they technically did not finish it.",
-    roastPhrase: "Just finish it.",
-    toastPhrase: "At least they left something.",
-    roastPercentage: 91,
-    toastPercentage: 9,
+      "Someone repeatedly asks for advice, ignores every suggestion, then comes back upset when the predictable outcome happens.",
+
+    roastPhrase:
+      "Stop asking me.",
+
+    toastPhrase:
+      "They may just need support.",
+
+    roastPercentage: 64,
+    toastPercentage: 36,
+
     topComment:
-      "That final sip was left behind as an administrative task.",
+      "I am not shocked because we already discussed this episode.",
   },
+
   {
     id: "everyday-002",
     category: "Everyday Life",
+
     question:
-      "Someone uses the last of the toilet paper and places a new roll on the counter without putting it on the holder.",
-    roastPhrase: "Finish the entire job.",
-    toastPhrase: "The new roll is right there.",
-    roastPercentage: 76,
-    toastPercentage: 24,
+      "A person says they hate drama, but somehow every situation around them becomes a crisis.",
+
+    roastPhrase:
+      "They may be the drama.",
+
+    toastPhrase:
+      "Some people attract chaos.",
+
+    roastPercentage: 82,
+    toastPercentage: 18,
+
     topComment:
-      "They completed 90% of a task and somehow created 100% irritation.",
+      "At some point the common denominator deserves an interview.",
   },
+
   {
     id: "everyday-003",
     category: "Everyday Life",
+
     question:
-      "Someone returns a shopping cart that was rolling toward another person’s car.",
-    roastPhrase: "That was not their responsibility.",
-    toastPhrase: "That was good citizenship.",
-    roastPercentage: 4,
-    toastPercentage: 96,
+      "Someone tells you to calm down after doing the exact thing they knew would upset you.",
+
+    roastPhrase:
+      "That is manipulation.",
+
+    toastPhrase:
+      "Maybe the reaction got too intense.",
+
+    roastPercentage: 86,
+    toastPercentage: 14,
+
     topComment:
-      "A small act of heroism in a grocery-store parking lot.",
+      "Creating the fire and criticizing the smoke is bold.",
   },
+
   {
     id: "everyday-004",
     category: "Everyday Life",
+
     question:
-      "Someone takes a speakerphone call in a waiting room but warns the caller that other people can hear.",
-    roastPhrase: "Take it off speaker.",
-    toastPhrase: "At least they warned them.",
-    roastPercentage: 72,
-    toastPercentage: 28,
+      "A person repeatedly shows up late but gets irritated if anyone makes them wait.",
+
+    roastPhrase:
+      "The rules are one-sided.",
+
+    toastPhrase:
+      "Everyone values time differently.",
+
+    roastPercentage: 88,
+    toastPercentage: 12,
+
     topComment:
-      "Consent from the caller did not include consent from the room.",
+      "Their lateness is a personality. Mine is apparently disrespect.",
   },
+
   {
     id: "everyday-005",
     category: "Everyday Life",
+
     question:
-      "Someone studies the restaurant menu, parking situation, and reviews before agreeing to go.",
-    roastPhrase: "It should not be this serious.",
-    toastPhrase: "Preparation prevents disappointment.",
-    roastPercentage: 33,
-    toastPercentage: 67,
+      "Someone asks what is wrong, then gets defensive when you answer honestly.",
+
+    roastPhrase:
+      "They wanted reassurance, not truth.",
+
+    toastPhrase:
+      "Honesty can still hurt.",
+
+    roastPercentage: 78,
+    toastPercentage: 22,
+
     topComment:
-      "Some people make dinner plans. Others conduct due diligence.",
+      "They opened the door and got mad when the answer walked through it.",
   },
+
   {
     id: "everyday-006",
     category: "Everyday Life",
+
     question:
-      "Someone holds the elevator while you are still far away, forcing everyone inside to wait.",
-    roastPhrase: "Let the next one get me.",
-    toastPhrase: "They were trying to be kind.",
-    roastPercentage: 52,
-    toastPercentage: 48,
+      "A person says they are just being honest, but only uses honesty when it gives them permission to be cruel.",
+
+    roastPhrase:
+      "That is not honesty.",
+
+    toastPhrase:
+      "Truth is not always comfortable.",
+
+    roastPercentage: 91,
+    toastPercentage: 9,
+
     topComment:
-      "A thoughtful gesture with six unwilling participants.",
+      "Honesty without care is often just disrespect with better branding.",
   },
+
   {
     id: "everyday-007",
     category: "Everyday Life",
+
     question:
-      "Someone leaves every cabinet door open while cooking because they are still using things.",
-    roastPhrase: "Close what you opened.",
-    toastPhrase: "They are not finished yet.",
-    roastPercentage: 68,
-    toastPercentage: 32,
+      "Someone expects you to remember every detail about their life but rarely remembers anything important about yours.",
+
+    roastPhrase:
+      "The attention is one-sided.",
+
+    toastPhrase:
+      "Some people are forgetful.",
+
+    roastPercentage: 75,
+    toastPercentage: 25,
+
     topComment:
-      "The kitchen looks like it just received shocking news.",
+      "I am apparently the archive, and they are the main character.",
   },
+
   {
     id: "everyday-008",
     category: "Everyday Life",
+
     question:
-      'Someone texts "five minutes away" while they are still choosing what to wear.',
-    roastPhrase: "That is a calculated lie.",
-    toastPhrase: "It creates urgency.",
-    roastPercentage: 88,
-    toastPercentage: 12,
+      "A person complains that nobody checks on them, but repeatedly ignores people who try.",
+
+    roastPhrase:
+      "They are rejecting support.",
+
+    toastPhrase:
+      "They may be overwhelmed.",
+
+    roastPercentage: 67,
+    toastPercentage: 33,
+
     topComment:
-      "Five minutes away emotionally. Twenty-five geographically.",
+      "You cannot close every door and then complain that nobody came in.",
   },
+
   {
     id: "everyday-009",
     category: "Everyday Life",
+
     question:
-      "Someone stops a stranger to compliment their outfit, then immediately keeps walking.",
-    roastPhrase: "Do not stop strangers.",
-    toastPhrase: "That could make their day.",
-    roastPercentage: 8,
-    toastPercentage: 92,
+      "Someone says they forgot to reply, but expects you to believe it after the fifth time.",
+
+    roastPhrase:
+      "The pattern is the answer.",
+
+    toastPhrase:
+      "Some people are genuinely forgetful.",
+
+    roastPercentage: 72,
+    toastPercentage: 28,
+
     topComment:
-      "A compliment with no hidden agenda is premium public behavior.",
+      "One missed reply is life. Five becomes a system.",
   },
+
   {
     id: "everyday-010",
     category: "Everyday Life",
+
     question:
-      "Someone walks slowly down the center of a crowded aisle while looking at their phone.",
-    roastPhrase: "Choose a lane.",
-    toastPhrase: "People are allowed to take their time.",
-    roastPercentage: 92,
-    toastPercentage: 8,
+      "A person wants patience for their bad habits but gives everyone else very little grace.",
+
+    roastPhrase:
+      "Grace should go both ways.",
+
+    toastPhrase:
+      "People are hardest on others sometimes.",
+
+    roastPercentage: 81,
+    toastPercentage: 19,
+
     topComment:
-      "The aisle has become a one-person parade with no exit route.",
+      "Their mistakes need context. Everyone else's need consequences.",
   },
+
   {
     id: "everyday-011",
     category: "Everyday Life",
+
     question:
-      "Someone leaves dishes soaking overnight even though they only need a quick rinse.",
-    roastPhrase: "Wash them now.",
-    toastPhrase: "Soaking makes it easier.",
-    roastPercentage: 57,
-    toastPercentage: 43,
+      "Someone keeps borrowing small things and never returning them because they think it is not a big deal.",
+
+    roastPhrase:
+      "Return what you borrow.",
+
+    toastPhrase:
+      "It is probably replaceable.",
+
+    roastPercentage: 83,
+    toastPercentage: 17,
+
     topComment:
-      "Those dishes entered the sink with no scheduled release date.",
+      "It became a big deal around the sixth missing item.",
   },
+
   {
     id: "everyday-012",
     category: "Everyday Life",
+
     question:
-      "Someone picks up litter they did not drop while everyone else walks past it.",
-    roastPhrase: "That is not their job.",
-    toastPhrase: "That is community care.",
-    roastPercentage: 3,
-    toastPercentage: 97,
+      "A person repeatedly interrupts you, then says you never communicate clearly.",
+
+    roastPhrase:
+      "They never let you finish.",
+
+    toastPhrase:
+      "Maybe the conversation was messy.",
+
+    roastPercentage: 84,
+    toastPercentage: 16,
+
     topComment:
-      "A tiny action that made everybody else look slightly worse.",
+      "My communication would improve if the sentence survived.",
   },
+
   {
     id: "everyday-013",
     category: "Everyday Life",
+
     question:
-      "Someone borrows your phone charger and returns it completely dead.",
-    roastPhrase: "Charge it before returning it.",
-    toastPhrase: "At least they returned it.",
-    roastPercentage: 82,
-    toastPercentage: 18,
+      "Someone says they hate being judged but spends most of their time judging everyone around them.",
+
+    roastPhrase:
+      "The mirror is missing.",
+
+    toastPhrase:
+      "Everyone has opinions.",
+
+    roastPercentage: 79,
+    toastPercentage: 21,
+
     topComment:
-      "Returned physically. Spiritually still unavailable.",
+      "They want freedom from the exact behavior they hand out daily.",
   },
+
   {
     id: "everyday-014",
     category: "Everyday Life",
+
     question:
-      "Someone says to help yourself to anything, then looks surprised when you actually open the refrigerator.",
-    roastPhrase: "Do not offer what you do not mean.",
-    toastPhrase: "You should still ask first.",
-    roastPercentage: 58,
-    toastPercentage: 42,
+      "A person does something hurtful, then focuses more on your reaction than what caused it.",
+
+    roastPhrase:
+      "They are avoiding accountability.",
+
+    toastPhrase:
+      "Reactions still matter.",
+
+    roastPercentage: 87,
+    toastPercentage: 13,
+
     topComment:
-      "Hospitality became a test nobody knew they were taking.",
+      "The reaction became the emergency because the behavior was inconvenient to discuss.",
   },
+
   {
     id: "everyday-015",
     category: "Everyday Life",
+
     question:
-      "Someone waits beside an occupied parking space with their turn signal on while the driver takes several minutes to leave.",
-    roastPhrase: "Find another space.",
-    toastPhrase: "They found it first.",
-    roastPercentage: 49,
-    toastPercentage: 51,
+      "Someone keeps asking you to explain the same boundary as if repetition will eventually change your answer.",
+
+    roastPhrase:
+      "They understand. They disagree.",
+
+    toastPhrase:
+      "Maybe they need clarity.",
+
+    roastPercentage: 88,
+    toastPercentage: 12,
+
     topComment:
-      "Patience or parking-space hostage negotiation?",
+      "The boundary was clear. They were hoping persistence would erase it.",
   },
+
   {
     id: "everyday-016",
     category: "Everyday Life",
+
     question:
-      "Someone asks to cut ahead in line because they only have one item.",
-    roastPhrase: "The line applies to everyone.",
-    toastPhrase: "One item is harmless.",
-    roastPercentage: 47,
-    toastPercentage: 53,
+      "A person complains that you have become distant after repeatedly making you feel unwelcome around them.",
+
+    roastPhrase:
+      "The distance has a cause.",
+
+    toastPhrase:
+      "Maybe they did not realize.",
+
+    roastPercentage: 80,
+    toastPercentage: 20,
+
     topComment:
-      "One item is quick. The principle somehow takes longer.",
+      "They noticed the withdrawal but missed every reason behind it.",
   },
+
   {
     id: "everyday-017",
     category: "Everyday Life",
+
     question:
-      "Someone sends a reminder about plans the morning of because people often cancel on them.",
-    roastPhrase: "The calendar was enough.",
-    toastPhrase: "Confirming plans is reasonable.",
-    roastPercentage: 27,
-    toastPercentage: 73,
+      "Someone gives you unsolicited advice, then gets offended when you do not follow it.",
+
+    roastPhrase:
+      "Advice is not an order.",
+
+    toastPhrase:
+      "They were trying to help.",
+
+    roastPercentage: 77,
+    toastPercentage: 23,
+
     topComment:
-      "A confirmation text is cheaper than getting dressed for nothing.",
+      "I listened. I simply did not surrender decision-making rights.",
   },
+
   {
     id: "everyday-018",
     category: "Everyday Life",
+
     question:
-      "Someone puts an empty container back in the refrigerator because they plan to replace it later.",
-    roastPhrase: "Remove the evidence.",
-    toastPhrase: "They are using it as a reminder.",
-    roastPercentage: 89,
-    toastPercentage: 11,
+      "A person treats you badly during a stressful time, then says stress should excuse everything.",
+
+    roastPhrase:
+      "Stress explains. It does not erase.",
+
+    toastPhrase:
+      "People struggle under pressure.",
+
+    roastPercentage: 74,
+    toastPercentage: 26,
+
     topComment:
-      "The empty container is not a grocery list.",
+      "The stress deserves compassion. The behavior still needs accountability.",
   },
+
   {
     id: "everyday-019",
     category: "Everyday Life",
+
     question:
-      "Someone cleans the table around you while you are still eating.",
-    roastPhrase: "Let me finish.",
-    toastPhrase: "They are being productive.",
-    roastPercentage: 63,
-    toastPercentage: 37,
+      "Someone says they value communication but disappears whenever the conversation becomes uncomfortable.",
+
+    roastPhrase:
+      "They value easy communication.",
+
+    toastPhrase:
+      "Some people need space.",
+
+    roastPercentage: 76,
+    toastPercentage: 24,
+
     topComment:
-      "Nothing adds pressure to a meal like a disinfectant wipe approaching.",
+      "Communication apparently ends where accountability begins.",
   },
+
   {
     id: "everyday-020",
     category: "Everyday Life",
+
     question:
-      "Someone corrects a stranger who accidentally gets your name wrong before you can respond.",
-    roastPhrase: "I can speak for myself.",
-    toastPhrase: "They were looking out for you.",
-    roastPercentage: 38,
-    toastPercentage: 62,
+      "A person repeatedly tells you who they are through their behavior, but expects their words to matter more.",
+
+    roastPhrase:
+      "Believe the pattern.",
+
+    toastPhrase:
+      "People are more than mistakes.",
+
+    roastPercentage: 83,
+    toastPercentage: 17,
+
     topComment:
-      "Helpful intervention or unnecessary customer service?",
+      "Words introduce the character. Patterns finish the story.",
   },
 ];

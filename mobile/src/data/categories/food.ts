@@ -260,4 +260,402 @@ export const foodMoments: Moment[] = [
     topComment:
       "Respecting the boundary somehow unlocked the fries.",
   },
+    {
+      id: "food-021",
+      category: "Food",
+
+      question:
+        "Your friend says they don't want anything, then spends the entire meal eating off your plate.",
+
+      roastPhrase:
+        "Order your own food.",
+
+      toastPhrase:
+        "Sharing is caring.",
+
+      roastPercentage: 81,
+      toastPercentage: 19,
+
+      topComment:
+        "The fries apparently came with a community membership.",
+    },
+
+    {
+      id: "food-022",
+      category: "Food",
+
+      question:
+        "Someone remembers your favorite snack every time they stop at the store without you ever asking.",
+
+      roastPhrase:
+        "Now I owe them snacks.",
+
+      toastPhrase:
+        "That is thoughtful.",
+
+      roastPercentage: 8,
+      toastPercentage: 92,
+
+      topComment:
+        "Remembering the little things is underrated.",
+    },
+
+    {
+      id: "food-023",
+      category: "Food",
+
+      question:
+        "Your friend orders the most expensive thing on the menu after suggesting everyone split the bill evenly.",
+
+      roastPhrase:
+        "Absolutely not.",
+
+      toastPhrase:
+        "It keeps things simple.",
+
+      roastPercentage: 89,
+      toastPercentage: 11,
+
+      topComment:
+        "Funny how the split gets easier once the lobster arrives.",
+    },
+
+    {
+      id: "food-024",
+      category: "Food",
+
+      question:
+        "Someone asks for a bite of your dessert... then takes almost half.",
+
+      roastPhrase:
+        "That was not a bite.",
+
+      toastPhrase:
+        "Dessert is meant to be shared.",
+
+      roastPercentage: 87,
+      toastPercentage: 13,
+
+      topComment:
+        "We clearly have different definitions of 'just a taste.'",
+    },
+
+    {
+      id: "food-025",
+      category: "Food",
+
+      question:
+        "Your grandma insists you take home leftovers even after you've told her three times you're full.",
+
+      roastPhrase:
+        "Respect my stomach.",
+
+      toastPhrase:
+        "That is love.",
+
+      roastPercentage: 11,
+      toastPercentage: 89,
+
+      topComment:
+        "The meal ends when Grandma says it ends.",
+    },
+
+    {
+      id: "food-026",
+      category: "Food",
+
+      question:
+        "Someone says they're on a diet... but asks to taste everyone else's food.",
+
+      roastPhrase:
+        "Calories still count.",
+
+      toastPhrase:
+        "One bite won't hurt.",
+
+      roastPercentage: 58,
+      toastPercentage: 42,
+
+      topComment:
+        "Apparently borrowed calories don't exist.",
+    },
+
+    {
+      id: "food-027",
+      category: "Food",
+
+      question:
+        "Your friend quietly pays for everyone's meal without telling anyone.",
+
+      roastPhrase:
+        "Now I feel guilty.",
+
+      toastPhrase:
+        "That is incredibly generous.",
+
+      roastPercentage: 5,
+      toastPercentage: 95,
+
+      topComment:
+        "Some people flex with money. Others make people feel appreciated.",
+    },
+
+    {
+      id: "food-028",
+      category: "Food",
+
+      question:
+        "Someone double dips the chip after making eye contact with everyone at the table.",
+
+      roastPhrase:
+        "Straight to jail.",
+
+      toastPhrase:
+        "It's just family.",
+
+      roastPercentage: 84,
+      toastPercentage: 16,
+
+      topComment:
+        "The confidence was honestly impressive.",
+    },
+
+    {
+      id: "food-029",
+      category: "Food",
+
+      question:
+        "Your friend says they'll only have one fry... then finishes half your order.",
+
+      roastPhrase:
+        "You owe me potatoes.",
+
+      toastPhrase:
+        "Friends share food.",
+
+      roastPercentage: 79,
+      toastPercentage: 21,
+
+      topComment:
+        "The first fry was permission. The next fourteen were a crime.",
+    },
+
+    {
+      id: "food-030",
+      category: "Food",
+
+      question:
+        "Someone cooks your favorite meal after hearing you've had a rough week.",
+
+      roastPhrase:
+        "Now I'm emotional.",
+
+      toastPhrase:
+        "That is real care.",
+
+      roastPercentage: 4,
+      toastPercentage: 96,
+
+      topComment:
+        "Sometimes a meal says what words can't.",
+    },
+      {
+        id: "food-031",
+        category: "Food",
+
+        question:
+          "You tell your friend you are saving the leftovers for tomorrow, and they eat them later that night without asking.",
+
+        roastPhrase:
+          "Those leftovers had plans.",
+
+        toastPhrase:
+          "Food should not go to waste.",
+
+        roastPercentage: 94,
+        toastPercentage: 6,
+
+        topComment:
+          "I was emotionally depending on that container.",
+      },
+
+      {
+        id: "food-032",
+        category: "Food",
+
+        question:
+          "Someone notices you have not eaten all day and quietly orders enough food for both of you.",
+
+        roastPhrase:
+          "Now I feel watched.",
+
+        toastPhrase:
+          "That is genuine care.",
+
+        roastPercentage: 5,
+        toastPercentage: 95,
+
+        topComment:
+          "They noticed the need before I had to ask.",
+      },
+
+      {
+        id: "food-033",
+        category: "Food",
+
+        question:
+          "Your friend says they are not hungry, refuses to order anything, then asks for a separate plate when your food arrives.",
+
+        roastPhrase:
+          "The kitchen is still open.",
+
+        toastPhrase:
+          "Just share a little.",
+
+        roastPercentage: 82,
+        toastPercentage: 18,
+
+        topComment:
+          "Not hungry somehow required utensils.",
+      },
+
+      {
+        id: "food-034",
+        category: "Food",
+
+        question:
+          "Someone brings a homemade dish to the gathering, but spends the entire night asking whether everyone liked it.",
+
+        roastPhrase:
+          "Let the food speak.",
+
+        toastPhrase:
+          "They put effort into it.",
+
+        roastPercentage: 44,
+        toastPercentage: 56,
+
+        topComment:
+          "The meal came with a mandatory performance review.",
+      },
+
+      {
+        id: "food-035",
+        category: "Food",
+
+        question:
+          "Your family argues over who gets the last piece of food, then secretly saves it for the oldest person in the room.",
+
+        roastPhrase:
+          "That drama was unnecessary.",
+
+        toastPhrase:
+          "The ending was sweet.",
+
+        roastPercentage: 18,
+        toastPercentage: 82,
+
+        topComment:
+          "The argument was loud, but the love quietly won.",
+      },
+
+      {
+        id: "food-036",
+        category: "Food",
+
+        question:
+          "Someone claims they can taste the difference between expensive bottled water brands and asks everyone to test them.",
+
+        roastPhrase:
+          "It is still water.",
+
+        toastPhrase:
+          "Some people have refined taste.",
+
+        roastPercentage: 63,
+        toastPercentage: 37,
+
+        topComment:
+          "The water tasting had notes of confidence and plastic.",
+      },
+
+      {
+        id: "food-037",
+        category: "Food",
+
+        question:
+          "Your coworker remembers your dietary restriction and makes sure there is something you can eat at the team lunch.",
+
+        roastPhrase:
+          "That should be standard.",
+
+        toastPhrase:
+          "They made sure you were included.",
+
+        roastPercentage: 8,
+        toastPercentage: 92,
+
+        topComment:
+          "Being considered before arriving feels different.",
+      },
+
+      {
+        id: "food-038",
+        category: "Food",
+
+        question:
+          "Someone orders food for the table without asking, then expects everyone to pay for dishes they did not want.",
+
+        roastPhrase:
+          "You ordered it. You pay.",
+
+        toastPhrase:
+          "Group meals are for sharing.",
+
+        roastPercentage: 86,
+        toastPercentage: 14,
+
+        topComment:
+          "Their generosity became expensive once the bill arrived.",
+      },
+
+      {
+        id: "food-039",
+        category: "Food",
+
+        question:
+          "Your friend takes one bite of the meal you cooked, adds several seasonings, and says they are only helping.",
+
+        roastPhrase:
+          "Taste it first.",
+
+        toastPhrase:
+          "Maybe it needed help.",
+
+        roastPercentage: 74,
+        toastPercentage: 26,
+
+        topComment:
+          "The seasoning cabinet opened before the compliment arrived.",
+      },
+
+      {
+        id: "food-040",
+        category: "Food",
+
+        question:
+          "Someone learns how to make your favorite childhood meal because you said you missed it.",
+
+        roastPhrase:
+          "That is almost too much effort.",
+
+        toastPhrase:
+          "That is incredibly thoughtful.",
+
+        roastPercentage: 3,
+        toastPercentage: 97,
+
+        topComment:
+          "They did not just feed me. They brought back a memory.",
+      },
 ];

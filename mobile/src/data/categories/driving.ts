@@ -2,262 +2,421 @@
 // File: driving.ts
 //
 // Purpose:
-// Stores Driving category Moments.
+// Stores Driving category Moments for Roast or Toast.
 //
 // Content Direction:
-// • Traffic and parking etiquette
-// • Passenger behavior
-// • Courtesy versus inconvenience
-// • Situations drivers immediately have opinions about
-//
-// Important:
-// Existing IDs are preserved so saved sessions remain
-// compatible after this content update.
+// • Road behavior that reveals entitlement
+// • Everyday driving frustration and hypocrisy
+// • Realistic situations people argue about
+// • A mix of serious, funny, and relatable Moments
 //
 // Project: Roast or Toast
 // =====================================================
 
 import type { Moment } from "../types";
 
+// =====================================================
+// Driving Moments
+// =====================================================
+
 export const drivingMoments: Moment[] = [
   {
     id: "driving-001",
     category: "Driving",
+
     question:
-      "Someone crosses three lanes at the last second because missing the exit would add fifteen minutes.",
-    roastPhrase: "Take the next exit.",
-    toastPhrase: "Fifteen minutes is a lot.",
-    roastPercentage: 91,
-    toastPercentage: 9,
+      "Someone cuts across three lanes at the last second because they did not want to wait in the exit line.",
+
+    roastPhrase:
+      "Back of the line.",
+
+    toastPhrase:
+      "At least they made the exit.",
+
+    roastPercentage: 93,
+    toastPercentage: 7,
+
     topComment:
-      "A missed exit is inconvenient. A three-lane emergency is everyone’s problem.",
+      "Your poor planning does not create a priority lane.",
   },
+
   {
     id: "driving-002",
     category: "Driving",
+
     question:
-      "Someone lets several cars merge in front of them during traffic even though the lane behind them is backed up.",
-    roastPhrase: "One car was enough.",
-    toastPhrase: "That is good road karma.",
-    roastPercentage: 52,
-    toastPercentage: 48,
+      "A driver speeds around you, then ends up directly beside you at the next red light.",
+
+    roastPhrase:
+      "All that for nothing.",
+
+    toastPhrase:
+      "They still tried.",
+
+    roastPercentage: 86,
+    toastPercentage: 14,
+
     topComment:
-      "Generosity feels different when you are trapped directly behind it.",
+      "Congratulations on arriving at the same red light more aggressively.",
   },
+
   {
     id: "driving-003",
     category: "Driving",
+
     question:
-      "Someone leaves a shopping cart beside their car because the cart return is across the parking lot.",
-    roastPhrase: "Return the cart.",
-    toastPhrase: "Employees collect them.",
-    roastPercentage: 93,
-    toastPercentage: 7,
+      "Someone refuses to let you merge, then gets angry when nobody lets them in later.",
+
+    roastPhrase:
+      "The road remembered.",
+
+    toastPhrase:
+      "Merging is stressful.",
+
+    roastPercentage: 88,
+    toastPercentage: 12,
+
     topComment:
-      "The distance somehow doubled after unloading the groceries.",
+      "Their compassion appeared exactly when they needed it.",
   },
+
   {
     id: "driving-004",
     category: "Driving",
+
     question:
-      "Someone drives exactly the speed limit in the left lane while faster traffic builds behind them.",
-    roastPhrase: "Move over.",
-    toastPhrase: "They are following the law.",
-    roastPercentage: 69,
-    toastPercentage: 31,
+      "A driver honks the second the light turns green, even though the car ahead has barely had time to move.",
+
+    roastPhrase:
+      "Give them one second.",
+
+    toastPhrase:
+      "They are keeping traffic moving.",
+
+    roastPercentage: 82,
+    toastPercentage: 18,
+
     topComment:
-      "Legal speed. Questionable lane awareness.",
+      "The light changed, not the laws of human reaction time.",
   },
+
   {
     id: "driving-005",
     category: "Driving",
+
     question:
-      "Someone flashes their headlights to warn oncoming drivers about a speed trap.",
-    roastPhrase: "Let reckless drivers learn.",
-    toastPhrase: "That is community service.",
-    roastPercentage: 36,
-    toastPercentage: 64,
+      "Someone drives twenty miles under the speed limit in the left lane and refuses to move over.",
+
+    roastPhrase:
+      "Move to the right.",
+
+    toastPhrase:
+      "They are driving safely.",
+
+    roastPercentage: 89,
+    toastPercentage: 11,
+
     topComment:
-      "Public safety and public solidarity are having a debate.",
+      "Safety does not require leading a parade.",
   },
+
   {
     id: "driving-006",
     category: "Driving",
+
     question:
-      "Your passenger changes the music after asking once and hearing no response.",
-    roastPhrase: "Driver controls the playlist.",
-    toastPhrase: "Silence counted as permission.",
-    roastPercentage: 47,
-    toastPercentage: 53,
+      "A driver follows you closely because they want you to speed, even though there is nowhere for you to go.",
+
+    roastPhrase:
+      "Back up.",
+
+    toastPhrase:
+      "Maybe traffic is moving too slowly.",
+
+    roastPercentage: 92,
+    toastPercentage: 8,
+
     topComment:
-      "No answer is not always consent, especially near the auxiliary cord.",
+      "My trunk is not going to open a new lane.",
   },
+
   {
     id: "driving-007",
     category: "Driving",
+
     question:
-      "Someone takes several attempts to reverse into a space while cars wait behind them.",
-    roastPhrase: "Just pull in.",
-    toastPhrase: "Let them park safely.",
-    roastPercentage: 44,
-    toastPercentage: 56,
+      "Someone uses the shoulder to pass traffic, then tries to merge back in ahead of everyone.",
+
+    roastPhrase:
+      "Do not let them in.",
+
+    toastPhrase:
+      "Traffic brings out desperation.",
+
+    roastPercentage: 94,
+    toastPercentage: 6,
+
     topComment:
-      "Careful parking is valid. The audience is still becoming restless.",
+      "The shoulder is not a VIP entrance.",
   },
+
   {
     id: "driving-008",
     category: "Driving",
+
     question:
-      "Someone stands in a parking space to hold it while their friend drives around the block.",
-    roastPhrase: "People are not traffic cones.",
-    toastPhrase: "They found it first.",
-    roastPercentage: 79,
-    toastPercentage: 21,
+      "A driver does not use a turn signal, then gets upset when someone does not let them over.",
+
+    roastPhrase:
+      "Communicate first.",
+
+    toastPhrase:
+      "They may have forgotten.",
+
+    roastPercentage: 90,
+    toastPercentage: 10,
+
     topComment:
-      "A human body is not an accepted vehicle type.",
+      "We cannot respond to a plan you never announced.",
   },
+
   {
     id: "driving-009",
     category: "Driving",
+
     question:
-      "Your friend returns your borrowed car with a full tank but leaves fast-food trash inside.",
-    roastPhrase: "Clean the car too.",
-    toastPhrase: "A full tank covers it.",
-    roastPercentage: 51,
-    toastPercentage: 49,
+      "Someone blocks the intersection because they entered even though traffic was not moving.",
+
+    roastPhrase:
+      "You trapped everyone.",
+
+    toastPhrase:
+      "They thought traffic would move.",
+
+    roastPercentage: 91,
+    toastPercentage: 9,
+
     topComment:
-      "Fuel restitution versus interior disrespect.",
+      "Optimism is not a traffic strategy.",
   },
+
   {
     id: "driving-010",
     category: "Driving",
+
     question:
-      "Someone stops traffic to let one car exit a busy driveway.",
-    roastPhrase: "Keep traffic moving.",
-    toastPhrase: "That was considerate.",
-    roastPercentage: 49,
-    toastPercentage: 51,
+      "A person drives aggressively the entire trip, then says everyone else on the road is terrible.",
+
+    roastPhrase:
+      "They may be the problem.",
+
+    toastPhrase:
+      "Bad drivers are everywhere.",
+
+    roastPercentage: 84,
+    toastPercentage: 16,
+
     topComment:
-      "One driver felt grateful. Eight drivers felt selected for sacrifice.",
+      "The road has one common denominator in every complaint.",
   },
+
   {
     id: "driving-011",
     category: "Driving",
+
     question:
-      "Someone honks the instant the light turns green because the first driver is looking down.",
-    roastPhrase: "Give them one second.",
-    toastPhrase: "They should pay attention.",
-    roastPercentage: 48,
-    toastPercentage: 52,
+      "Someone parks across two spaces because they do not want anyone near their car.",
+
+    roastPhrase:
+      "Buy two spaces then.",
+
+    toastPhrase:
+      "They are protecting their property.",
+
+    roastPercentage: 87,
+    toastPercentage: 13,
+
     topComment:
-      "Aggressive timing, accurate diagnosis.",
+      "Your car is not important enough to delete a parking space.",
   },
+
   {
     id: "driving-012",
     category: "Driving",
+
     question:
-      "Your passenger grips the door and reacts dramatically even though you have never had an accident.",
-    roastPhrase: "Walk next time.",
-    toastPhrase: "Your driving may still scare them.",
-    roastPercentage: 55,
-    toastPercentage: 45,
+      "A driver sits in a parking lot waiting for someone to leave while blocking everyone else from getting around them.",
+
+    roastPhrase:
+      "Keep moving.",
+
+    toastPhrase:
+      "A good spot is worth waiting for.",
+
+    roastPercentage: 74,
+    toastPercentage: 26,
+
     topComment:
-      "A clean record does not always create a calm passenger.",
+      "The parking spot is not worth shutting down the entire lane.",
   },
+
   {
     id: "driving-013",
     category: "Driving",
+
     question:
-      "Someone leaves a note after lightly scratching a parked car but does not include their insurance information.",
-    roastPhrase: "The note is incomplete.",
-    toastPhrase: "At least they admitted it.",
-    roastPercentage: 72,
-    toastPercentage: 28,
+      "Someone leaves their high beams on behind you even after you clearly signal that they are blinding you.",
+
+    roastPhrase:
+      "Turn them down.",
+
+    toastPhrase:
+      "Maybe they did not notice.",
+
+    roastPercentage: 95,
+    toastPercentage: 5,
+
     topComment:
-      "Honesty arrived without enough paperwork.",
+      "My mirrors have become portable suns.",
   },
+
   {
     id: "driving-014",
     category: "Driving",
+
     question:
-      "Someone uses their turn signal in an empty parking lot out of habit.",
-    roastPhrase: "Nobody is there.",
-    toastPhrase: "Good habits stay consistent.",
-    roastPercentage: 18,
-    toastPercentage: 82,
+      "A driver speeds through a residential street where children are playing nearby.",
+
+    roastPhrase:
+      "Slow down immediately.",
+
+    toastPhrase:
+      "Maybe they know the road.",
+
+    roastPercentage: 97,
+    toastPercentage: 3,
+
     topComment:
-      "The unseen audience is still impressed.",
+      "Knowing the road does not make the children disappear.",
   },
+
   {
     id: "driving-015",
     category: "Driving",
+
     question:
-      "Someone parks across two spaces because the neighboring cars were already parked badly.",
-    roastPhrase: "Do not continue the problem.",
-    toastPhrase: "They had no real choice.",
-    roastPercentage: 61,
-    toastPercentage: 39,
+      "Someone stops in the middle of the road to let a passenger out instead of pulling over safely.",
+
+    roastPhrase:
+      "Move out of traffic.",
+
+    toastPhrase:
+      "It only takes a second.",
+
+    roastPercentage: 85,
+    toastPercentage: 15,
+
     topComment:
-      "A bad parking chain has produced another victim and another suspect.",
+      "One second somehow became everybody else's problem.",
   },
+
   {
     id: "driving-016",
     category: "Driving",
+
     question:
-      "Your friend asks you to drive, then suggests a different route at every turn.",
-    roastPhrase: "You should have driven.",
-    toastPhrase: "They know the area better.",
-    roastPercentage: 76,
-    toastPercentage: 24,
+      "A person complains about traffic while driving during the busiest hour of the day on the busiest route.",
+
+    roastPhrase:
+      "You are part of the traffic.",
+
+    toastPhrase:
+      "Traffic is still frustrating.",
+
+    roastPercentage: 62,
+    toastPercentage: 38,
+
     topComment:
-      "Free transportation now includes unpaid navigation supervision.",
+      "Every driver in traffic believes traffic is everyone else.",
   },
+
   {
     id: "driving-017",
     category: "Driving",
+
     question:
-      "Someone stops to let a pedestrian cross even though the pedestrian is waving them through.",
-    roastPhrase: "Now everyone is confused.",
-    toastPhrase: "Safety comes first.",
-    roastPercentage: 58,
-    toastPercentage: 42,
+      "Someone refuses to ask for directions, gets lost, then blames everyone in the car for not helping.",
+
+    roastPhrase:
+      "Use the navigation.",
+
+    toastPhrase:
+      "Driving can be stressful.",
+
+    roastPercentage: 88,
+    toastPercentage: 12,
+
     topComment:
-      "Two polite people have created a traffic negotiation.",
+      "Pride took the wheel and accountability missed the exit.",
   },
+
   {
     id: "driving-018",
     category: "Driving",
+
     question:
-      "Someone records a quick video while fully stopped in traffic, then puts the phone away once cars move.",
-    roastPhrase: "Keep the phone down.",
-    toastPhrase: "They were not moving.",
-    roastPercentage: 63,
-    toastPercentage: 37,
+      "A driver waves to thank you after you let them merge into heavy traffic.",
+
+    roastPhrase:
+      "That is the minimum.",
+
+    toastPhrase:
+      "The wave matters.",
+
+    roastPercentage: 12,
+    toastPercentage: 88,
+
     topComment:
-      "Stopped traffic is still not a film studio.",
+      "That tiny wave repaired something in me.",
   },
+
   {
     id: "driving-019",
     category: "Driving",
+
     question:
-      "Your friend cleans trash from your passenger seat without asking because they need somewhere to sit.",
-    roastPhrase: "Do not touch my things.",
-    toastPhrase: "The seat needed help.",
-    roastPercentage: 41,
-    toastPercentage: 59,
+      "Someone sees you waiting for a parking space and intentionally pulls into it from the opposite direction.",
+
+    roastPhrase:
+      "That was theft.",
+
+    toastPhrase:
+      "The space was technically open.",
+
+    roastPercentage: 93,
+    toastPercentage: 7,
+
     topComment:
-      "Privacy ended where the empty bottles began.",
+      "The turn signal was evidence. The betrayal was documented.",
   },
+
   {
     id: "driving-020",
     category: "Driving",
+
     question:
-      "Someone circles for twenty minutes to avoid paying ten dollars for parking.",
-    roastPhrase: "Pay and move on.",
-    toastPhrase: "Ten dollars is still money.",
-    roastPercentage: 55,
-    toastPercentage: 45,
+      "A driver gets angry when you do not turn right on red, even though you cannot safely see oncoming traffic.",
+
+    roastPhrase:
+      "They can wait.",
+
+    toastPhrase:
+      "Maybe the road was clear.",
+
+    roastPercentage: 90,
+    toastPercentage: 10,
+
     topComment:
-      "Ten dollars saved. Time, gas, and group morale spent.",
+      "They are free to risk their own car when they reach the front.",
   },
 ];

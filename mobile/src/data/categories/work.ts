@@ -2,263 +2,422 @@
 // File: work.ts
 //
 // Purpose:
-// Stores Work category Moments.
+// Stores Work category Moments for Roast or Toast.
 //
 // Content Direction:
-// • Remote-work behavior
-// • Meetings and messaging
-// • Credit, boundaries, and office politics
-// • Helpful coworkers
-// • Situations that feel specific and familiar
-//
-// Important:
-// Existing IDs are preserved so saved sessions remain
-// compatible after this content update.
+// • Micromanagement and weak leadership
+// • Workplace gaslighting and manipulation
+// • Credit, recognition, and accountability
+// • Boundaries and unrealistic expectations
+// • Situations employees recognize immediately
 //
 // Project: Roast or Toast
 // =====================================================
 
 import type { Moment } from "../types";
 
+// =====================================================
+// Work Moments
+// =====================================================
+
 export const workMoments: Moment[] = [
   {
     id: "work-001",
     category: "Work",
+
     question:
-      'Your coworker replies all to a company-wide email just to say, "Thanks!"',
-    roastPhrase: "Revoke Reply All.",
-    toastPhrase: "They were being polite.",
-    roastPercentage: 88,
-    toastPercentage: 12,
+      "Your manager requires constant status updates on work that is already tracked in multiple systems.",
+
+    roastPhrase:
+      "That is micromanagement.",
+
+    toastPhrase:
+      "They need visibility.",
+
+    roastPercentage: 84,
+    toastPercentage: 16,
+
     topComment:
-      "Three thousand inboxes received their gratitude.",
+      "The tracker has a tracker, but somehow I still need to send an email.",
   },
+
   {
     id: "work-002",
     category: "Work",
+
     question:
-      "Your boss schedules a thirty-minute meeting, reads three bullet points aloud, and ends eight minutes early.",
-    roastPhrase: "Send the email next time.",
-    toastPhrase: "At least it ended early.",
-    roastPercentage: 69,
-    toastPercentage: 31,
+      "Your boss calls it coaching, but most of the conversation is them monitoring every tiny decision you make.",
+
+    roastPhrase:
+      "Control is not coaching.",
+
+    toastPhrase:
+      "They are trying to help.",
+
+    roastPercentage: 81,
+    toastPercentage: 19,
+
     topComment:
-      "Twenty-two minutes were returned, but the calendar still has questions.",
+      "Leadership should build judgment, not replace it.",
   },
+
   {
     id: "work-003",
     category: "Work",
+
     question:
-      "Your coworker covers your shift during an emergency but reminds everyone about it for weeks.",
-    roastPhrase: "The favor has expired.",
-    toastPhrase: "They still helped.",
-    roastPercentage: 48,
-    toastPercentage: 52,
+      "Your manager changes the expectations after the work is finished, then asks why you did not meet them.",
+
+    roastPhrase:
+      "They moved the goalpost.",
+
+    toastPhrase:
+      "Priorities can change.",
+
+    roastPercentage: 92,
+    toastPercentage: 8,
+
     topComment:
-      "Generosity with a recurring announcement is still technically generosity.",
+      "The requirement did not exist until the deadline had already passed.",
   },
+
   {
     id: "work-004",
     category: "Work",
+
     question:
-      "Your coworker gives you credit for your idea in front of leadership even though they helped improve it.",
-    roastPhrase: "They should mention their part too.",
-    toastPhrase: "That shows integrity.",
-    roastPercentage: 15,
-    toastPercentage: 85,
+      "A coworker presents your idea in a meeting and receives praise without mentioning that it came from you.",
+
+    roastPhrase:
+      "Give me my credit.",
+
+    toastPhrase:
+      "The team still benefits.",
+
+    roastPercentage: 90,
+    toastPercentage: 10,
+
     topComment:
-      "A coworker who shares credit without being asked is workplace luxury.",
+      "Collaboration is not identity theft with a PowerPoint.",
   },
+
   {
     id: "work-005",
     category: "Work",
+
     question:
-      'Your coworker sends "???" five minutes after asking a nonurgent question.',
-    roastPhrase: "Blocked on Teams.",
-    toastPhrase: "Maybe they need it quickly.",
-    roastPercentage: 84,
-    toastPercentage: 16,
+      "Your manager says they trust you, but wants to be copied on every email and included in every minor decision.",
+
+    roastPhrase:
+      "That is not trust.",
+
+    toastPhrase:
+      "They are accountable too.",
+
+    roastPercentage: 85,
+    toastPercentage: 15,
+
     topComment:
-      "Five minutes is not a service-level agreement.",
+      "Trust apparently comes with full surveillance access.",
   },
+
   {
     id: "work-006",
     category: "Work",
+
     question:
-      "Your coworker volunteers the entire team for an extra project because it could increase visibility.",
-    roastPhrase: "Volunteer yourself.",
-    toastPhrase: "It might help everyone.",
-    roastPercentage: 79,
-    toastPercentage: 21,
+      "Your boss praises your independence, then criticizes you for making a reasonable decision without asking permission first.",
+
+    roastPhrase:
+      "They cannot have it both ways.",
+
+    toastPhrase:
+      "Some decisions need approval.",
+
+    roastPercentage: 82,
+    toastPercentage: 18,
+
     topComment:
-      "Exposure has once again been assigned without consent.",
+      "They want initiative, but only after approving the initiative.",
   },
+
   {
     id: "work-007",
     category: "Work",
+
     question:
-      'Your manager messages during lunch asking for "a quick favor" that takes twenty minutes.',
-    roastPhrase: "Lunch is not office hours.",
-    toastPhrase: "Some things cannot wait.",
-    roastPercentage: 71,
-    toastPercentage: 29,
+      "Leadership asks employees for honest feedback, then treats anyone who gives it like they are being negative.",
+
+    roastPhrase:
+      "They wanted agreement.",
+
+    toastPhrase:
+      "Delivery still matters.",
+
+    roastPercentage: 89,
+    toastPercentage: 11,
+
     topComment:
-      "The quickest part was how fast lunch disappeared.",
+      "They asked for honesty and expected applause.",
   },
+
   {
     id: "work-008",
     category: "Work",
+
     question:
-      "Your coworker keeps their camera off in every meeting but consistently contributes and finishes their work.",
-    roastPhrase: "Turn the camera on sometimes.",
-    toastPhrase: "Performance matters more.",
-    roastPercentage: 28,
-    toastPercentage: 72,
+      "Your manager tells you something is urgent, then does not review it for several days after you rush to finish it.",
+
+    roastPhrase:
+      "Their emergency was fake.",
+
+    toastPhrase:
+      "Priorities may have shifted.",
+
+    roastPercentage: 87,
+    toastPercentage: 13,
+
     topComment:
-      "A black square with excellent deliverables is still an excellent coworker.",
+      "Nothing says urgent like sitting unopened until next week.",
   },
+
   {
     id: "work-009",
     category: "Work",
+
     question:
-      "Your boss sends emails late at night but schedules them so they arrive the next morning.",
-    roastPhrase: "They should log off too.",
-    toastPhrase: "That respects boundaries.",
-    roastPercentage: 18,
-    toastPercentage: 82,
+      "A coworker regularly asks for help but becomes unavailable whenever you need support from them.",
+
+    roastPhrase:
+      "The teamwork is one-sided.",
+
+    toastPhrase:
+      "They may be overloaded.",
+
+    roastPercentage: 79,
+    toastPercentage: 21,
+
     topComment:
-      "Workaholic behavior, responsibly packaged.",
+      "Their workload explains everything until my workload enters the conversation.",
   },
+
   {
     id: "work-010",
     category: "Work",
+
     question:
-      "Your coworker brings breakfast for the team but asks everyone to send money afterward.",
-    roastPhrase: "That was not a gift.",
-    toastPhrase: "Breakfast was still organized.",
-    roastPercentage: 74,
-    toastPercentage: 26,
+      "Your boss sends late-night messages marked 'no rush,' but repeatedly follows up first thing in the morning.",
+
+    roastPhrase:
+      "There was clearly a rush.",
+
+    toastPhrase:
+      "They still gave you the night.",
+
+    roastPercentage: 83,
+    toastPercentage: 17,
+
     topComment:
-      "A surprise invoice is not team morale.",
+      "No rush apparently means before I finish my coffee.",
   },
+
   {
     id: "work-011",
     category: "Work",
+
     question:
-      "Your coworker says they are overwhelmed, then spends twenty minutes explaining every task they have.",
-    roastPhrase: "Use that time to work.",
-    toastPhrase: "They may need support.",
-    roastPercentage: 62,
-    toastPercentage: 38,
+      "Your manager criticizes you for not speaking up, but interrupts or dismisses you whenever you do.",
+
+    roastPhrase:
+      "They do not want your voice.",
+
+    toastPhrase:
+      "Maybe the timing was wrong.",
+
+    roastPercentage: 90,
+    toastPercentage: 10,
+
     topComment:
-      "The workload presentation became another item on the workload.",
+      "They want participation that never challenges the room.",
   },
+
   {
     id: "work-012",
     category: "Work",
+
     question:
-      "Your manager praises the team publicly but describes the success as their own during an executive meeting.",
-    roastPhrase: "That is credit theft.",
-    toastPhrase: "They represent the team.",
-    roastPercentage: 92,
-    toastPercentage: 8,
+      "Leadership celebrates work-life balance publicly but rewards the employees who answer messages at all hours.",
+
+    roastPhrase:
+      "The culture tells the truth.",
+
+    toastPhrase:
+      "Extra effort deserves recognition.",
+
+    roastPercentage: 76,
+    toastPercentage: 24,
+
     topComment:
-      "Our work has become their leadership story.",
+      "The policy says balance. The promotions say availability.",
   },
+
   {
     id: "work-013",
     category: "Work",
+
     question:
-      "Your coworker quietly corrects your mistake, then tells you privately so it does not happen again.",
-    roastPhrase: "They should have asked first.",
-    toastPhrase: "That is professional.",
-    roastPercentage: 11,
-    toastPercentage: 89,
+      "Your boss adds more responsibilities after strong performance but offers no raise, title change, or added support.",
+
+    roastPhrase:
+      "Success became punishment.",
+
+    toastPhrase:
+      "Growth can create opportunity.",
+
+    roastPercentage: 88,
+    toastPercentage: 12,
+
     topComment:
-      "Protected publicly, corrected privately. Perfect execution.",
+      "Apparently the reward for doing good work is someone else's job too.",
   },
+
   {
     id: "work-014",
     category: "Work",
+
     question:
-      "Your coworker marks every email as high importance because they believe their work is always urgent.",
-    roastPhrase: "Nothing is urgent now.",
-    toastPhrase: "At least expectations are clear.",
-    roastPercentage: 89,
-    toastPercentage: 11,
+      "A manager takes credit when the project succeeds but blames the team when anything goes wrong.",
+
+    roastPhrase:
+      "That is weak leadership.",
+
+    toastPhrase:
+      "Leaders still answer for results.",
+
+    roastPercentage: 95,
+    toastPercentage: 5,
+
     topComment:
-      "The red exclamation mark has lost all legal authority.",
+      "They own every victory and rent every failure.",
   },
+
   {
     id: "work-015",
     category: "Work",
+
     question:
-      "Your manager asks for honest feedback, then explains why every criticism is unfair.",
-    roastPhrase: "They wanted compliments.",
-    toastPhrase: "They are allowed to respond.",
-    roastPercentage: 83,
-    toastPercentage: 17,
+      "Your manager says they are only checking in, but messages you repeatedly throughout the day asking whether the same task is done.",
+
+    roastPhrase:
+      "The checking is slowing it down.",
+
+    toastPhrase:
+      "They need reassurance.",
+
+    roastPercentage: 86,
+    toastPercentage: 14,
+
     topComment:
-      "This feedback session has become a defense hearing.",
+      "The task would be finished faster if I stopped reporting that I was finishing it.",
   },
+
   {
     id: "work-016",
     category: "Work",
+
     question:
-      "Your coworker leaves exactly at five while the rest of the team stays late to finish a shared deadline.",
-    roastPhrase: "Read the room.",
-    toastPhrase: "Their workday is over.",
-    roastPercentage: 46,
-    toastPercentage: 54,
+      "Your boss tells you to take ownership, then rewrites or overrides every decision you make.",
+
+    roastPhrase:
+      "They do not want ownership.",
+
+    toastPhrase:
+      "They are still responsible.",
+
+    roastPercentage: 84,
+    toastPercentage: 16,
+
     topComment:
-      "A boundary can still feel inconvenient to people without one.",
+      "They handed me the wheel and kept both hands on it.",
   },
+
   {
     id: "work-017",
     category: "Work",
+
     question:
-      "Your coworker schedules an early meeting because every reasonable time conflicts across time zones.",
-    roastPhrase: "Find another solution.",
-    toastPhrase: "Someone has to compromise.",
-    roastPercentage: 51,
-    toastPercentage: 49,
+      "A coworker acts confused about something you clearly explained, then later repeats your explanation as if it were their own idea.",
+
+    roastPhrase:
+      "They understood perfectly.",
+
+    toastPhrase:
+      "Maybe it finally clicked.",
+
+    roastPercentage: 80,
+    toastPercentage: 20,
+
     topComment:
-      "Global collaboration means local resentment.",
+      "The idea became understandable once their name was attached.",
   },
+
   {
     id: "work-018",
     category: "Work",
+
     question:
-      "Your coworker corrects your grammar in a casual message but ignores the actual question.",
-    roastPhrase: "Answer the question.",
-    toastPhrase: "Accuracy matters.",
-    roastPercentage: 91,
-    toastPercentage: 9,
+      "Your manager gives vague instructions, then criticizes you for not reading their mind.",
+
+    roastPhrase:
+      "Clarity is their job too.",
+
+    toastPhrase:
+      "You could have asked more questions.",
+
+    roastPercentage: 78,
+    toastPercentage: 22,
+
     topComment:
-      "The sentence is fixed. The problem remains completely untouched.",
+      "I can clarify instructions. I cannot interview an invisible expectation.",
   },
+
   {
     id: "work-019",
     category: "Work",
+
     question:
-      "Your manager encourages you to take vacation and does not contact you once while you are away.",
-    roastPhrase: "That should be normal.",
-    toastPhrase: "That is excellent leadership.",
-    roastPercentage: 9,
-    toastPercentage: 91,
+      "Leadership launches another tracking tool to fix a communication problem caused by too many tracking tools.",
+
+    roastPhrase:
+      "Another dashboard will not help.",
+
+    toastPhrase:
+      "The right system may work.",
+
+    roastPercentage: 85,
+    toastPercentage: 15,
+
     topComment:
-      "The bar is low, but this manager brought a ladder.",
+      "We now need a meeting to explain where the information lives.",
   },
+
   {
     id: "work-020",
     category: "Work",
+
     question:
-      "Your coworker misses a deadline and says nobody reminded them, even though it was on the shared calendar.",
-    roastPhrase: "The deadline was the reminder.",
-    toastPhrase: "The team could communicate better.",
-    roastPercentage: 87,
-    toastPercentage: 13,
+      "Your boss calls the team a family whenever they need extra work, but treats every personal need like an inconvenience.",
+
+    roastPhrase:
+      "That family language is manipulation.",
+
+    toastPhrase:
+      "Work still has responsibilities.",
+
+    roastPercentage: 91,
+    toastPercentage: 9,
+
     topComment:
-      "The calendar invitation would like to enter evidence.",
+      "We are family when they need sacrifice and employees when we need understanding.",
   },
 ];

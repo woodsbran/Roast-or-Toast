@@ -5,260 +5,419 @@
 // Stores Social Media category Moments.
 //
 // Content Direction:
-// • Modern internet behavior
-// • Performative posting
-// • Privacy and boundaries
-// • Friendship and dating signals
-// • Situations with more than one reasonable opinion
-//
-// Important:
-// Existing IDs are preserved so saved sessions remain
-// compatible after this content update.
+// • Passive support and performative behavior
+// • Online attention compared with real effort
+// • Digital boundaries and selective engagement
+// • Modern social habits people immediately recognize
+// • Funny, messy, and emotionally honest situations
 //
 // Project: Roast or Toast
 // =====================================================
 
 import type { Moment } from "../types";
 
+// =====================================================
+// Social Media Moments
+// =====================================================
+
 export const socialMediaMoments: Moment[] = [
   {
     id: "social-001",
     category: "Social Media",
+
     question:
-      "Someone announces a social media break, returns the next day, and explains that the break gave them clarity.",
-    roastPhrase: "That was one business day.",
-    toastPhrase: "Maybe it helped.",
-    roastPercentage: 78,
-    toastPercentage: 22,
+      "Someone watches every single Story you post but never likes, replies, or acknowledges anything you actually care about.",
+
+    roastPhrase:
+      "That is silent surveillance.",
+
+    toastPhrase:
+      "Watching still counts as support.",
+
+    roastPercentage: 66,
+    toastPercentage: 34,
+
     topComment:
-      "The digital detox ended before the withdrawal symptoms began.",
+      "They never miss a Story, but somehow always miss the moment to support me.",
   },
+
   {
     id: "social-002",
     category: "Social Media",
+
     question:
-      "Someone likes one of your photos from five years ago, then immediately follows you.",
-    roastPhrase: "They were investigating.",
-    toastPhrase: "They liked what they found.",
-    roastPercentage: 55,
-    toastPercentage: 45,
+      "A friend ignores your message for days but continues posting, liking, and commenting everywhere else.",
+
+    roastPhrase:
+      "The silence was a choice.",
+
+    toastPhrase:
+      "Posting takes less energy.",
+
+    roastPercentage: 71,
+    toastPercentage: 29,
+
     topComment:
-      "The scroll was deep, but at least they committed.",
+      "Busy is believable until the third Story update.",
   },
+
   {
     id: "social-003",
     category: "Social Media",
+
     question:
-      "Your friend comments something supportive on every post, even when nobody else does.",
-    roastPhrase: "It can feel forced.",
-    toastPhrase: "That is a real friend.",
-    roastPercentage: 12,
-    toastPercentage: 88,
+      "Someone says social media is fake, but gets upset when their post does not get enough attention.",
+
+    roastPhrase:
+      "Pick a philosophy.",
+
+    toastPhrase:
+      "Everyone wants engagement.",
+
+    roastPercentage: 78,
+    toastPercentage: 22,
+
     topComment:
-      "Everybody deserves one unpaid publicist.",
+      "They hate validation right up until the likes slow down.",
   },
+
   {
     id: "social-004",
     category: "Social Media",
+
     question:
-      "Someone posts fifteen concert clips but saves the best full video to send privately to friends.",
-    roastPhrase: "Fifteen is still too many.",
-    toastPhrase: "They are sharing the night.",
-    roastPercentage: 63,
-    toastPercentage: 37,
+      "A person unfollows you after an argument, then continues checking your page from another account.",
+
+    roastPhrase:
+      "That is obsession with extra steps.",
+
+    toastPhrase:
+      "They are still curious.",
+
+    roastPercentage: 84,
+    toastPercentage: 16,
+
     topComment:
-      "The Story became a tour documentary.",
+      "You removed the follow but kept the surveillance plan.",
   },
+
   {
     id: "social-005",
     category: "Social Media",
+
     question:
-      "Someone edits every photo heavily but openly posts the unedited version too.",
-    roastPhrase: "Just post the real picture.",
-    toastPhrase: "They are being transparent.",
-    roastPercentage: 41,
-    toastPercentage: 59,
+      "Someone posts a long message about supporting small businesses but never supports the people they actually know.",
+
+    roastPhrase:
+      "The support is performative.",
+
+    toastPhrase:
+      "Awareness still matters.",
+
+    roastPercentage: 83,
+    toastPercentage: 17,
+
     topComment:
-      "At least the before and after came from the same person.",
+      "The caption supports everyone except the people in their contacts.",
   },
+
   {
     id: "social-006",
     category: "Social Media",
+
     question:
-      "Your friend posts a photo where they look amazing and you look terrible, but asks before uploading it.",
-    roastPhrase: "Do not even ask.",
-    toastPhrase: "They gave you a choice.",
-    roastPercentage: 48,
-    toastPercentage: 52,
+      "A friend shares strangers' projects all day but ignores the app, business, or art you personally asked them to try.",
+
+    roastPhrase:
+      "That feels intentional.",
+
+    toastPhrase:
+      "Maybe it is not their thing.",
+
+    roastPercentage: 76,
+    toastPercentage: 24,
+
     topComment:
-      "Consent was requested. Dignity was still endangered.",
+      "Apparently support becomes complicated when the creator is someone they actually know.",
   },
+
   {
     id: "social-007",
     category: "Social Media",
+
     question:
-      "Someone responds to your Story with an actual conversation starter instead of just an emoji.",
-    roastPhrase: "They could have texted.",
-    toastPhrase: "That is how conversations start now.",
-    roastPercentage: 29,
-    toastPercentage: 71,
+      "Someone posts a tribute saying how much they love you, but rarely calls, visits, or checks in privately.",
+
+    roastPhrase:
+      "The post is doing all the work.",
+
+    toastPhrase:
+      "Public love still matters.",
+
+    roastPercentage: 72,
+    toastPercentage: 28,
+
     topComment:
-      "A thoughtful Story reply is basically modern courtship.",
+      "The caption is beautiful. The relationship could use the same effort.",
   },
+
   {
     id: "social-008",
     category: "Social Media",
+
     question:
-      "Someone shares a screenshot of a private conversation after removing names and identifying details.",
-    roastPhrase: "Private still means private.",
-    toastPhrase: "Context matters.",
-    roastPercentage: 67,
-    toastPercentage: 33,
+      "Someone screenshots a private conversation and sends it to other people for opinions.",
+
+    roastPhrase:
+      "That is a trust violation.",
+
+    toastPhrase:
+      "They may need advice.",
+
+    roastPercentage: 89,
+    toastPercentage: 11,
+
     topComment:
-      "Anonymous to the internet does not always mean anonymous to the people involved.",
+      "Advice did not require distributing the full transcript.",
   },
+
   {
     id: "social-009",
     category: "Social Media",
+
     question:
-      "Someone unfollows a friend after an argument but keeps their number and remains open to talking.",
-    roastPhrase: "That is performative.",
-    toastPhrase: "Space can be healthy.",
-    roastPercentage: 46,
-    toastPercentage: 54,
+      "A person posts that they are protecting their peace, but spends all day arguing with strangers in comment sections.",
+
+    roastPhrase:
+      "That peace is fighting for its life.",
+
+    toastPhrase:
+      "Some things deserve a response.",
+
+    roastPercentage: 82,
+    toastPercentage: 18,
+
     topComment:
-      "The friendship is paused, but the contact card survived.",
+      "Their peace has logged twelve hours of overtime today.",
   },
+
   {
     id: "social-010",
     category: "Social Media",
+
     question:
-      "Someone reposts a creator's video, tags them clearly, and links the original post.",
-    roastPhrase: "That is the bare minimum.",
-    toastPhrase: "That deserves credit.",
-    roastPercentage: 17,
-    toastPercentage: 83,
+      "Someone posts an embarrassing picture of you because they think it is funny, even after you ask them to take it down.",
+
+    roastPhrase:
+      "Delete it immediately.",
+
+    toastPhrase:
+      "Maybe it is harmless.",
+
+    roastPercentage: 94,
+    toastPercentage: 6,
+
     topComment:
-      "Basic internet manners are now considered premium behavior.",
+      "The joke stopped being funny when I asked you to remove it.",
   },
+
   {
     id: "social-011",
     category: "Social Media",
+
     question:
-      "Someone deletes an app every Sunday night and reinstalls it by Tuesday.",
-    roastPhrase: "Accept who you are.",
-    toastPhrase: "At least they keep trying.",
-    roastPercentage: 61,
-    toastPercentage: 39,
+      "A friend hypes you up in private but stays completely silent when other people criticize or disrespect you online.",
+
+    roastPhrase:
+      "Private support is convenient.",
+
+    toastPhrase:
+      "Not everyone likes conflict.",
+
+    roastPercentage: 68,
+    toastPercentage: 32,
+
     topComment:
-      "The weekly breakup with Instagram has become a situationship.",
+      "They support me loudly in the safest possible location.",
   },
+
   {
     id: "social-012",
     category: "Social Media",
+
     question:
-      "Your friend promotes your business often but also expects a small discount.",
-    roastPhrase: "Support should be support.",
-    toastPhrase: "They are bringing customers.",
-    roastPercentage: 51,
-    toastPercentage: 49,
+      "Someone announces they are leaving social media for their mental health, then returns the next morning.",
+
+    roastPhrase:
+      "That break was brief.",
+
+    toastPhrase:
+      "Trying still counts.",
+
+    roastPercentage: 61,
+    toastPercentage: 39,
+
     topComment:
-      "The friendship discount has entered contract negotiations.",
+      "The digital detox lasted until breakfast.",
   },
+
   {
     id: "social-013",
     category: "Social Media",
+
     question:
-      "Someone records fireworks for ten seconds, then puts the phone away and watches.",
-    roastPhrase: "The video is still unnecessary.",
-    toastPhrase: "That is a fair balance.",
-    roastPercentage: 27,
-    toastPercentage: 73,
+      "A person posts motivational quotes about loyalty while repeatedly treating people as disposable.",
+
+    roastPhrase:
+      "The quotes are not applying.",
+
+    toastPhrase:
+      "Maybe they are learning too.",
+
+    roastPercentage: 86,
+    toastPercentage: 14,
+
     topComment:
-      "A short memory and an actual experience can coexist.",
+      "Their reposts have stronger values than their behavior.",
   },
+
   {
     id: "social-014",
     category: "Social Media",
+
     question:
-      'Someone comments "first" on a friend’s post because it is an ongoing joke between them.',
-    roastPhrase: "The joke is tired.",
-    toastPhrase: "Let friends be annoying.",
-    roastPercentage: 43,
-    toastPercentage: 57,
+      "Someone constantly posts how busy they are but somehow has time to comment on every piece of celebrity drama.",
+
+    roastPhrase:
+      "Busy with selected priorities.",
+
+    toastPhrase:
+      "Everyone needs a distraction.",
+
+    roastPercentage: 67,
+    toastPercentage: 33,
+
     topComment:
-      "Cringe to strangers, tradition to the group chat.",
+      "No time to reply, but fully briefed on the internet.",
   },
+
   {
     id: "social-015",
     category: "Social Media",
+
     question:
-      "Someone sends you several memes every day but rarely asks how you are doing.",
-    roastPhrase: "Memes are not communication.",
-    toastPhrase: "That is how they check in.",
-    roastPercentage: 52,
-    toastPercentage: 48,
+      "A friend posts your accomplishment only after they notice other people celebrating you first.",
+
+    roastPhrase:
+      "The support needed an audience.",
+
+    toastPhrase:
+      "They still showed love.",
+
+    roastPercentage: 69,
+    toastPercentage: 31,
+
     topComment:
-      "Emotional availability, delivered in vertical video format.",
+      "The congratulations arrived once it became socially required.",
   },
+
   {
     id: "social-016",
     category: "Social Media",
+
     question:
-      "Someone leaves your message on seen, posts several Stories, then replies thoughtfully the next morning.",
-    roastPhrase: "They clearly had time.",
-    toastPhrase: "A good reply can wait.",
-    roastPercentage: 56,
-    toastPercentage: 44,
+      "Someone repeatedly checks who viewed their Story, then pretends they do not care who is watching.",
+
+    roastPhrase:
+      "They care deeply.",
+
+    toastPhrase:
+      "Curiosity is normal.",
+
+    roastPercentage: 57,
+    toastPercentage: 43,
+
     topComment:
-      "Posting takes seconds. Emotional labor apparently needed office hours.",
+      "The viewer list has been audited three times today.",
   },
+
   {
     id: "social-017",
     category: "Social Media",
+
     question:
-      "Someone posts gym progress every week because public accountability keeps them consistent.",
-    roastPhrase: "Not every workout needs witnesses.",
-    toastPhrase: "Whatever keeps them motivated.",
-    roastPercentage: 39,
-    toastPercentage: 61,
+      "A person gives relationship advice online while quietly staying in the exact situation they warn everyone else about.",
+
+    roastPhrase:
+      "The advice needs a home visit.",
+
+    toastPhrase:
+      "Good advice can come from experience.",
+
+    roastPercentage: 63,
+    toastPercentage: 37,
+
     topComment:
-      "Slightly annoying and undeniably committed.",
+      "They know the lesson. They just have not submitted the homework.",
   },
+
   {
     id: "social-018",
     category: "Social Media",
+
     question:
-      "Someone takes one quick picture of their meal before everyone starts eating.",
-    roastPhrase: "The food is getting cold.",
-    toastPhrase: "One picture is harmless.",
-    roastPercentage: 31,
-    toastPercentage: 69,
+      "Someone sends you a meme instead of responding to the serious message you sent before it.",
+
+    roastPhrase:
+      "Answer the actual message.",
+
+    toastPhrase:
+      "Maybe they are easing into it.",
+
+    roastPercentage: 74,
+    toastPercentage: 26,
+
     topComment:
-      "A five-second photoshoot is not a production delay.",
+      "The meme was funny. The emotional avoidance was louder.",
   },
+
   {
     id: "social-019",
     category: "Social Media",
+
     question:
-      "Someone sends you a TikTok because it explains their feelings better than they can.",
-    roastPhrase: "Use your own words.",
-    toastPhrase: "The message still counts.",
-    roastPercentage: 45,
-    toastPercentage: 55,
+      "A friend never comments on your work but suddenly asks for a discount once your project starts getting attention.",
+
+    roastPhrase:
+      "Support was available earlier.",
+
+    toastPhrase:
+      "Friends ask friends.",
+
+    roastPercentage: 88,
+    toastPercentage: 12,
+
     topComment:
-      "Therapy language, but delivered by the algorithm.",
+      "They skipped the support phase and arrived directly at the benefits.",
   },
+
   {
     id: "social-020",
     category: "Social Media",
+
     question:
-      "Someone puts their phone away while hanging out but takes a few pictures before everyone leaves.",
-    roastPhrase: "The night did not need documentation.",
-    toastPhrase: "That is a healthy balance.",
-    roastPercentage: 19,
-    toastPercentage: 81,
+      "Someone tells you not to care what people think, but edits every post for hours before sharing it.",
+
+    roastPhrase:
+      "The advice is aspirational.",
+
+    toastPhrase:
+      "Presentation still matters.",
+
+    roastPercentage: 54,
+    toastPercentage: 46,
+
     topComment:
-      "Present during the night, documented before the goodbye. Ideal.",
+      "They do not care what people think after the seventh draft.",
   },
 ];
