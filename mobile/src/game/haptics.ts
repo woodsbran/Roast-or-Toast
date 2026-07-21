@@ -2,15 +2,19 @@
 // File: haptics.ts
 //
 // Purpose:
-// Centralizes every vibration used throughout Roast or
-// Toast.
+// Centralizes every haptic pattern used throughout
+// Roast or Toast.
 //
 // Instead of calling Expo Haptics directly throughout
-// the app, every screen calls one of these helper
-// functions.
+// the app, every screen calls one of these helpers.
 //
-// This keeps gameplay code cleaner and makes it easy to
-// adjust the feel of the game later.
+// These patterns use small pauses between taps so Roast,
+// Toast, correct guesses, and level-ups each feel
+// noticeably different on a physical iPhone.
+//
+// Important:
+// iOS haptics feel like short Taptic Engine taps rather
+// than a long Android-style vibration.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -18,20 +22,75 @@
 import * as Haptics from "expo-haptics";
 
 // =====================================================
+// Timing Helper
+// =====================================================
+
+// Adds a small pause between taps in a haptic pattern.
+function wait(
+  durationInMilliseconds: number,
+): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(
+      resolve,
+      durationInMilliseconds,
+    );
+  });
+}
+
+// =====================================================
+// Safe Haptic Runner
+// =====================================================
+
+// Haptics should never crash gameplay.
+//
+// If the device cannot perform a requested pattern, the
+// error is logged during development and the game keeps
+// running normally.
+async function safelyRunHaptic(
+  hapticAction: () => Promise<void>,
+): Promise<void> {
+  try {
+    await hapticAction();
+  } catch (error) {
+    console.warn(
+      "Unable to play haptic feedback:",
+      error,
+    );
+  }
+}
+
+// =====================================================
 // Regular Votes
 // =====================================================
 
-// Roast should feel stronger.
-export async function playRoastHaptic() {
-  await Haptics.impactAsync(
-    Haptics.ImpactFeedbackStyle.Medium,
+// Roast receives one strong, decisive impact.
+export async function playRoastHaptic(): Promise<void> {
+  await safelyRunHaptic(
+    async () => {
+      await Haptics.impactAsync(
+        Haptics.ImpactFeedbackStyle.Heavy,
+      );
+    },
   );
 }
 
-// Toast is softer.
-export async function playToastHaptic() {
-  await Haptics.impactAsync(
-    Haptics.ImpactFeedbackStyle.Light,
+// Toast receives two lighter taps.
+//
+// This gives Toast a warmer and more playful feel without
+// making it as forceful as Roast.
+export async function playToastHaptic(): Promise<void> {
+  await safelyRunHaptic(
+    async () => {
+      await Haptics.impactAsync(
+        Haptics.ImpactFeedbackStyle.Light,
+      );
+
+      await wait(85);
+
+      await Haptics.impactAsync(
+        Haptics.ImpactFeedbackStyle.Medium,
+      );
+    },
   );
 }
 
@@ -39,17 +98,35 @@ export async function playToastHaptic() {
 // Guess the Crowd
 // =====================================================
 
-// Correct prediction.
-export async function playCrowdCorrectHaptic() {
-  await Haptics.notificationAsync(
-    Haptics.NotificationFeedbackType.Success,
+// Correct prediction gets a success notification followed
+// by a small celebratory tap.
+export async function playCrowdCorrectHaptic(): Promise<void> {
+  await safelyRunHaptic(
+    async () => {
+      await Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Success,
+      );
+
+      await wait(110);
+
+      await Haptics.impactAsync(
+        Haptics.ImpactFeedbackStyle.Light,
+      );
+    },
   );
 }
 
-// Incorrect prediction.
-export async function playCrowdWrongHaptic() {
-  await Haptics.notificationAsync(
-    Haptics.NotificationFeedbackType.Warning,
+// Incorrect prediction gets a warning pattern.
+//
+// We keep this noticeable but not harsh because guessing
+// incorrectly should still feel playful.
+export async function playCrowdWrongHaptic(): Promise<void> {
+  await safelyRunHaptic(
+    async () => {
+      await Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Warning,
+      );
+    },
   );
 }
 
@@ -57,10 +134,29 @@ export async function playCrowdWrongHaptic() {
 // Heat / Leveling
 // =====================================================
 
-// Leveling up should feel exciting.
-export async function playLevelUpHaptic() {
-  await Haptics.notificationAsync(
-    Haptics.NotificationFeedbackType.Success,
+// Leveling up gets the largest celebration pattern.
+//
+// The pattern rises from light to medium to heavy so the
+// player can feel that something special happened.
+export async function playLevelUpHaptic(): Promise<void> {
+  await safelyRunHaptic(
+    async () => {
+      await Haptics.impactAsync(
+        Haptics.ImpactFeedbackStyle.Light,
+      );
+
+      await wait(90);
+
+      await Haptics.impactAsync(
+        Haptics.ImpactFeedbackStyle.Medium,
+      );
+
+      await wait(100);
+
+      await Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Success,
+      );
+    },
   );
 }
 
@@ -68,7 +164,38 @@ export async function playLevelUpHaptic() {
 // Navigation
 // =====================================================
 
-// Small tap used for Next and Continue.
-export async function playNavigationHaptic() {
-  await Haptics.selectionAsync();
+// Small tap used for Next, Continue, Back, and Home.
+//
+// Navigation should feel responsive without becoming
+// distracting during a full round.
+export async function playNavigationHaptic(): Promise<void> {
+  await safelyRunHaptic(
+    async () => {
+      await Haptics.selectionAsync();
+    },
+  );
+}
+
+// =====================================================
+// Settings Preview
+// =====================================================
+
+// Lets the Settings screen immediately demonstrate that
+// haptics were turned on.
+//
+// We will connect this during the next settings update.
+export async function playHapticsEnabledPreview(): Promise<void> {
+  await safelyRunHaptic(
+    async () => {
+      await Haptics.impactAsync(
+        Haptics.ImpactFeedbackStyle.Medium,
+      );
+
+      await wait(80);
+
+      await Haptics.impactAsync(
+        Haptics.ImpactFeedbackStyle.Light,
+      );
+    },
+  );
 }

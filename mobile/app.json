@@ -38,7 +38,8 @@
           "imageWidth": 300,
           "resizeMode": "contain"
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,

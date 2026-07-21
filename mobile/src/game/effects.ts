@@ -2,20 +2,8 @@
 // File: effects.ts
 //
 // Purpose:
-// Coordinates feedback effects used throughout
+// Coordinates haptic and sound feedback used throughout
 // Roast or Toast.
-//
-// Current Effects:
-// • Haptics
-//
-// Every haptic checks the player's local Settings before
-// running.
-//
-// Future Effects:
-// • Sounds
-// • Floating Heat animations
-// • Confetti
-// • Fire and heart particles
 //
 // Project: Roast or Toast
 // =====================================================
@@ -23,6 +11,7 @@
 import {
   playCrowdCorrectHaptic,
   playCrowdWrongHaptic,
+  playHapticsEnabledPreview,
   playLevelUpHaptic,
   playNavigationHaptic,
   playRoastHaptic,
@@ -30,82 +19,93 @@ import {
 } from "./haptics";
 
 import {
+  playLevelUpSound,
+  playNavigationSound,
+  playRevealSound,
+  playRoastSound,
+  playSuccessSound,
+  playToastSound,
+  playWarningSound,
+} from "./sounds";
+
+import {
   areHapticsEnabled,
+  areSoundEffectsEnabled,
 } from "./settingsStorage";
 
-// Runs one haptic only when the player has haptics
-// enabled in Settings.
 async function runHaptic(
   hapticFunction: () => Promise<void>,
 ): Promise<void> {
-  const hapticsEnabled =
-    await areHapticsEnabled();
-
-  if (!hapticsEnabled) {
-    return;
+  try {
+    if (await areHapticsEnabled()) {
+      await hapticFunction();
+    }
+  } catch (error) {
+    console.warn("Unable to run haptic effect:", error);
   }
-
-  await hapticFunction();
 }
 
-// =====================================================
-// Vote Effects
-// =====================================================
+async function runSound(
+  soundFunction: () => Promise<void>,
+): Promise<void> {
+  try {
+    if (await areSoundEffectsEnabled()) {
+      await soundFunction();
+    }
+  } catch (error) {
+    console.warn("Unable to run sound effect:", error);
+  }
+}
+
+function runFeedback(
+  hapticFunction: () => Promise<void>,
+  soundFunction: () => Promise<void>,
+): void {
+  void Promise.all([
+    runHaptic(hapticFunction),
+    runSound(soundFunction),
+  ]);
+}
 
 export function triggerRoastEffect(): void {
-  void runHaptic(
-    playRoastHaptic,
-  );
+  runFeedback(playRoastHaptic, playRoastSound);
 }
 
 export function triggerToastEffect(): void {
-  void runHaptic(
-    playToastHaptic,
-  );
+  runFeedback(playToastHaptic, playToastSound);
 }
 
-// =====================================================
-// Guess the Crowd Effects
-// =====================================================
-
 export function triggerCrowdPredictionEffect(): void {
-  void runHaptic(
-    playNavigationHaptic,
-  );
+  runFeedback(playNavigationHaptic, playNavigationSound);
 }
 
 export function triggerCrowdResultEffect(
   guessedCorrectly: boolean,
 ): void {
   if (guessedCorrectly) {
-    void runHaptic(
-      playCrowdCorrectHaptic,
-    );
-
+    runFeedback(playCrowdCorrectHaptic, playSuccessSound);
     return;
   }
 
-  void runHaptic(
-    playCrowdWrongHaptic,
-  );
+  runFeedback(playCrowdWrongHaptic, playWarningSound);
 }
-
-// =====================================================
-// Level Effects
-// =====================================================
 
 export function triggerLevelUpEffect(): void {
-  void runHaptic(
-    playLevelUpHaptic,
-  );
+  runFeedback(playLevelUpHaptic, playLevelUpSound);
 }
 
-// =====================================================
-// Navigation Effects
-// =====================================================
-
 export function triggerNavigationEffect(): void {
-  void runHaptic(
-    playNavigationHaptic,
-  );
+  runFeedback(playNavigationHaptic, playNavigationSound);
+}
+
+export function triggerRevealEffect(): void {
+  void runSound(playRevealSound);
+}
+
+export function triggerHapticsPreview(): void {
+  void playHapticsEnabledPreview();
+}
+
+export function triggerSoundPreview(): void {
+  void playToastSound();
 }

@@ -9,6 +9,7 @@
 //
 // Current Controls:
 // • Turn haptics on or off
+// • Turn sound effects on or off
 // • Clear recently seen Moment history
 // • Reset all player data and daily streak
 // • View app version and local-storage information
@@ -56,6 +57,11 @@ import {
 } from "../game/recentMomentsStorage";
 
 import {
+  triggerHapticsPreview,
+  triggerSoundPreview,
+} from "../game/effects";
+
+import {
   createDefaultSettings,
   loadAppSettings,
   saveAppSettings,
@@ -71,6 +77,11 @@ export default function SettingsScreen() {
   const [
     hapticsEnabled,
     setHapticsEnabledState,
+  ] = useState(true);
+
+  const [
+    soundEffectsEnabled,
+    setSoundEffectsEnabledState,
   ] = useState(true);
 
   const [
@@ -105,6 +116,10 @@ export default function SettingsScreen() {
 
         setHapticsEnabledState(
           savedSettings.hapticsEnabled,
+        );
+
+        setSoundEffectsEnabledState(
+          savedSettings.soundEffectsEnabled,
         );
 
         setHasLoadedSettings(true);
@@ -145,6 +160,32 @@ export default function SettingsScreen() {
         hapticsEnabled:
           enabled,
       });
+
+      if (enabled) {
+        triggerHapticsPreview();
+      }
+    };
+
+  // =====================================================
+  // Sound Effects
+  // =====================================================
+
+  const handleSoundEffectsChange =
+    async (
+      enabled: boolean,
+    ) => {
+      setSoundEffectsEnabledState(
+        enabled,
+      );
+
+      await saveAppSettings({
+        soundEffectsEnabled:
+          enabled,
+      });
+
+      if (enabled) {
+        triggerSoundPreview();
+      }
     };
 
   // =====================================================
@@ -214,6 +255,10 @@ export default function SettingsScreen() {
                 );
 
                 setHapticsEnabledState(
+                  true,
+                );
+
+                setSoundEffectsEnabledState(
                   true,
                 );
 
@@ -365,6 +410,47 @@ export default function SettingsScreen() {
               thumbColor={
                 hapticsEnabled
                   ? Colors.roast
+                  : "#F5F5F5"
+              }
+              ios_backgroundColor="#D4D1CD"
+            />
+          </View>
+
+          <View style={styles.settingDivider} />
+
+          <View style={styles.settingRow}>
+            <View style={styles.soundSettingIcon}>
+              <Ionicons
+                name="volume-high-outline"
+                size={21}
+                color={Colors.toast}
+              />
+            </View>
+
+            <View style={styles.settingText}>
+              <Text style={styles.settingTitle}>
+                Sound Effects
+              </Text>
+
+              <Text style={styles.settingDescription}>
+                Play short sounds for votes, results, and level-ups.
+              </Text>
+            </View>
+
+            <Switch
+              value={soundEffectsEnabled}
+              onValueChange={(enabled) => {
+                void handleSoundEffectsChange(
+                  enabled,
+                );
+              }}
+              trackColor={{
+                false: "#D4D1CD",
+                true: "#A9DDD2",
+              }}
+              thumbColor={
+                soundEffectsEnabled
+                  ? Colors.toast
                   : "#F5F5F5"
               }
               ios_backgroundColor="#D4D1CD"
@@ -695,6 +781,30 @@ const styles = StyleSheet.create({
 
   settingEmoji: {
     fontSize: 21,
+  },
+
+  soundSettingIcon: {
+    width: 43,
+    height: 43,
+
+    backgroundColor:
+      "#EAF8F5",
+
+    borderRadius: 22,
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    marginRight: 12,
+  },
+
+  settingDivider: {
+    height: 1,
+
+    backgroundColor:
+      Colors.border,
+
+    marginVertical: 15,
   },
 
   settingText: {

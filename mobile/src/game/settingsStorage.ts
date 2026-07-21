@@ -6,52 +6,45 @@
 //
 // Current Settings:
 // • Haptics enabled or disabled
-//
-// More preferences such as sound and notifications can
-// be added here later.
+// • Sound effects enabled or disabled
 //
 // Project: Roast or Toast
 // =====================================================
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Unique storage key for local app settings.
 const SETTINGS_STORAGE_KEY =
   "@roast_or_toast/settings";
 
-// Complete locally stored settings object.
 export type AppSettings = {
   hapticsEnabled: boolean;
+  soundEffectsEnabled: boolean;
 };
 
-// Default settings for new players.
 export function createDefaultSettings(): AppSettings {
   return {
     hapticsEnabled: true,
+    soundEffectsEnabled: true,
   };
 }
 
-// Ensures incomplete or older saved settings still
-// contain every current property.
 function normalizeSettings(
   savedSettings: Partial<AppSettings>,
 ): AppSettings {
   const defaults = createDefaultSettings();
 
   return {
-    ...defaults,
-    ...savedSettings,
-
     hapticsEnabled:
       typeof savedSettings.hapticsEnabled === "boolean"
         ? savedSettings.hapticsEnabled
         : defaults.hapticsEnabled,
+
+    soundEffectsEnabled:
+      typeof savedSettings.soundEffectsEnabled === "boolean"
+        ? savedSettings.soundEffectsEnabled
+        : defaults.soundEffectsEnabled,
   };
 }
-
-// =====================================================
-// Load Settings
-// =====================================================
 
 export async function loadAppSettings(): Promise<AppSettings> {
   try {
@@ -82,18 +75,18 @@ export async function loadAppSettings(): Promise<AppSettings> {
   }
 }
 
-// =====================================================
-// Save Settings
-// =====================================================
-
 export async function saveAppSettings(
-  settings: AppSettings,
+  settings: Partial<AppSettings>,
 ): Promise<void> {
   try {
+    const currentSettings =
+      await loadAppSettings();
+
     const normalizedSettings =
-      normalizeSettings(
-        settings,
-      );
+      normalizeSettings({
+        ...currentSettings,
+        ...settings,
+      });
 
     await AsyncStorage.setItem(
       SETTINGS_STORAGE_KEY,
@@ -109,27 +102,32 @@ export async function saveAppSettings(
   }
 }
 
-// =====================================================
-// Update Haptics
-// =====================================================
-
 export async function setHapticsEnabled(
   enabled: boolean,
 ): Promise<void> {
-  const currentSettings =
-    await loadAppSettings();
-
   await saveAppSettings({
-    ...currentSettings,
     hapticsEnabled: enabled,
   });
 }
 
-// Checks the setting before a gameplay effect attempts
-// to play any vibration feedback.
 export async function areHapticsEnabled(): Promise<boolean> {
   const settings =
     await loadAppSettings();
 
   return settings.hapticsEnabled;
+}
+
+export async function setSoundEffectsEnabled(
+  enabled: boolean,
+): Promise<void> {
+  await saveAppSettings({
+    soundEffectsEnabled: enabled,
+  });
+}
+
+export async function areSoundEffectsEnabled(): Promise<boolean> {
+  const settings =
+    await loadAppSettings();
+
+  return settings.soundEffectsEnabled;
 }
