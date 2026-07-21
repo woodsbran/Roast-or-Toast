@@ -3,19 +3,19 @@
 //
 // Purpose:
 // Keeps all short sound effects in one place so the
-// rest of the app doesn't need to know where audio
-// files are stored.
+// rest of the app does not need to know where the
+// audio files are stored.
 //
 // This file:
-// • Loads every sound once.
+// • Loads each sound file.
 // • Creates reusable audio players.
 // • Configures audio the first time a sound is played.
-// • Exposes simple helper functions like
-//   playRoastSound() and playToastSound().
+// • Exposes simple helper functions for the rest of
+//   the app to use.
 //
-// If a sound ever needs to be replaced, update the
-// filename below instead of changing code throughout
-// the app.
+// Navigation sounds were removed on purpose. Regular
+// menu and screen taps now use haptics only so the app
+// feels cleaner and less noisy.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -26,13 +26,15 @@ import {
 } from "expo-audio";
 
 // -----------------------------------------------------
-// Maps each sound name to its corresponding file in
+// Maps each sound name to the matching file inside
 // assets/sounds.
+//
+// These are the only sound files currently used by
+// the app.
 // -----------------------------------------------------
 const soundSources = {
   roast: require("../../assets/sounds/roast.mp3"),
   toast: require("../../assets/sounds/toast.mp3"),
-  navigation: require("../../assets/sounds/navigation.wav"),
   reveal: require("../../assets/sounds/reveal.mp3"),
   success: require("../../assets/sounds/correct.mp3"),
   warning: require("../../assets/sounds/wrong.mp3"),
@@ -40,14 +42,15 @@ const soundSources = {
 };
 
 // -----------------------------------------------------
-// Create each audio player once when the app starts.
-// Reusing the same player is much faster than creating
-// a new one every time a sound is played.
+// Creates one reusable player for each sound.
+//
+// Reusing the same players keeps the code simple and
+// avoids rebuilding a new audio player every time a
+// sound effect is triggered.
 // -----------------------------------------------------
 const soundPlayers = {
   roast: createAudioPlayer(soundSources.roast),
   toast: createAudioPlayer(soundSources.toast),
-  navigation: createAudioPlayer(soundSources.navigation),
   reveal: createAudioPlayer(soundSources.reveal),
   success: createAudioPlayer(soundSources.success),
   warning: createAudioPlayer(soundSources.warning),
@@ -55,17 +58,17 @@ const soundPlayers = {
 };
 
 // -----------------------------------------------------
-// Audio settings only need to be configured once while
-// the app is running.
+// Audio only needs to be configured once while the
+// app is open.
 // -----------------------------------------------------
 let hasConfiguredAudio = false;
 
 // -----------------------------------------------------
-// Configure the audio session the first time a sound
-// is played.
+// Configures the app's audio session the first time
+// any sound is played.
 //
-// This prevents repeating the same setup work every
-// time another sound effect is triggered.
+// Sounds respect the phone's silent mode and do not
+// continue playing in the background.
 // -----------------------------------------------------
 async function configureAudioOnce(): Promise<void> {
   if (hasConfiguredAudio) {
@@ -81,13 +84,16 @@ async function configureAudioOnce(): Promise<void> {
   hasConfiguredAudio = true;
 }
 
+// This type automatically stays in sync with the keys
+// inside soundPlayers.
 type SoundName = keyof typeof soundPlayers;
 
 // -----------------------------------------------------
-// Generic helper used by every sound effect.
+// Shared helper used by every sound function.
 //
-// Before playing, rewind the sound back to the
-// beginning so rapid taps always play from the start.
+// The player is moved back to the beginning before it
+// plays so the same effect can be triggered again
+// without waiting for the previous playback position.
 // -----------------------------------------------------
 async function playSound(
   soundName: SoundName,
@@ -110,9 +116,8 @@ async function playSound(
 // -----------------------------------------------------
 // Public sound helpers.
 //
-// The rest of the app should call these functions
-// instead of interacting with the audio players
-// directly.
+// The rest of the app should use these functions
+// instead of accessing the sound players directly.
 // -----------------------------------------------------
 
 export async function playRoastSound(): Promise<void> {
@@ -121,10 +126,6 @@ export async function playRoastSound(): Promise<void> {
 
 export async function playToastSound(): Promise<void> {
   await playSound("toast");
-}
-
-export async function playNavigationSound(): Promise<void> {
-  await playSound("navigation");
 }
 
 export async function playRevealSound(): Promise<void> {
