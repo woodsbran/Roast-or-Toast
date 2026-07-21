@@ -2,8 +2,20 @@
 // File: sounds.ts
 //
 // Purpose:
-// Centralizes short sound effects used throughout
-// Roast or Toast.
+// Keeps all short sound effects in one place so the
+// rest of the app doesn't need to know where audio
+// files are stored.
+//
+// This file:
+// • Loads every sound once.
+// • Creates reusable audio players.
+// • Configures audio the first time a sound is played.
+// • Exposes simple helper functions like
+//   playRoastSound() and playToastSound().
+//
+// If a sound ever needs to be replaced, update the
+// filename below instead of changing code throughout
+// the app.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -13,16 +25,25 @@ import {
   setAudioModeAsync,
 } from "expo-audio";
 
+// -----------------------------------------------------
+// Maps each sound name to its corresponding file in
+// assets/sounds.
+// -----------------------------------------------------
 const soundSources = {
-  roast: require("../../assets/sounds/roast.wav"),
-  toast: require("../../assets/sounds/toast.wav"),
+  roast: require("../../assets/sounds/roast.mp3"),
+  toast: require("../../assets/sounds/toast.mp3"),
   navigation: require("../../assets/sounds/navigation.wav"),
-  reveal: require("../../assets/sounds/reveal.wav"),
-  success: require("../../assets/sounds/success.wav"),
-  warning: require("../../assets/sounds/warning.wav"),
-  levelUp: require("../../assets/sounds/level-up.wav"),
+  reveal: require("../../assets/sounds/reveal.mp3"),
+  success: require("../../assets/sounds/correct.mp3"),
+  warning: require("../../assets/sounds/wrong.mp3"),
+  levelUp: require("../../assets/sounds/level-up.mp3"),
 };
 
+// -----------------------------------------------------
+// Create each audio player once when the app starts.
+// Reusing the same player is much faster than creating
+// a new one every time a sound is played.
+// -----------------------------------------------------
 const soundPlayers = {
   roast: createAudioPlayer(soundSources.roast),
   toast: createAudioPlayer(soundSources.toast),
@@ -33,8 +54,19 @@ const soundPlayers = {
   levelUp: createAudioPlayer(soundSources.levelUp),
 };
 
+// -----------------------------------------------------
+// Audio settings only need to be configured once while
+// the app is running.
+// -----------------------------------------------------
 let hasConfiguredAudio = false;
 
+// -----------------------------------------------------
+// Configure the audio session the first time a sound
+// is played.
+//
+// This prevents repeating the same setup work every
+// time another sound effect is triggered.
+// -----------------------------------------------------
 async function configureAudioOnce(): Promise<void> {
   if (hasConfiguredAudio) {
     return;
@@ -51,6 +83,12 @@ async function configureAudioOnce(): Promise<void> {
 
 type SoundName = keyof typeof soundPlayers;
 
+// -----------------------------------------------------
+// Generic helper used by every sound effect.
+//
+// Before playing, rewind the sound back to the
+// beginning so rapid taps always play from the start.
+// -----------------------------------------------------
 async function playSound(
   soundName: SoundName,
 ): Promise<void> {
@@ -68,6 +106,14 @@ async function playSound(
     );
   }
 }
+
+// -----------------------------------------------------
+// Public sound helpers.
+//
+// The rest of the app should call these functions
+// instead of interacting with the audio players
+// directly.
+// -----------------------------------------------------
 
 export async function playRoastSound(): Promise<void> {
   await playSound("roast");
