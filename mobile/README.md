@@ -1,56 +1,219 @@
-# Welcome to your Expo app 👋
+# 🔥 Roast or Toast
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> **The game of hot takes.**
 
-## Get started
+Roast or Toast is a social opinion game for iPhone where players react to funny, relatable, and unexpected everyday situations.
 
-1. Install dependencies
+Read the moment, make your choice, and decide:
 
-   ```bash
-   npm install
-   ```
+# 🔥 Roast or ❤️ Toast?
 
-2. Start the app
+Players can also test how well they understand popular opinion in **Guess the Crowd**, earn Heat, build streaks, unlock titles, and track their hottest takes.
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+# 📱 App Status
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+**Version:** 1.0
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+**Platform:** iPhone
 
-## Get a fresh project
+**Status:** Submitted to the Apple App Store for review
 
-When you're ready, run:
+**Release:** Manual release after Apple approval
 
-```bash
-npm run reset-project
+---
+
+# ✨ Features
+
+## Core Gameplay
+
+- 🔥 Roast or Toast voting
+- 👥 Guess the Crowd mode
+- 🎯 Multiple game lengths
+- 📂 Scenario categories
+- 🎉 Mid-game breaks
+- 📊 Results after every round
+
+## Progression
+
+- 🌡️ Heat XP system
+- 🏆 Unlockable titles
+- 📅 Daily streak tracking
+- 📈 Lifetime statistics
+- 📝 Recent response history
+
+## Experience
+
+- 📳 Haptic feedback
+- 🔊 Sound effects
+- 🎨 Premium Apple-inspired interface
+- ⚡ Fast offline gameplay
+- 💾 Local progress saving
+
+---
+
+# 🎮 How It Works
+
+Players are shown relatable everyday situations and answer one simple question:
+
+## 🔥 Roast
+
+or
+
+## ❤️ Toast
+
+Example:
+
+> Your coworker hits **Reply All** just to say "Thanks."
+
+Would you Roast it or Toast it?
+
+Players can also play **Guess the Crowd**, predicting how everyone else voted before seeing the results.
+
+---
+
+# 🌡️ Progression System
+
+Players earn **Heat** by playing games and making correct predictions.
+
+Heat unlocks:
+
+- New levels
+- Player titles
+- Lifetime milestones
+- Daily streak progress
+
+All player progress is stored locally on the device.
+
+---
+
+# 🛠 Tech Stack
+
+Built with:
+
+- React Native
+- Expo
+- Expo Router
+- TypeScript
+- React
+- AsyncStorage
+- EAS Build
+- TestFlight
+- App Store Connect
+
+Version 1.0 intentionally does **not** use:
+
+- Backend server
+- User accounts
+- Cloud database
+- Third-party analytics
+- Advertising SDKs
+- In-app purchases
+
+---
+
+# 📂 Project Structure
+
+```text
+Roast-or-Toast/
+│
+├── docs/
+│   ├── Product documentation
+│   ├── MVP definition
+│   ├── User stories
+│   └── Product requirements
+│
+├── mobile/
+│   ├── assets/
+│   ├── ios/
+│   ├── scripts/
+│   ├── src/
+│   └── React Native application
+│
+├── README.md
+└── .gitignore
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-### Other setup steps
+# 📚 Documentation
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+The **docs** folder contains project planning and product documentation.
 
-## Learn more
+| Document | Purpose |
+|----------|----------|
+| 00_Project_Status.md | Current project progress |
+| 01_Product_Bible.md | Product vision and principles |
+| 02_MVP_Definition.md | MVP scope |
+| 03_Product_Requirements_Document.md | Functional requirements |
+| 04_User_Stories.md | User stories |
 
-To learn more about developing your project with Expo, look at the following resources:
+Some documentation contains future ideas beyond Version 1.0.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+# 🚀 Roadmap
 
-Join our community of developers creating universal apps.
+Future updates may include:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- More scenarios
+- Additional categories
+- Expanded Guess the Crowd
+- Community-submitted moments
+- More unlockable titles
+- Better celebrations and sound effects
+- Accessibility improvements
+- Premium content
+- Additional party game modes
+
+The roadmap is subject to change based on player feedback.
+
+---
+
+# 🔒 Privacy
+
+Roast or Toast does **not** require an account.
+
+The app does **not** collect personal information.
+
+Player progress, Heat, streaks, settings, titles, and statistics are stored locally using AsyncStorage.
+
+Privacy Policy:
+
+https://woodsbran.github.io/roast-or-toast-site/privacy.html
+
+---
+
+# 🌐 Website
+
+https://woodsbran.github.io/roast-or-toast-site/
+
+---
+
+# 📧 Support
+
+b_woods20@icloud.com
+
+---
+
+# 👨🏽‍💻 Developer
+
+Created and developed by **Branden Woods**.
+
+Roast or Toast represents the complete product lifecycle:
+
+- Product planning
+- UX/UI design
+- React Native development
+- Testing with TestFlight
+- App Store submission
+- Ongoing product iteration based on user feedback
+
+---
+
+# 📄 License
+
+Copyright © 2026 Branden Woods.
+
+All rights reserved.
