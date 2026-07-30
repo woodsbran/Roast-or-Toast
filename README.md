@@ -1,32 +1,68 @@
 # 🔥 Roast or Toast
 
-> **The funniest place on the internet to settle everyday debates.**
+> **The game of hot takes.**
 
-Roast or Toast is a social mobile game where players vote on relatable everyday situations by answering one simple question:
+Roast or Toast is a social opinion game for iPhone where players react to funny, relatable, and unexpected everyday situations.
+
+Every round begins with one question:
 
 # 🔥 Roast or ❤️ Toast?
 
-Read a scenario.
-
-Cast your vote.
-
-See how everyone else voted.
-
-Laugh at the comments.
-
-Repeat.
+Cast your vote, predict what everyone else chose in **Guess the Crowd**, earn Heat, unlock titles, and see how your opinions stack up.
 
 ---
 
-## 🎯 Mission
+# 📱 App Status
 
-Create the funniest place on the internet to settle everyday debates.
+**Version:** 1.0
+
+**Platform:** iPhone
+
+**Status:** ✅ Approved by Apple
+
+**Release:** Ready for manual release on the App Store
 
 ---
 
-## 📱 What is Roast or Toast?
+# ✨ Features
 
-Roast or Toast transforms everyday moments into quick, social experiences.
+## Core Gameplay
+
+- 🔥 Roast or Toast voting
+- 👥 Guess the Crowd
+- 🎯 Multiple game lengths
+- 📂 Scenario categories
+- 🎉 Mid-game breaks
+- 📊 Community results after every round
+
+---
+
+## Player Progression
+
+- 🌡️ Heat XP
+- 🏆 Unlockable titles
+- 📅 Daily streaks
+- 📈 Lifetime statistics
+- 📝 Recent response history
+
+---
+
+## Experience
+
+- 📳 Haptic feedback
+- 🔊 Sound effects
+- 🎨 Premium Apple-inspired interface
+- ⚡ Fast gameplay
+- 💾 Local game saves
+- 🚫 No login required
+- 🚫 No advertisements
+- 🚫 No user tracking
+
+---
+
+# 🎮 How It Works
+
+Players are presented with relatable everyday situations.
 
 Example:
 
@@ -34,100 +70,159 @@ Example:
 
 Do you...
 
-🔥 **Roast**
+🔥 Roast
 
 or
 
-❤️ **Toast**
+❤️ Toast
 
-After voting, players instantly see community results and the funniest comments from other players.
-
----
-
-## ✨ Core Features
-
-- 🔥 Roast or Toast voting
-- 📊 Live community results
-- 💬 Funny comments
-- 📅 Daily scenarios
-- 🔥 Daily streaks
-- 👤 User profiles
-- 🏆 Leaderboards
-- ✍️ Submit your own scenarios
-- 📂 Scenario categories
+Then predict how everyone else voted in **Guess the Crowd** and see whether your instincts were right.
 
 ---
 
-## 🎮 Long-Term Vision
+# 🌡️ Progression
 
-Roast or Toast is designed to grow beyond a mobile app.
+Players earn **Heat** while playing.
 
-Future plans include:
+Heat unlocks:
 
-- 🎉 Party Mode
-- 👥 Private rooms
-- 🤝 Friends
-- 🏅 Achievements
-- 🎯 Daily challenges
-- 🎨 Profile customization
-- 🤖 AI-assisted scenario creation
-- 📱 Social sharing
-- 📦 Creator scenario packs
+- New Levels
+- Player Titles
+- Daily Streak Progress
+- Lifetime Statistics
+
+Everything is stored locally on the player's device.
 
 ---
 
-## 📚 Documentation
+# 🛠 Technology
 
-Project documentation can be found in the **docs** folder.
+Built with:
 
-| Document | Description |
-|----------|-------------|
-| Product Bible | Vision, mission, principles, and long-term goals |
-| Product Requirements Document | Complete product specification |
-| User Stories | Functional requirements from the user's perspective |
-| User Flows | Screen-to-screen navigation |
-| Technical Architecture | System design and technology stack |
-| Database Schema | Data models and relationships |
-| Design System | UI components, colors, typography, and branding |
-| Roadmap | Development milestones |
-| Monetization Plan | Business model and revenue strategy |
-| Launch Plan | Beta testing and App Store launch |
-
----
-
-## 🛠 Tech Stack
-
-*Coming soon.*
-
-The MVP is expected to use:
-
-- React Native (Expo)
+- React Native
+- Expo
+- Expo Router
 - TypeScript
-- Supabase
-- PostgreSQL
-- GitHub Actions
-- RevenueCat
-- Firebase Analytics
-- OneSignal
+- React
+- AsyncStorage
+- EAS Build
+- TestFlight
+- App Store Connect
+
+Version 1.0 intentionally does **not** use:
+
+- Backend servers
+- User accounts
+- Cloud databases
+- Third-party analytics
+- Advertising SDKs
+- In-App Purchases
 
 ---
 
-## 🚀 Current Status
+# 📂 Project Structure
 
-**Stage:** Product Planning
+```text
+Roast-or-Toast/
 
-Current focus:
-
-- ✅ Product vision
-- 🚧 Documentation
-- ⏳ Wireframes
-- ⏳ UI/UX design
-- ⏳ MVP development
+├── docs/
+│   ├── Product documentation
+│   ├── MVP definition
+│   ├── User stories
+│   └── Product requirements
+│
+├── mobile/
+│   ├── assets/
+│   ├── ios/
+│   ├── scripts/
+│   ├── src/
+│   └── React Native application
+│
+├── README.md
+└── .gitignore
+```
 
 ---
 
-## 📄 License
+# 📚 Documentation
 
-This project is currently private.
+The **docs** folder contains planning and product documentation.
 
-© 2026 Branden Woods. All rights reserved.
+| Document | Purpose |
+|----------|----------|
+| 00_Project_Status.md | Current project progress |
+| 01_Product_Bible.md | Product vision |
+| 02_MVP_Definition.md | MVP scope |
+| 03_Product_Requirements_Document.md | Functional requirements |
+| 04_User_Stories.md | User stories |
+
+Some documentation contains ideas planned for future releases.
+
+---
+
+# 🚀 Roadmap
+
+Future updates may include:
+
+- More scenarios
+- Additional categories
+- Friend challenges
+- Player profiles
+- Community submitted moments
+- Expanded Guess the Crowd
+- Better celebrations
+- Accessibility improvements
+- Premium content
+- Party modes
+
+Roadmap items are subject to change based on player feedback.
+
+---
+
+# 🔒 Privacy
+
+Roast or Toast does not require an account.
+
+The app does not collect personal information.
+
+Player progress, Heat, streaks, titles, settings, and statistics are stored locally using AsyncStorage.
+
+Privacy Policy
+
+https://woodsbran.github.io/roast-or-toast-site/privacy.html
+
+---
+
+# 🌐 Website
+
+https://woodsbran.github.io/roast-or-toast-site/
+
+---
+
+# 📧 Support
+
+b_woods20@icloud.com
+
+---
+
+# 👨🏽‍💻 Developer
+
+Created and developed by **Branden Woods**.
+
+Roast or Toast represents the complete product lifecycle:
+
+- Product planning
+- UX/UI design
+- React Native development
+- Beta testing
+- TestFlight distribution
+- App Store approval
+- Continuous iteration based on player feedback
+
+---
+
+# 📄 License
+
+Copyright © 2026 Branden Woods.
+
+All rights reserved.
