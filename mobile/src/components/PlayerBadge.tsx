@@ -4,14 +4,16 @@
 // Purpose:
 // Displays the player's current Roast or Toast identity.
 //
+// Version 1.1:
+// • Uses the custom Ember Spark for progression
+// • Heat now has its own orange color system
+// • Roast coral is reserved for Roast gameplay
+//
 // The badge shows:
 // • Current title
 // • Current level
-// • Animated progress toward the next level
+// • Progress toward the next level
 // • Current majority-match streak
-//
-// Heat remains compact so the gameplay screen does not
-// feel crowded.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -42,7 +44,8 @@ import {
   Radius,
 } from "../theme";
 
-// Information required by the player badge.
+import HeatMark from "./HeatMark";
+
 type PlayerBadgeProps = {
   progress: PlayerProgress;
 };
@@ -50,31 +53,31 @@ type PlayerBadgeProps = {
 export default function PlayerBadge({
   progress,
 }: PlayerBadgeProps) {
-  // Gets the personality title associated with the
-  // player's current level.
   const playerTitle =
-    getPlayerTitle(progress.level);
+    getPlayerTitle(
+      progress.level,
+    );
 
-  // Prevents invalid progress values from producing a
-  // broken percentage.
-  const safeHeatRequirement = Math.max(
-    progress.heatForNextLevel,
-    1,
-  );
-
-  const levelProgressPercentage = Math.min(
+  const safeHeatRequirement =
     Math.max(
-      progress.currentLevelHeat /
-        safeHeatRequirement,
-      0,
-    ),
-    1,
-  );
+      progress.heatForNextLevel,
+      1,
+    );
 
-  // Controls the animated width of the level bar.
-  const progressAnimation = useRef(
-    new Animated.Value(0),
-  ).current;
+  const levelProgressPercentage =
+    Math.min(
+      Math.max(
+        progress.currentLevelHeat /
+          safeHeatRequirement,
+        0,
+      ),
+      1,
+    );
+
+  const progressAnimation =
+    useRef(
+      new Animated.Value(0),
+    ).current;
 
   useEffect(() => {
     Animated.timing(
@@ -98,7 +101,6 @@ export default function PlayerBadge({
     progressAnimation,
   ]);
 
-  // Converts the animated value into a percentage width.
   const animatedProgressWidth =
     progressAnimation.interpolate({
       inputRange: [0, 1],
@@ -110,67 +112,120 @@ export default function PlayerBadge({
     });
 
   return (
-    <View style={styles.container}>
-      {/* =================================================
-          Top Row
-      ================================================= */}
-
-      <View style={styles.topRow}>
-        {/* Player identity */}
-        <View style={styles.identityContainer}>
-          <View style={styles.iconContainer}>
-            <Text style={styles.heatIcon}>
-              🔥
-            </Text>
+    <View
+      style={
+        styles.container
+      }
+    >
+      <View
+        style={
+          styles.topRow
+        }
+      >
+        <View
+          style={
+            styles.identityContainer
+          }
+        >
+          <View
+            style={
+              styles.iconContainer
+            }
+          >
+            <HeatMark
+              size="small"
+            />
           </View>
 
-          <View style={styles.identityTextContainer}>
+          <View
+            style={
+              styles.identityTextContainer
+            }
+          >
             <Text
-              style={styles.title}
-              numberOfLines={1}
+              style={
+                styles.title
+              }
+              numberOfLines={
+                1
+              }
             >
               {playerTitle}
             </Text>
 
-            <Text style={styles.level}>
-              Level {progress.level}
+            <Text
+              style={
+                styles.level
+              }
+            >
+              Level{" "}
+              {progress.level}
             </Text>
           </View>
         </View>
 
-        {/* Current crowd-match streak */}
-        <View style={styles.streakContainer}>
-          <Text style={styles.streakNumber}>
-            {progress.currentStreak}
+        <View
+          style={
+            styles.streakContainer
+          }
+        >
+          <Text
+            style={
+              styles.streakNumber
+            }
+          >
+            {
+              progress.currentStreak
+            }
           </Text>
 
-          <Text style={styles.streakLabel}>
+          <Text
+            style={
+              styles.streakLabel
+            }
+          >
             streak
           </Text>
         </View>
       </View>
 
-      {/* =================================================
-          Level Progress
-      ================================================= */}
-
-      <View style={styles.progressHeader}>
-        <Text style={styles.progressLabel}>
+      <View
+        style={
+          styles.progressHeader
+        }
+      >
+        <Text
+          style={
+            styles.progressLabel
+          }
+        >
           NEXT LEVEL
         </Text>
 
-        <Text style={styles.progressAmount}>
-          {progress.currentLevelHeat}
+        <Text
+          style={
+            styles.progressAmount
+          }
+        >
+          {
+            progress.currentLevelHeat
+          }
           {" / "}
-          {progress.heatForNextLevel}
+          {
+            progress.heatForNextLevel
+          }
         </Text>
       </View>
 
-      {/* Progress track */}
-      <View style={styles.progressTrack}>
+      <View
+        style={
+          styles.progressTrack
+        }
+      >
         <Animated.View
           style={[
             styles.progressFill,
+
             {
               width:
                 animatedProgressWidth,
@@ -186,146 +241,152 @@ export default function PlayerBadge({
 // Styles
 // =====================================================
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.surface,
+const styles =
+  StyleSheet.create({
+    container: {
+      backgroundColor:
+        Colors.surface,
 
-    borderColor: Colors.border,
-    borderWidth: 1,
-    borderRadius: Radius.lg,
+      borderColor:
+        Colors.border,
 
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+      borderWidth: 1,
+      borderRadius:
+        Radius.lg,
 
-    marginBottom: 18,
-  },
+      paddingVertical: 12,
+      paddingHorizontal: 14,
 
-  // =====================================================
-  // Top Row
-  // =====================================================
+      marginBottom: 18,
+    },
 
-  topRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    topRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent:
+        "space-between",
 
-    marginBottom: 11,
-  },
+      marginBottom: 11,
+    },
 
-  identityContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    identityContainer: {
+      flexDirection: "row",
+      alignItems: "center",
 
-    flex: 1,
-    paddingRight: 12,
-  },
+      flex: 1,
+      paddingRight: 12,
+    },
 
-  iconContainer: {
-    width: 36,
-    height: 36,
+    iconContainer: {
+      width: 40,
+      height: 40,
 
-    borderRadius: 18,
+      borderRadius: 20,
 
-    backgroundColor: "#FFF1EC",
+      backgroundColor:
+        Colors.heatSoft,
 
-    alignItems: "center",
-    justifyContent: "center",
+      alignItems: "center",
+      justifyContent: "center",
 
-    marginRight: 10,
-  },
+      marginRight: 10,
+    },
 
-  heatIcon: {
-    fontSize: 20,
-  },
+    identityTextContainer: {
+      flex: 1,
+    },
 
-  identityTextContainer: {
-    flex: 1,
-  },
+    title: {
+      color:
+        Colors.textPrimary,
 
-  title: {
-    color: Colors.textPrimary,
+      fontSize: 14,
+      fontWeight: "900",
+    },
 
-    fontSize: 14,
-    fontWeight: "900",
-  },
+    level: {
+      color:
+        Colors.textSecondary,
 
-  level: {
-    color: Colors.textSecondary,
+      fontSize: 11,
+      fontWeight: "700",
 
-    fontSize: 11,
-    fontWeight: "700",
+      marginTop: 2,
+    },
 
-    marginTop: 2,
-  },
+    streakContainer: {
+      alignItems: "flex-end",
 
-  streakContainer: {
-    alignItems: "flex-end",
+      minWidth: 45,
+    },
 
-    minWidth: 45,
-  },
+    streakNumber: {
+      color:
+        Colors.heatDark,
 
-  streakNumber: {
-    color: Colors.roast,
+      fontSize: 18,
+      fontWeight: "900",
+    },
 
-    fontSize: 18,
-    fontWeight: "900",
-  },
+    streakLabel: {
+      color:
+        Colors.textSecondary,
 
-  streakLabel: {
-    color: Colors.textSecondary,
+      fontSize: 9,
+      fontWeight: "800",
 
-    fontSize: 9,
-    fontWeight: "800",
+      textTransform:
+        "uppercase",
 
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-  },
+      letterSpacing: 0.8,
+    },
 
-  // =====================================================
-  // Progress Bar
-  // =====================================================
+    progressHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent:
+        "space-between",
 
-  progressHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+      marginBottom: 6,
+    },
 
-    marginBottom: 6,
-  },
+    progressLabel: {
+      color:
+        Colors.textSecondary,
 
-  progressLabel: {
-    color: Colors.textSecondary,
+      fontSize: 9,
+      fontWeight: "900",
 
-    fontSize: 9,
-    fontWeight: "900",
+      letterSpacing: 1.1,
+    },
 
-    letterSpacing: 1.1,
-  },
+    progressAmount: {
+      color:
+        Colors.textSecondary,
 
-  progressAmount: {
-    color: Colors.textSecondary,
+      fontSize: 10,
+      fontWeight: "800",
+    },
 
-    fontSize: 10,
-    fontWeight: "800",
-  },
+    progressTrack: {
+      height: 7,
 
-  progressTrack: {
-    height: 7,
+      backgroundColor:
+        Colors.surfaceAlt,
 
-    backgroundColor:
-      Colors.surfaceAlt,
+      borderRadius:
+        Radius.pill,
 
-    borderRadius: Radius.pill,
+      overflow: "hidden",
+    },
 
-    overflow: "hidden",
-  },
+    progressFill: {
+      height: "100%",
 
-  progressFill: {
-    height: "100%",
+      backgroundColor:
+        Colors.heat,
 
-    backgroundColor:
-      Colors.roast,
-
-    borderRadius: Radius.pill,
-  },
-});
+      borderRadius:
+        Radius.pill,
+    },
+  });

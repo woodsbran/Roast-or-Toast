@@ -5,14 +5,16 @@
 // Celebrates the Heat earned after a regular Roast or
 // Toast vote.
 //
+// Version 1.1:
+// • Uses the custom Ember Spark Heat mark
+// • Heat has its own orange identity
+// • Roast coral is no longer used for progression
+//
 // Animation Sequence:
 // • Card fades and rises into view
 // • Heat amount counts from 0 to the earned total
 // • Final Heat number pops slightly
 // • Crowd feedback appears shortly afterward
-//
-// This component remains reusable for future modes such
-// as Daily Debate and community challenges.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -36,13 +38,10 @@ import {
   Radius,
 } from "../theme";
 
-// Information required by the Heat reward card.
-type FloatingHeatProps = {
-  // Total Heat earned from the current answer.
-  heatEarned: number;
+import HeatMark from "./HeatMark";
 
-  // Whether the player's answer matched the community
-  // majority.
+type FloatingHeatProps = {
+  heatEarned: number;
   matchedMajority: boolean;
 };
 
@@ -50,61 +49,46 @@ export default function FloatingHeat({
   heatEarned,
   matchedMajority,
 }: FloatingHeatProps) {
-  // Ensures invalid values cannot break the count-up.
   const safeHeatEarned = Math.max(
     Math.round(heatEarned),
     0,
   );
 
-  // Stores the Heat number currently shown on screen.
   const [
     displayedHeat,
     setDisplayedHeat,
   ] = useState(0);
 
-  // Controls the visibility of the entire reward card.
   const cardOpacity = useRef(
     new Animated.Value(0),
   ).current;
 
-  // Starts the card slightly below its final position.
   const cardTranslateY = useRef(
     new Animated.Value(18),
   ).current;
 
-  // Gives the entire card a subtle entrance pop.
   const cardScale = useRef(
     new Animated.Value(0.96),
   ).current;
 
-  // Controls the Heat number count-up.
-  //
-  // This moves from 0 to 1. The visible number is
-  // calculated by multiplying the value by heatEarned.
   const heatCountProgress = useRef(
     new Animated.Value(0),
   ).current;
 
-  // Makes the final Heat amount briefly grow larger.
   const heatScale = useRef(
     new Animated.Value(0.82),
   ).current;
 
-  // Controls when the crowd feedback becomes visible.
   const messageOpacity = useRef(
     new Animated.Value(0),
   ).current;
 
-  // Slides the crowd message in from the right.
   const messageTranslateX = useRef(
     new Animated.Value(10),
   ).current;
 
   useEffect(() => {
-    // ===================================================
-    // Reset Animation State
-    // ===================================================
-
+    // Reset animation state.
     cardOpacity.stopAnimation();
     cardTranslateY.stopAnimation();
     cardScale.stopAnimation();
@@ -125,8 +109,6 @@ export default function FloatingHeat({
 
     setDisplayedHeat(0);
 
-    // Updates the visible Heat number while the animated
-    // value moves from zero to one.
     const heatListenerId =
       heatCountProgress.addListener(
         ({ value }) => {
@@ -139,12 +121,7 @@ export default function FloatingHeat({
         },
       );
 
-    // ===================================================
-    // Animation Sequence
-    // ===================================================
-
     Animated.sequence([
-      // First, reveal and raise the whole reward card.
       Animated.parallel([
         Animated.timing(
           cardOpacity,
@@ -180,7 +157,6 @@ export default function FloatingHeat({
         ),
       ]),
 
-      // Count from zero to the final Heat reward.
       Animated.timing(
         heatCountProgress,
         {
@@ -190,14 +166,10 @@ export default function FloatingHeat({
             Easing.out(
               Easing.cubic,
             ),
-
-          // The listener updates React text, so this value
-          // cannot use the native driver.
           useNativeDriver: false,
         },
       ),
 
-      // Pop and settle the final Heat number.
       Animated.sequence([
         Animated.spring(
           heatScale,
@@ -220,7 +192,6 @@ export default function FloatingHeat({
         ),
       ]),
 
-      // Finally, reveal the crowd feedback.
       Animated.parallel([
         Animated.timing(
           messageOpacity,
@@ -246,8 +217,6 @@ export default function FloatingHeat({
         ),
       ]),
     ]).start(() => {
-      // Guarantees the final amount is exact even if the
-      // animation was interrupted by a small frame delay.
       setDisplayedHeat(
         safeHeatEarned,
       );
@@ -282,7 +251,6 @@ export default function FloatingHeat({
     <Animated.View
       style={[
         styles.container,
-
         {
           opacity: cardOpacity,
 
@@ -291,45 +259,47 @@ export default function FloatingHeat({
               translateY:
                 cardTranslateY,
             },
-
             {
-              scale: cardScale,
+              scale:
+                cardScale,
             },
           ],
         },
       ]}
     >
-      {/* Animated Heat reward */}
       <Animated.View
         style={[
           styles.rewardContainer,
-
           {
             transform: [
               {
-                scale: heatScale,
+                scale:
+                  heatScale,
               },
             ],
           },
         ]}
       >
-        <Text style={styles.fireIcon}>
-          🔥
-        </Text>
+        <HeatMark size="small" />
 
-        <Text style={styles.rewardText}>
+        <Text
+          style={
+            styles.rewardText
+          }
+        >
           +{displayedHeat} Heat
         </Text>
       </Animated.View>
 
-      {/* Visual divider */}
-      <View style={styles.divider} />
+      <View
+        style={
+          styles.divider
+        }
+      />
 
-      {/* Animated crowd feedback */}
       <Animated.Text
         style={[
           styles.matchText,
-
           {
             opacity:
               messageOpacity,
@@ -355,76 +325,82 @@ export default function FloatingHeat({
 // Styles
 // =====================================================
 
-const styles = StyleSheet.create({
-  container: {
-    minHeight: 66,
+const styles =
+  StyleSheet.create({
+    container: {
+      minHeight: 66,
 
-    backgroundColor: "#FFF1EC",
+      backgroundColor:
+        Colors.heatSoft,
 
-    borderColor: "#F4C9BE",
-    borderWidth: 1.25,
-    borderRadius: Radius.lg,
+      borderColor:
+        "#F2C89E",
 
-    paddingVertical: 13,
-    paddingHorizontal: 15,
+      borderWidth: 1.25,
+      borderRadius:
+        Radius.lg,
 
-    flexDirection: "row",
-    alignItems: "center",
+      paddingVertical: 13,
+      paddingHorizontal: 15,
 
-    marginBottom: 18,
+      flexDirection: "row",
+      alignItems: "center",
 
-    shadowColor: Colors.roast,
+      marginBottom: 18,
 
-    shadowOffset: {
-      width: 0,
-      height: 5,
+      shadowColor:
+        Colors.heatDark,
+
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+
+      shadowOpacity: 0.08,
+      shadowRadius: 10,
+
+      elevation: 2,
     },
 
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
+    rewardContainer: {
+      flexDirection: "row",
+      alignItems: "center",
 
-    elevation: 2,
-  },
+      flexShrink: 0,
 
-  rewardContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+      minWidth: 110,
+    },
 
-    flexShrink: 0,
+    rewardText: {
+      color:
+        Colors.heatDark,
 
-    minWidth: 92,
-  },
+      fontSize: 15,
+      fontWeight: "900",
 
-  fireIcon: {
-    fontSize: 20,
-    marginRight: 6,
-  },
+      letterSpacing: -0.25,
 
-  rewardText: {
-    color: Colors.roast,
+      marginLeft: 7,
+    },
 
-    fontSize: 15,
-    fontWeight: "900",
+    divider: {
+      width: 1,
+      height: 25,
 
-    letterSpacing: -0.25,
-  },
+      backgroundColor:
+        "#E8C29D",
 
-  divider: {
-    width: 1,
-    height: 25,
+      marginHorizontal: 13,
+    },
 
-    backgroundColor: "#E7BEB4",
+    matchText: {
+      color:
+        Colors.textPrimary,
 
-    marginHorizontal: 13,
-  },
+      fontSize: 12,
+      fontWeight: "800",
+      lineHeight: 17,
 
-  matchText: {
-    color: Colors.textPrimary,
-
-    fontSize: 12,
-    fontWeight: "800",
-    lineHeight: 17,
-
-    flex: 1,
-  },
-});
+      flex: 1,
+    },
+  });

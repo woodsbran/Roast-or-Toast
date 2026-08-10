@@ -2,17 +2,17 @@
 // File: ResultsCard.tsx
 //
 // Purpose:
-// Displays community results after a regular Roast or
-// Toast vote.
+// Displays the results after a regular Roast or Toast
+// vote.
 //
-// Current Features:
-// • Confirms the player's vote
-// • Displays animated Roast and Toast percentages
-// • Shows animated Heat earned
-// • Shows majority-match feedback
-// • Celebrates level increases
-// • Displays the top comment
-// • Provides the Next action
+// Version 1.1 gives the result screen a stronger
+// Roast-vs-Toast identity.
+//
+// Instead of treating both percentages like ordinary
+// progress bars, the screen presents them as opposing
+// sides of the same decision.
+//
+// The flame is reserved for Heat and progression.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -32,7 +32,9 @@ import {
   View,
 } from "react-native";
 
-import type { Moment } from "../data/types";
+import type {
+  Moment,
+} from "../data/types";
 
 import {
   Colors,
@@ -41,15 +43,21 @@ import {
 
 import FloatingHeat from "./FloatingHeat";
 import LevelUpCard from "./LevelUpCard";
+import VoteMark from "./VoteMark";
 
 import type {
   VoteChoice,
 } from "./VoteButtons";
 
-// Information required to display one result screen.
 type ResultsCardProps = {
   moment: Moment;
-  selectedVote: Exclude<VoteChoice, null>;
+
+  selectedVote:
+    Exclude<
+      VoteChoice,
+      null
+    >;
+
   categoryAccent: string;
 
   heatEarned: number;
@@ -91,68 +99,188 @@ export default function ResultsCard({
         },
       ]}
     >
-      {/* Main results heading */}
-      <Text style={styles.resultsHeading}>
-        The People Have Spoken
-      </Text>
+      {/* =================================================
+          Heading
+      ================================================= */}
 
-      {/* Confirms the player's selected answer */}
-      <Text style={styles.yourVoteText}>
-        You chose{" "}
+      <View
+        style={
+          styles.headingRow
+        }
+      >
+        <Text
+          style={
+            styles.resultsEyebrow
+          }
+        >
+          THE VERDICT
+        </Text>
 
         <Text
           style={
-            selectedVote === "roast"
-              ? styles.roastText
-              : styles.toastText
+            styles.resultsHeading
           }
         >
-          {selectedVote === "roast"
-            ? "Roast"
-            : "Toast"}
+          The People{"\n"}
+          Have Spoken
         </Text>
-      </Text>
+      </View>
 
-      {/* Animated Heat reward */}
+      {/* Player's choice */}
+      <View
+        style={[
+          styles.playerVoteCard,
+
+          selectedVote ===
+          "roast"
+            ? styles.playerVoteRoast
+            : styles.playerVoteToast,
+        ]}
+      >
+        <VoteMark
+          type={selectedVote}
+          size="small"
+        />
+
+        <View
+          style={
+            styles.playerVoteText
+          }
+        >
+          <Text
+            style={
+              styles.playerVoteLabel
+            }
+          >
+            YOU PICKED
+          </Text>
+
+          <Text
+            style={[
+              styles.playerVoteValue,
+
+              selectedVote ===
+              "roast"
+                ? styles.roastText
+                : styles.toastText,
+            ]}
+          >
+            {selectedVote ===
+            "roast"
+              ? "ROAST"
+              : "TOAST"}
+          </Text>
+        </View>
+      </View>
+
+      {/* Heat reward stays separate from Roast */}
       <FloatingHeat
-        heatEarned={heatEarned}
-        matchedMajority={matchedMajority}
+        heatEarned={
+          heatEarned
+        }
+        matchedMajority={
+          matchedMajority
+        }
       />
 
-      {/* Appears only when the player reaches a new level */}
       {leveledUp && (
         <LevelUpCard
-          level={currentLevel}
+          level={
+            currentLevel
+          }
         />
       )}
 
-      {/* Animated Roast result */}
-      <AnimatedResultBar
-        label="🔥 Roast"
-        percentage={
-          moment.roastPercentage
-        }
-        fillColor={Colors.roast}
-        delay={120}
-      />
+      {/* =================================================
+          Roast vs Toast
+      ================================================= */}
 
-      {/* Animated Toast result */}
-      <AnimatedResultBar
-        label="♥ Toast"
-        percentage={
-          moment.toastPercentage
+      <View
+        style={
+          styles.battleCard
         }
-        fillColor={Colors.toast}
-        delay={270}
-      />
+      >
+        <Text
+          style={
+            styles.battleLabel
+          }
+        >
+          CROWD SPLIT
+        </Text>
 
-      {/* Top community comment */}
+        <View
+          style={
+            styles.battleHeader
+          }
+        >
+          <View
+            style={
+              styles.battleSide
+            }
+          >
+            <VoteMark
+              type="roast"
+              size="small"
+            />
+
+            <Text
+              style={
+                styles.roastBattleText
+              }
+            >
+              ROAST
+            </Text>
+          </View>
+
+          <Text
+            style={
+              styles.versusText
+            }
+          >
+            VS
+          </Text>
+
+          <View
+            style={[
+              styles.battleSide,
+              styles.toastBattleSide,
+            ]}
+          >
+            <Text
+              style={
+                styles.toastBattleText
+              }
+            >
+              TOAST
+            </Text>
+
+            <VoteMark
+              type="toast"
+              size="small"
+            />
+          </View>
+        </View>
+
+        <BattleResult
+          roastPercentage={
+            moment.roastPercentage
+          }
+          toastPercentage={
+            moment.toastPercentage
+          }
+        />
+      </View>
+
+      {/* =================================================
+          Top Comment
+      ================================================= */}
+
       <View
         style={[
           styles.commentCard,
 
           {
-            borderLeftColor:
+            borderColor:
               categoryAccent,
           },
         ]}
@@ -167,31 +295,47 @@ export default function ResultsCard({
             },
           ]}
         >
-          TOP COMMENT
+          TOP TAKE
         </Text>
 
-        <Text style={styles.commentText}>
+        <Text
+          style={
+            styles.commentText
+          }
+        >
           “{moment.topComment}”
         </Text>
       </View>
 
-      {/* Moves to the next Moment or special event */}
+      {/* Next Moment */}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Show next moment"
-        onPress={onNextPress}
-        style={({ pressed }) => [
+        onPress={
+          onNextPress
+        }
+        style={({
+          pressed,
+        }) => [
           styles.nextButton,
 
           pressed &&
             styles.buttonPressed,
         ]}
       >
-        <Text style={styles.nextButtonText}>
-          Next
+        <Text
+          style={
+            styles.nextButtonText
+          }
+        >
+          Next Moment
         </Text>
 
-        <Text style={styles.nextButtonArrow}>
+        <Text
+          style={
+            styles.nextButtonArrow
+          }
+        >
           →
         </Text>
       </Pressable>
@@ -200,129 +344,220 @@ export default function ResultsCard({
 }
 
 // =====================================================
-// Animated Result Bar
+// Battle Result
 // =====================================================
 
-type AnimatedResultBarProps = {
-  label: string;
-  percentage: number;
-  fillColor: string;
-
-  // Allows Roast and Toast to animate one after another.
-  delay?: number;
+type BattleResultProps = {
+  roastPercentage: number;
+  toastPercentage: number;
 };
 
-function AnimatedResultBar({
-  label,
-  percentage,
-  fillColor,
-  delay = 0,
-}: AnimatedResultBarProps) {
-  // Restricts invalid percentage values.
-  const safePercentage = Math.min(
-    Math.max(percentage, 0),
-    100,
-  );
+function BattleResult({
+  roastPercentage,
+  toastPercentage,
+}: BattleResultProps) {
+  const safeRoast =
+    Math.min(
+      Math.max(
+        roastPercentage,
+        0,
+      ),
+      100,
+    );
 
-  // Controls the visual bar fill from zero to one.
-  const fillProgress = useRef(
-    new Animated.Value(0),
-  ).current;
+  const safeToast =
+    Math.min(
+      Math.max(
+        toastPercentage,
+        0,
+      ),
+      100,
+    );
 
-  // Stores the visible percentage number.
+  const roastProgress =
+    useRef(
+      new Animated.Value(0),
+    ).current;
+
+  const toastProgress =
+    useRef(
+      new Animated.Value(0),
+    ).current;
+
   const [
-    displayedPercentage,
-    setDisplayedPercentage,
-  ] = useState(0);
+    displayedRoast,
+    setDisplayedRoast,
+  ] =
+    useState(0);
+
+  const [
+    displayedToast,
+    setDisplayedToast,
+  ] =
+    useState(0);
 
   useEffect(() => {
-    // Reset the bar whenever a new result loads.
-    fillProgress.stopAnimation();
-    fillProgress.setValue(0);
-    setDisplayedPercentage(0);
+    roastProgress.setValue(0);
+    toastProgress.setValue(0);
 
-    // Updates the percentage label during the animation.
-    const listenerId =
-      fillProgress.addListener(
-        ({ value }) => {
-          setDisplayedPercentage(
+    setDisplayedRoast(0);
+    setDisplayedToast(0);
+
+    const roastListener =
+      roastProgress.addListener(
+        ({
+          value,
+        }) => {
+          setDisplayedRoast(
             Math.round(
               value *
-                safePercentage,
+                safeRoast,
             ),
           );
         },
       );
 
-    // Smoothly fills the result bar.
-    Animated.timing(
-      fillProgress,
-      {
-        toValue: 1,
-        duration: 720,
-        delay,
-        easing:
-          Easing.out(
-            Easing.cubic,
-          ),
-        useNativeDriver: false,
-      },
-    ).start();
+    const toastListener =
+      toastProgress.addListener(
+        ({
+          value,
+        }) => {
+          setDisplayedToast(
+            Math.round(
+              value *
+                safeToast,
+            ),
+          );
+        },
+      );
+
+    Animated.parallel([
+      Animated.timing(
+        roastProgress,
+        {
+          toValue: 1,
+          duration: 720,
+          delay: 100,
+
+          easing:
+            Easing.out(
+              Easing.cubic,
+            ),
+
+          useNativeDriver:
+            false,
+        },
+      ),
+
+      Animated.timing(
+        toastProgress,
+        {
+          toValue: 1,
+          duration: 720,
+          delay: 180,
+
+          easing:
+            Easing.out(
+              Easing.cubic,
+            ),
+
+          useNativeDriver:
+            false,
+        },
+      ),
+    ]).start();
 
     return () => {
-      fillProgress.removeListener(
-        listenerId,
+      roastProgress.removeListener(
+        roastListener,
+      );
+
+      toastProgress.removeListener(
+        toastListener,
       );
     };
   }, [
-    delay,
-    fillProgress,
-    safePercentage,
+    roastProgress,
+    safeRoast,
+    safeToast,
+    toastProgress,
   ]);
 
-  // Converts the animated value into a percentage width.
-  const animatedWidth =
-    fillProgress.interpolate({
-      inputRange: [0, 1],
+  const roastWidth =
+    roastProgress.interpolate({
+      inputRange: [
+        0,
+        1,
+      ],
 
       outputRange: [
         "0%",
-        `${safePercentage}%`,
+        `${safeRoast}%`,
+      ],
+    });
+
+  const toastWidth =
+    toastProgress.interpolate({
+      inputRange: [
+        0,
+        1,
+      ],
+
+      outputRange: [
+        "0%",
+        `${safeToast}%`,
       ],
     });
 
   return (
-    <View style={styles.resultSection}>
-      {/* Label and animated number */}
-      <View style={styles.resultLabelRow}>
-        <Text style={styles.resultLabel}>
-          {label}
+    <View>
+      {/* Large percentages */}
+      <View
+        style={
+          styles.percentageRow
+        }
+      >
+        <Text
+          style={
+            styles.roastPercentage
+          }
+        >
+          {displayedRoast}%
         </Text>
 
         <Text
           style={
-            styles.resultPercentage
+            styles.toastPercentage
           }
         >
-          {displayedPercentage}%
+          {displayedToast}%
         </Text>
       </View>
 
-      {/* Empty bar track */}
+      {/* Competing color bar */}
       <View
         style={
-          styles.resultBarBackground
+          styles.splitTrack
         }
       >
-        {/* Animated colored fill */}
         <Animated.View
           style={[
-            styles.resultBarFill,
+            styles.roastSplit,
 
             {
-              width: animatedWidth,
-              backgroundColor:
-                fillColor,
+              width:
+                roastWidth,
+            },
+          ]}
+        />
+
+        <Animated.View
+          style={[
+            styles.toastSplit,
+
+            {
+              width:
+                toastWidth,
             },
           ]}
         />
@@ -335,134 +570,311 @@ function AnimatedResultBar({
 // Styles
 // =====================================================
 
-const styles = StyleSheet.create({
-  resultsContainer: {
-    paddingBottom: 28,
-  },
+const styles =
+  StyleSheet.create({
+    resultsContainer: {
+      paddingBottom: 28,
+    },
 
-  resultsHeading: {
-    color: Colors.textPrimary,
-    fontSize: 26,
-    fontWeight: "900",
-    marginBottom: 5,
-  },
+    headingRow: {
+      marginBottom: 18,
+    },
 
-  yourVoteText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 16,
-  },
+    resultsEyebrow: {
+      color:
+        Colors.textMuted,
 
-  roastText: {
-    color: Colors.roast,
-    fontWeight: "900",
-  },
+      fontSize: 10,
+      fontWeight: "900",
+      letterSpacing: 2.2,
 
-  toastText: {
-    color: Colors.toast,
-    fontWeight: "900",
-  },
+      marginBottom: 5,
+    },
 
-  resultSection: {
-    marginBottom: 17,
-  },
+    resultsHeading: {
+      color:
+        Colors.textPrimary,
 
-  resultLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
+      fontSize: 35,
+      fontWeight: "900",
+      letterSpacing: -1.6,
+      lineHeight: 39,
+    },
 
-  resultLabel: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "800",
-  },
+    playerVoteCard: {
+      flexDirection: "row",
+      alignItems: "center",
 
-  resultPercentage: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "900",
+      borderWidth: 1.5,
+      borderRadius:
+        Radius.lg,
 
-    minWidth: 44,
-    textAlign: "right",
-  },
+      paddingVertical: 13,
+      paddingHorizontal: 15,
 
-  resultBarBackground: {
-    height: 12,
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: Radius.pill,
-    overflow: "hidden",
-  },
+      marginBottom: 15,
+    },
 
-  resultBarFill: {
-    height: "100%",
-    borderRadius: Radius.pill,
-  },
+    playerVoteRoast: {
+      backgroundColor:
+        Colors.roastWash,
 
-  commentCard: {
-    backgroundColor: Colors.surface,
+      borderColor:
+        Colors.roastSoft,
+    },
 
-    borderColor: Colors.border,
-    borderWidth: 1,
-    borderLeftWidth: 5,
-    borderRadius: Radius.lg,
+    playerVoteToast: {
+      backgroundColor:
+        Colors.toastWash,
 
-    padding: 18,
+      borderColor:
+        Colors.toastSoft,
+    },
 
-    marginTop: 7,
-    marginBottom: 20,
-  },
+    playerVoteText: {
+      marginLeft: 12,
+    },
 
-  commentLabel: {
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 1.5,
-    marginBottom: 8,
-  },
+    playerVoteLabel: {
+      color:
+        Colors.textMuted,
 
-  commentText: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "700",
-    lineHeight: 23,
-  },
+      fontSize: 9,
+      fontWeight: "900",
+      letterSpacing: 1.5,
+    },
 
-  nextButton: {
-    backgroundColor: Colors.textPrimary,
-    borderRadius: Radius.pill,
+    playerVoteValue: {
+      fontSize: 18,
+      fontWeight: "900",
+      letterSpacing: 1,
+      marginTop: 1,
+    },
 
-    paddingVertical: 17,
-    paddingHorizontal: 25,
+    roastText: {
+      color:
+        Colors.roastDark,
+    },
 
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    toastText: {
+      color:
+        Colors.toastDark,
+    },
 
-    marginBottom: 18,
-  },
+    battleCard: {
+      backgroundColor:
+        Colors.surfaceWarm,
 
-  buttonPressed: {
-    opacity: 0.78,
+      borderColor:
+        Colors.borderStrong,
 
-    transform: [
-      {
-        scale: 0.985,
-      },
-    ],
-  },
+      borderWidth: 1.5,
 
-  nextButtonText: {
-    color: Colors.white,
-    fontSize: 18,
-    fontWeight: "900",
-  },
+      borderRadius:
+        Radius.xl,
 
-  nextButtonArrow: {
-    color: Colors.white,
-    fontSize: 23,
-    fontWeight: "700",
-  },
-});
+      padding: 18,
+
+      marginTop: 4,
+      marginBottom: 18,
+
+      transform: [
+        {
+          rotate:
+            "-0.4deg",
+        },
+      ],
+    },
+
+    battleLabel: {
+      color:
+        Colors.textMuted,
+
+      fontSize: 9,
+      fontWeight: "900",
+      letterSpacing: 2,
+
+      textAlign: "center",
+
+      marginBottom: 13,
+    },
+
+    battleHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent:
+        "space-between",
+
+      marginBottom: 15,
+    },
+
+    battleSide: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+
+    toastBattleSide: {
+      justifyContent:
+        "flex-end",
+    },
+
+    roastBattleText: {
+      color:
+        Colors.roastDark,
+
+      fontSize: 17,
+      fontWeight: "900",
+      letterSpacing: 1,
+    },
+
+    toastBattleText: {
+      color:
+        Colors.toastDark,
+
+      fontSize: 17,
+      fontWeight: "900",
+      letterSpacing: 1,
+    },
+
+    versusText: {
+      color:
+        Colors.textMuted,
+
+      fontSize: 10,
+      fontWeight: "900",
+      letterSpacing: 1.5,
+    },
+
+    percentageRow: {
+      flexDirection: "row",
+      justifyContent:
+        "space-between",
+
+      marginBottom: 9,
+    },
+
+    roastPercentage: {
+      color:
+        Colors.roastDark,
+
+      fontSize: 29,
+      fontWeight: "900",
+    },
+
+    toastPercentage: {
+      color:
+        Colors.toastDark,
+
+      fontSize: 29,
+      fontWeight: "900",
+    },
+
+    splitTrack: {
+      height: 14,
+
+      flexDirection: "row",
+
+      backgroundColor:
+        Colors.surfaceAlt,
+
+      borderRadius:
+        Radius.pill,
+
+      overflow: "hidden",
+    },
+
+    roastSplit: {
+      height: "100%",
+
+      backgroundColor:
+        Colors.roast,
+    },
+
+    toastSplit: {
+      height: "100%",
+
+      backgroundColor:
+        Colors.toast,
+    },
+
+    commentCard: {
+      backgroundColor:
+        Colors.surface,
+
+      borderWidth: 1.5,
+      borderRadius:
+        Radius.lg,
+
+      padding: 18,
+
+      marginBottom: 20,
+
+      transform: [
+        {
+          rotate:
+            "0.4deg",
+        },
+      ],
+    },
+
+    commentLabel: {
+      fontSize: 10,
+      fontWeight: "900",
+      letterSpacing: 1.5,
+      marginBottom: 8,
+    },
+
+    commentText: {
+      color:
+        Colors.textPrimary,
+
+      fontSize: 16,
+      fontWeight: "700",
+      lineHeight: 23,
+    },
+
+    nextButton: {
+      backgroundColor:
+        Colors.textPrimary,
+
+      borderRadius:
+        Radius.pill,
+
+      paddingVertical: 17,
+      paddingHorizontal: 25,
+
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent:
+        "space-between",
+
+      marginBottom: 18,
+    },
+
+    buttonPressed: {
+      opacity: 0.78,
+
+      transform: [
+        {
+          scale: 0.985,
+        },
+      ],
+    },
+
+    nextButtonText: {
+      color:
+        Colors.white,
+
+      fontSize: 18,
+      fontWeight: "900",
+    },
+
+    nextButtonArrow: {
+      color:
+        Colors.white,
+
+      fontSize: 23,
+      fontWeight: "700",
+    },
+  });

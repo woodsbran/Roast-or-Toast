@@ -4,16 +4,18 @@
 // Purpose:
 // Celebrates a player reaching a new level.
 //
-// Celebration Types:
-// • Normal Level:
-//   Announces the new level and encourages the player.
+// Version 1.1:
+// • Uses the custom Ember Spark mark
+// • Heat has its own progression identity
+// • Roast coral is no longer used for leveling
 //
-// • Title Unlock:
-//   Announces the newly unlocked personality title.
+// Celebration Types:
+// • Normal Level
+// • New Title Unlock
 //
 // Animation:
 // • Card fades and rises into view
-// • Fire icon pops
+// • Heat mark pops
 // • Main message scales into place
 //
 // Project: Roast or Toast
@@ -40,7 +42,8 @@ import {
   Radius,
 } from "../theme";
 
-// Information required by the level-up card.
+import HeatMark from "./HeatMark";
+
 type LevelUpCardProps = {
   level: number;
 };
@@ -51,47 +54,44 @@ export default function LevelUpCard({
   const currentTitle =
     getPlayerTitle(level);
 
-  // Compare the current title with the title from the
-  // previous level.
-  //
-  // When they differ, the player unlocked a new title.
   const previousTitle =
     level > 1
-      ? getPlayerTitle(level - 1)
+      ? getPlayerTitle(
+          level - 1,
+        )
       : currentTitle;
 
   const unlockedNewTitle =
-    currentTitle !== previousTitle;
+    currentTitle !==
+    previousTitle;
 
-  // =====================================================
-  // Animation Values
-  // =====================================================
+  const cardOpacity =
+    useRef(
+      new Animated.Value(0),
+    ).current;
 
-  const cardOpacity = useRef(
-    new Animated.Value(0),
-  ).current;
+  const cardTranslateY =
+    useRef(
+      new Animated.Value(18),
+    ).current;
 
-  const cardTranslateY = useRef(
-    new Animated.Value(18),
-  ).current;
+  const iconScale =
+    useRef(
+      new Animated.Value(0.45),
+    ).current;
 
-  const iconScale = useRef(
-    new Animated.Value(0.45),
-  ).current;
-
-  const messageScale = useRef(
-    new Animated.Value(0.92),
-  ).current;
+  const messageScale =
+    useRef(
+      new Animated.Value(0.92),
+    ).current;
 
   useEffect(() => {
-    // Reset values whenever a new level-up occurs.
     cardOpacity.setValue(0);
     cardTranslateY.setValue(18);
     iconScale.setValue(0.45);
     messageScale.setValue(0.92);
 
     Animated.sequence([
-      // Reveal the card.
       Animated.parallel([
         Animated.timing(
           cardOpacity,
@@ -113,7 +113,6 @@ export default function LevelUpCard({
         ),
       ]),
 
-      // Pop the fire icon and message.
       Animated.parallel([
         Animated.spring(
           iconScale,
@@ -136,7 +135,6 @@ export default function LevelUpCard({
         ),
       ]),
 
-      // Settle the icon.
       Animated.spring(
         iconScale,
         {
@@ -161,7 +159,8 @@ export default function LevelUpCard({
         styles.container,
 
         {
-          opacity: cardOpacity,
+          opacity:
+            cardOpacity,
 
           transform: [
             {
@@ -172,10 +171,12 @@ export default function LevelUpCard({
         },
       ]}
     >
-      {/* Decorative glow */}
-      <View style={styles.glowCircle} />
+      <View
+        style={
+          styles.glowCircle
+        }
+      />
 
-      {/* Fire celebration icon */}
       <Animated.View
         style={[
           styles.iconContainer,
@@ -183,18 +184,18 @@ export default function LevelUpCard({
           {
             transform: [
               {
-                scale: iconScale,
+                scale:
+                  iconScale,
               },
             ],
           },
         ]}
       >
-        <Text style={styles.icon}>
-          🔥
-        </Text>
+        <HeatMark
+          size="medium"
+        />
       </Animated.View>
 
-      {/* Level-up content */}
       <Animated.View
         style={[
           styles.content,
@@ -209,33 +210,57 @@ export default function LevelUpCard({
           },
         ]}
       >
-        <Text style={styles.eyebrow}>
+        <Text
+          style={
+            styles.eyebrow
+          }
+        >
           {unlockedNewTitle
             ? "NEW TITLE UNLOCKED"
             : "YOU HEATED UP"}
         </Text>
 
-        <Text style={styles.level}>
+        <Text
+          style={
+            styles.level
+          }
+        >
           Level {level}
         </Text>
 
         {unlockedNewTitle ? (
           <>
-            <Text style={styles.title}>
+            <Text
+              style={
+                styles.title
+              }
+            >
               {currentTitle}
             </Text>
 
-            <Text style={styles.supportingText}>
+            <Text
+              style={
+                styles.supportingText
+              }
+            >
               Okay, now you&apos;re becoming a problem.
             </Text>
           </>
         ) : (
           <>
-            <Text style={styles.message}>
+            <Text
+              style={
+                styles.message
+              }
+            >
               Keep bringing the Heat.
             </Text>
 
-            <Text style={styles.supportingText}>
+            <Text
+              style={
+                styles.supportingText
+              }
+            >
               The next title is getting closer.
             </Text>
           </>
@@ -249,124 +274,128 @@ export default function LevelUpCard({
 // Styles
 // =====================================================
 
-const styles = StyleSheet.create({
-  container: {
-    position: "relative",
+const styles =
+  StyleSheet.create({
+    container: {
+      position: "relative",
 
-    backgroundColor:
-      Colors.textPrimary,
+      backgroundColor:
+        Colors.textPrimary,
 
-    borderRadius: Radius.lg,
+      borderRadius:
+        Radius.lg,
 
-    paddingVertical: 18,
-    paddingHorizontal: 18,
+      paddingVertical: 18,
+      paddingHorizontal: 18,
 
-    marginBottom: 18,
+      marginBottom: 18,
 
-    flexDirection: "row",
-    alignItems: "center",
+      flexDirection: "row",
+      alignItems: "center",
 
-    overflow: "hidden",
+      overflow: "hidden",
 
-    shadowColor: Colors.black,
+      shadowColor:
+        Colors.black,
 
-    shadowOffset: {
-      width: 0,
-      height: 8,
+      shadowOffset: {
+        width: 0,
+        height: 8,
+      },
+
+      shadowOpacity: 0.14,
+      shadowRadius: 14,
+
+      elevation: 5,
     },
 
-    shadowOpacity: 0.14,
-    shadowRadius: 14,
+    glowCircle: {
+      position: "absolute",
 
-    elevation: 5,
-  },
+      width: 130,
+      height: 130,
 
-  glowCircle: {
-    position: "absolute",
+      borderRadius: 65,
 
-    width: 130,
-    height: 130,
+      right: -45,
+      top: -52,
 
-    borderRadius: 65,
+      backgroundColor:
+        Colors.heat,
 
-    right: -45,
-    top: -52,
+      opacity: 0.18,
+    },
 
-    backgroundColor:
-      Colors.roast,
+    iconContainer: {
+      width: 58,
+      height: 58,
 
-    opacity: 0.18,
-  },
+      borderRadius: 29,
 
-  iconContainer: {
-    width: 54,
-    height: 54,
+      backgroundColor:
+        "#35291F",
 
-    borderRadius: 27,
+      alignItems: "center",
+      justifyContent: "center",
 
-    backgroundColor:
-      "#3A2724",
+      marginRight: 15,
+    },
 
-    alignItems: "center",
-    justifyContent: "center",
+    content: {
+      flex: 1,
+    },
 
-    marginRight: 15,
-  },
+    eyebrow: {
+      color:
+        Colors.heat,
 
-  icon: {
-    fontSize: 28,
-  },
+      fontSize: 10,
+      fontWeight: "900",
 
-  content: {
-    flex: 1,
-  },
+      letterSpacing: 1.5,
 
-  eyebrow: {
-    color: Colors.roast,
+      marginBottom: 5,
+    },
 
-    fontSize: 10,
-    fontWeight: "900",
+    level: {
+      color:
+        "#D7D7D7",
 
-    letterSpacing: 1.5,
+      fontSize: 13,
+      fontWeight: "800",
+    },
 
-    marginBottom: 5,
-  },
+    title: {
+      color:
+        Colors.white,
 
-  level: {
-    color: "#D7D7D7",
+      fontSize: 22,
+      fontWeight: "900",
 
-    fontSize: 13,
-    fontWeight: "800",
-  },
+      lineHeight: 27,
 
-  title: {
-    color: Colors.white,
+      marginTop: 2,
+    },
 
-    fontSize: 22,
-    fontWeight: "900",
+    message: {
+      color:
+        Colors.white,
 
-    lineHeight: 27,
+      fontSize: 19,
+      fontWeight: "900",
 
-    marginTop: 2,
-  },
+      marginTop: 2,
+    },
 
-  message: {
-    color: Colors.white,
+    supportingText: {
+      color:
+        "#CFCFCF",
 
-    fontSize: 19,
-    fontWeight: "900",
+      fontSize: 11,
+      fontWeight: "600",
 
-    marginTop: 2,
-  },
+      lineHeight: 16,
 
-  supportingText: {
-    color: "#CFCFCF",
-
-    fontSize: 11,
-    fontWeight: "600",
-
-    lineHeight: 16,
-
-    marginTop: 5,
-  },
-});
+      marginTop: 5,
+    },
+  });
