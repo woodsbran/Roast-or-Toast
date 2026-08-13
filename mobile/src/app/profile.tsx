@@ -3,24 +3,33 @@
 //
 // Screen: Profile
 //
-// Purpose:
-// Displays the player's local Roast or Toast identity,
-// lifetime statistics, daily return streak, achievements,
-// and future community features.
+// Version 1.1 — Big Design Batch 2
 //
-// Current Features:
-// • Editable nickname
-// • Current title and level
+// I am keeping all of the actual profile information, but
+// I am rebuilding the presentation so it belongs to the
+// same physical/editorial game as the Moment screen.
+//
+// What stays:
+// • editable nickname
+// • current title and level
 // • Heat progress
-// • Daily return streak
-// • Lifetime gameplay statistics
-// • Achievement badges
-// • Suggest a Moment preview
+// • daily streak
+// • lifetime stats
+// • Roast / Toast split
+// • crowd accuracy
+// • achievements
+//
+// What changes:
+// • no white stat-card grid
+// • fewer rounded cards
+// • paper, strips, stamps, rules, and editorial sections
 //
 // Project: Roast or Toast
 // =====================================================
 
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Ionicons,
+} from "@expo/vector-icons";
 
 import {
   router,
@@ -34,6 +43,7 @@ import {
 } from "react";
 
 import {
+  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -43,6 +53,11 @@ import {
   TextInput,
   View,
 } from "react-native";
+
+import EditorialHeading from "../components/EditorialHeading";
+import HeatMark from "../components/HeatMark";
+import StampLabel from "../components/StampLabel";
+import VoteMark from "../components/VoteMark";
 
 import type {
   PlayerProgress,
@@ -68,13 +83,22 @@ import {
 
 import {
   Colors,
-  Radius,
   Spacing,
 } from "../theme";
 
+type AchievementIcon =
+  | "verdict"
+  | "roast"
+  | "toast"
+  | "streak"
+  | "crowd"
+  | "heat"
+  | "opinions"
+  | "level";
+
 type Achievement = {
   id: string;
-  emoji: string;
+  icon: AchievementIcon;
   title: string;
   description: string;
   unlocked: boolean;
@@ -115,10 +139,6 @@ export default function ProfileScreen() {
     setIsSavingNickname,
   ] = useState(false);
 
-  // =====================================================
-  // Restore Local Profile
-  // =====================================================
-
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -149,10 +169,6 @@ export default function ProfileScreen() {
     }, []),
   );
 
-  // =====================================================
-  // Statistics
-  // =====================================================
-
   const totalVotes =
     progress.roastCount +
     progress.toastCount;
@@ -160,36 +176,40 @@ export default function ProfileScreen() {
   const roastPercentage =
     totalVotes > 0
       ? Math.round(
-          (progress.roastCount /
-            totalVotes) *
-            100,
+          (
+            progress.roastCount /
+            totalVotes
+          ) * 100,
         )
       : 0;
 
   const toastPercentage =
     totalVotes > 0
       ? Math.round(
-          (progress.toastCount /
-            totalVotes) *
-            100,
+          (
+            progress.toastCount /
+            totalVotes
+          ) * 100,
         )
       : 0;
 
   const crowdMatchPercentage =
     progress.momentsCompleted > 0
       ? Math.round(
-          (progress.majorityMatches /
-            progress.momentsCompleted) *
-            100,
+          (
+            progress.majorityMatches /
+            progress.momentsCompleted
+          ) * 100,
         )
       : 0;
 
   const crowdGuessAccuracy =
     progress.crowdGuesses > 0
       ? Math.round(
-          (progress.correctCrowdGuesses /
-            progress.crowdGuesses) *
-            100,
+          (
+            progress.correctCrowdGuesses /
+            progress.crowdGuesses
+          ) * 100,
         )
       : 0;
 
@@ -225,37 +245,37 @@ export default function ProfileScreen() {
         achievement.unlocked,
     ).length;
 
-  // =====================================================
-  // Navigation
-  // =====================================================
+  const handleBackPress =
+    () => {
+      router.back();
+    };
 
-  const handleBackPress = () => {
-    router.back();
-  };
+  const handleHomePress =
+    () => {
+      router.replace("/");
+    };
 
-  const handleHomePress = () => {
-    router.replace("/");
-  };
+  const handleEditNickname =
+    () => {
+      setNicknameDraft(
+        nickname,
+      );
 
-  // =====================================================
-  // Nickname Editing
-  // =====================================================
+      setIsEditingNickname(
+        true,
+      );
+    };
 
-  const handleEditNickname = () => {
-    setNicknameDraft(
-      nickname,
-    );
+  const handleCancelNickname =
+    () => {
+      setNicknameDraft(
+        nickname,
+      );
 
-    setIsEditingNickname(true);
-  };
-
-  const handleCancelNickname = () => {
-    setNicknameDraft(
-      nickname,
-    );
-
-    setIsEditingNickname(false);
-  };
+      setIsEditingNickname(
+        false,
+      );
+    };
 
   const handleSaveNickname =
     async () => {
@@ -269,7 +289,9 @@ export default function ProfileScreen() {
           ? cleanedNickname
           : DEFAULT_PLAYER_NICKNAME;
 
-      setIsSavingNickname(true);
+      setIsSavingNickname(
+        true,
+      );
 
       await savePlayerProfile({
         nickname:
@@ -284,8 +306,13 @@ export default function ProfileScreen() {
         finalNickname,
       );
 
-      setIsEditingNickname(false);
-      setIsSavingNickname(false);
+      setIsEditingNickname(
+        false,
+      );
+
+      setIsSavingNickname(
+        false,
+      );
     };
 
   if (
@@ -293,13 +320,11 @@ export default function ProfileScreen() {
     !hasLoadedDailyStreak
   ) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingEmoji}>
-          🔥
-        </Text>
+      <View style={styles.loading}>
+        <HeatMark size="large" />
 
         <Text style={styles.loadingText}>
-          Loading your opinions...
+          Loading your receipts...
         </Text>
       </View>
     );
@@ -314,29 +339,22 @@ export default function ProfileScreen() {
           : undefined
       }
     >
-      <Text style={styles.roastBackdrop}>
-        ROAST
-      </Text>
-
-      <Text style={styles.toastBackdrop}>
-        TOAST
-      </Text>
-
       <View style={styles.header}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
-          onPress={handleBackPress}
+          onPress={
+            handleBackPress
+          }
           style={({ pressed }) => [
             styles.headerButton,
-
             pressed &&
-              styles.buttonPressed,
+              styles.pressed,
           ]}
         >
           <Ionicons
             name="arrow-back"
-            size={23}
+            size={22}
             color={
               Colors.textPrimary
             }
@@ -344,23 +362,24 @@ export default function ProfileScreen() {
         </Pressable>
 
         <Text style={styles.headerTitle}>
-          My Profile
+          MY PROFILE
         </Text>
 
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Return Home"
-          onPress={handleHomePress}
+          onPress={
+            handleHomePress
+          }
           style={({ pressed }) => [
             styles.headerButton,
-
             pressed &&
-              styles.buttonPressed,
+              styles.pressed,
           ]}
         >
           <Ionicons
             name="home-outline"
-            size={22}
+            size={21}
             color={
               Colors.textPrimary
             }
@@ -369,153 +388,131 @@ export default function ProfileScreen() {
       </View>
 
       <ScrollView
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={
+          false
+        }
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={
           styles.scrollContent
         }
       >
-        <View style={styles.introBadge}>
-          <Text style={styles.introBadgeText}>
-            YOUR OPINION HISTORY
-          </Text>
-        </View>
+        <StampLabel
+          text="YOUR OPINION HISTORY"
+          color={Colors.roast}
+          rotate={-2}
+          size="medium"
+        />
 
-        <Text style={styles.heading}>
-          The receipts are in.
-        </Text>
+        <View style={styles.profileHeading}>
+          <EditorialHeading
+            title={"THE RECEIPTS\nARE IN."}
+            underlineColor={Colors.roast}
+          />
+        </View>
 
         <Text style={styles.subheading}>
           Apparently, you have opinions.
         </Text>
 
         {/* =================================================
-            Main Identity Card
+            Identity Paper
+
+            This replaces the giant rounded black profile card.
+            I keep all the same data but put it on one piece
+            of physical-looking paper.
         ================================================= */}
 
-        <View style={styles.identityCard}>
-          <View style={styles.identityTopRow}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarEmoji}>
-                🔥
+        <ImageBackground
+          source={require("../../assets/game/paper/paper-plain.png")}
+          resizeMode="stretch"
+          style={styles.identityPaper}
+        >
+          {!isEditingNickname ? (
+            <>
+              <Text style={styles.nickname}>
+                {nickname}
               </Text>
-            </View>
 
-            <View style={styles.identityText}>
-              {!isEditingNickname ? (
-                <>
-                  <Text
-                    style={
-                      styles.nickname
-                    }
-                    numberOfLines={1}
-                  >
-                    {nickname}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Edit nickname"
+                onPress={
+                  handleEditNickname
+                }
+                style={styles.editNickname}
+              >
+                <Ionicons
+                  name="pencil"
+                  size={11}
+                  color={
+                    Colors.roast
+                  }
+                />
+
+                <Text style={styles.editNicknameText}>
+                  EDIT NICKNAME
+                </Text>
+              </Pressable>
+            </>
+          ) : (
+            <View style={styles.editor}>
+              <TextInput
+                value={
+                  nicknameDraft
+                }
+                onChangeText={
+                  setNicknameDraft
+                }
+                autoFocus
+                maxLength={24}
+                returnKeyType="done"
+                placeholder="Choose a nickname"
+                placeholderTextColor={
+                  Colors.textMuted
+                }
+                onSubmitEditing={() => {
+                  void handleSaveNickname();
+                }}
+                style={styles.nicknameInput}
+              />
+
+              <View style={styles.editorActions}>
+                <Pressable
+                  onPress={
+                    handleCancelNickname
+                  }
+                  style={styles.editorAction}
+                >
+                  <Text style={styles.editorActionText}>
+                    CANCEL
                   </Text>
+                </Pressable>
 
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Edit nickname"
-                    onPress={
-                      handleEditNickname
-                    }
-                    style={({ pressed }) => [
-                      styles.editNicknameButton,
-
-                      pressed &&
-                        styles.smallButtonPressed,
-                    ]}
-                  >
-                    <Ionicons
-                      name="pencil"
-                      size={12}
-                      color={
-                        Colors.roast
-                      }
-                    />
-
-                    <Text
-                      style={
-                        styles.editNicknameText
-                      }
-                    >
-                      Edit nickname
-                    </Text>
-                  </Pressable>
-                </>
-              ) : (
-                <View style={styles.editor}>
-                  <TextInput
-                    value={
-                      nicknameDraft
-                    }
-                    onChangeText={
-                      setNicknameDraft
-                    }
-                    autoFocus
-                    maxLength={24}
-                    returnKeyType="done"
-                    placeholder="Choose a nickname"
-                    placeholderTextColor="#8D8D92"
-                    onSubmitEditing={() => {
-                      void handleSaveNickname();
-                    }}
-                    style={styles.nicknameInput}
-                  />
-
-                  <View style={styles.editorActions}>
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel="Cancel nickname changes"
-                      onPress={
-                        handleCancelNickname
-                      }
-                      style={({ pressed }) => [
-                        styles.cancelButton,
-
-                        pressed &&
-                          styles.smallButtonPressed,
-                      ]}
-                    >
-                      <Text style={styles.cancelButtonText}>
-                        Cancel
-                      </Text>
-                    </Pressable>
-
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel="Save nickname"
-                      disabled={
-                        isSavingNickname
-                      }
-                      onPress={() => {
-                        void handleSaveNickname();
-                      }}
-                      style={({ pressed }) => [
-                        styles.saveButton,
-
-                        pressed &&
-                          styles.smallButtonPressed,
-
-                        isSavingNickname &&
-                          styles.disabledButton,
-                      ]}
-                    >
-                      <Text style={styles.saveButtonText}>
-                        {isSavingNickname
-                          ? "Saving..."
-                          : "Save"}
-                      </Text>
-                    </Pressable>
-                  </View>
-                </View>
-              )}
+                <Pressable
+                  disabled={
+                    isSavingNickname
+                  }
+                  onPress={() => {
+                    void handleSaveNickname();
+                  }}
+                  style={[
+                    styles.editorAction,
+                    styles.editorSave,
+                  ]}
+                >
+                  <Text style={styles.editorSaveText}>
+                    {isSavingNickname
+                      ? "SAVING..."
+                      : "SAVE"}
+                  </Text>
+                </Pressable>
+              </View>
             </View>
-          </View>
+          )}
 
-          <View style={styles.identityDivider} />
+          <View style={styles.identityRule} />
 
-          <Text style={styles.titleEyebrow}>
+          <Text style={styles.energyLabel}>
             CURRENT ENERGY
           </Text>
 
@@ -525,14 +522,14 @@ export default function ProfileScreen() {
 
           <View style={styles.levelRow}>
             <Text style={styles.levelText}>
-              Level {progress.level}
+              LEVEL {progress.level}
             </Text>
 
             <Text style={styles.levelHeat}>
               {progress.currentLevelHeat}
               {" / "}
               {progress.heatForNextLevel}
-              {" Heat"}
+              {" HEAT"}
             </Text>
           </View>
 
@@ -540,189 +537,160 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.levelFill,
-
                 {
-                  width: `${levelProgressPercentage * 100}%`,
+                  width:
+                    `${levelProgressPercentage * 100}%`,
                 },
               ]}
             />
           </View>
-        </View>
+        </ImageBackground>
 
-        {/* =================================================
-            Daily Streak
-        ================================================= */}
+        {/* Daily streak becomes a strip instead of a card. */}
+        <SectionStamp
+          text="DAILY STREAK"
+          accent={
+            Colors.heatDark
+          }
+        />
 
-        <Text style={styles.sectionTitle}>
-          Daily Streak
-        </Text>
+        <View style={styles.streakStrip}>
+          <HeatMark
+            size="small"
+          />
 
-        <View style={styles.dailyStreakCard}>
-          <View style={styles.dailyStreakIcon}>
-            <Text style={styles.dailyStreakEmoji}>
-              🔥
-            </Text>
-          </View>
-
-          <View style={styles.dailyStreakText}>
-            <Text style={styles.dailyStreakValue}>
-              Day {dailyStreak.currentStreak}
+          <View style={styles.streakCopy}>
+            <Text style={styles.streakDay}>
+              DAY {dailyStreak.currentStreak}
             </Text>
 
-            <Text style={styles.dailyStreakDescription}>
+            <Text style={styles.streakDescription}>
               Come back tomorrow to keep the Heat going.
             </Text>
           </View>
 
-          <View style={styles.dailyBest}>
-            <Text style={styles.dailyBestValue}>
+          <View style={styles.bestWrap}>
+            <Text style={styles.bestValue}>
               {dailyStreak.bestStreak}
             </Text>
 
-            <Text style={styles.dailyBestLabel}>
+            <Text style={styles.bestLabel}>
               BEST
             </Text>
           </View>
         </View>
 
-        {/* =================================================
-            Main Statistics
-        ================================================= */}
+        <SectionStamp
+          text="LIFETIME RECEIPTS"
+          accent={
+            Colors.roast
+          }
+        />
 
-        <Text style={styles.sectionTitle}>
-          Lifetime Stats
-        </Text>
-
-        <View style={styles.statsGrid}>
-          <StatCard
-            emoji="🔥"
+        <View style={styles.receipts}>
+          <Receipt
+            label="TOTAL HEAT"
             value={
               progress.totalHeat
             }
-            label="Total Heat"
+            accent={
+              Colors.heatDark
+            }
           />
 
-          <StatCard
-            emoji="⚖️"
+          <Receipt
+            label="MOMENTS JUDGED"
             value={
               progress.momentsCompleted
             }
-            label="Moments judged"
+            accent={
+              Colors.textPrimary
+            }
           />
 
-          <StatCard
-            emoji="🎯"
+          <Receipt
+            label="WITH THE CROWD"
             value={`${crowdMatchPercentage}%`}
-            label="With the crowd"
+            accent={
+              Colors.toastDark
+            }
           />
 
-          <StatCard
-            emoji="⚡"
+          <Receipt
+            label="BEST STREAK"
             value={
               progress.bestStreak
             }
-            label="Best match streak"
-          />
-        </View>
-
-        {/* =================================================
-            Roast vs Toast
-        ================================================= */}
-
-        <Text style={styles.sectionTitle}>
-          Your Verdicts
-        </Text>
-
-        <View style={styles.verdictCard}>
-          <VerdictRow
-            emoji="🔥"
-            label="Roast"
-            count={
-              progress.roastCount
-            }
-            percentage={
-              roastPercentage
-            }
-            fillColor={
+            accent={
               Colors.roast
             }
           />
-
-          <View style={styles.verdictDivider} />
-
-          <VerdictRow
-            emoji="♥"
-            label="Toast"
-            count={
-              progress.toastCount
-            }
-            percentage={
-              toastPercentage
-            }
-            fillColor={
-              Colors.toast
-            }
-          />
         </View>
 
-        {/* =================================================
-            Guess the Crowd
-        ================================================= */}
+        <SectionStamp
+          text="YOUR VERDICTS"
+          accent={
+            Colors.toast
+          }
+        />
 
-        <Text style={styles.sectionTitle}>
-          Guess the Crowd
-        </Text>
+        <View style={styles.verdictBattle}>
+          <View style={styles.roastVerdict}>
+            <VoteMark
+              type="roast"
+              size="medium"
+            />
 
-        <View style={styles.crowdCard}>
-          <View style={styles.crowdIconContainer}>
-            <Text style={styles.crowdIcon}>
-              👀
+            <Text style={styles.verdictPercent}>
+              {roastPercentage}%
+            </Text>
+
+            <Text style={styles.verdictLabel}>
+              ROAST
             </Text>
           </View>
 
-          <View style={styles.crowdTextContainer}>
-            <Text style={styles.crowdValue}>
-              {progress.correctCrowdGuesses}
-              {" of "}
-              {progress.crowdGuesses}
+          <View style={styles.toastVerdict}>
+            <VoteMark
+              type="toast"
+              size="medium"
+            />
+
+            <Text style={styles.verdictPercent}>
+              {toastPercentage}%
             </Text>
 
-            <Text style={styles.crowdLabel}>
-              predictions correct
-            </Text>
-          </View>
-
-          <View style={styles.crowdAccuracy}>
-            <Text style={styles.crowdAccuracyValue}>
-              {crowdGuessAccuracy}%
-            </Text>
-
-            <Text style={styles.crowdAccuracyLabel}>
-              ACCURACY
+            <Text style={styles.verdictLabel}>
+              TOAST
             </Text>
           </View>
         </View>
 
-        {/* =================================================
-            Achievements
-        ================================================= */}
-
-        <View style={styles.achievementHeader}>
-          <Text style={styles.sectionTitle}>
-            Achievements
+        <View style={styles.crowdEditorial}>
+          <Text style={styles.crowdEditorialLabel}>
+            CROWD READING
           </Text>
 
-          <Text style={styles.achievementCount}>
-            {unlockedAchievements}
-            {" / "}
-            {achievements.length}
+          <Text style={styles.crowdEditorialValue}>
+            {crowdGuessAccuracy}%
+          </Text>
+
+          <Text style={styles.crowdEditorialCopy}>
+            Guess the Crowd accuracy across {progress.crowdGuesses} predictions.
           </Text>
         </View>
 
-        <View style={styles.achievementsGrid}>
+        <SectionStamp
+          text={`ACHIEVEMENTS ${unlockedAchievements}/${achievements.length}`}
+          accent={
+            Colors.textPrimary
+          }
+        />
+
+        <View style={styles.achievementList}>
           {achievements.map(
             (achievement) => (
-              <AchievementCard
+              <AchievementRow
                 key={
                   achievement.id
                 }
@@ -733,327 +701,227 @@ export default function ProfileScreen() {
             ),
           )}
         </View>
-
-        {/* =================================================
-            Community Feature Preview
-        ================================================= */}
-
-        <Text style={styles.communitySectionTitle}>
-          Community
-        </Text>
-
-        <View style={styles.suggestionCard}>
-          <View style={styles.suggestionTopRow}>
-            <View style={styles.suggestionIcon}>
-              <Ionicons
-                name="bulb-outline"
-                size={24}
-                color={
-                  Colors.roast
-                }
-              />
-            </View>
-
-            <View style={styles.comingSoonBadge}>
-              <Text style={styles.comingSoonText}>
-                COMING SOON
-              </Text>
-            </View>
-          </View>
-
-          <Text style={styles.suggestionTitle}>
-            Got a better take?
-          </Text>
-
-          <Text style={styles.suggestionDescription}>
-            Soon you&apos;ll be able to submit your own Roast or Toast Moment. Community favorites can be featured in the game, with the winning creator getting credit.
-          </Text>
-
-          <View style={styles.weeklyWinnerPreview}>
-            <Text style={styles.weeklyWinnerEmoji}>
-              🏆
-            </Text>
-
-            <View style={styles.weeklyWinnerText}>
-              <Text style={styles.weeklyWinnerTitle}>
-                Moment of the Week
-              </Text>
-
-              <Text style={styles.weeklyWinnerDescription}>
-                One featured community submission each week.
-              </Text>
-            </View>
-          </View>
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Suggest a Moment feature coming soon"
-            disabled
-            style={styles.disabledSuggestionButton}
-          >
-            <Text style={styles.disabledSuggestionButtonText}>
-              Suggest a Moment
-            </Text>
-
-            <Ionicons
-              name="lock-closed-outline"
-              size={16}
-              color={
-                Colors.textSecondary
-              }
-            />
-          </Pressable>
-        </View>
-
-        <Text style={styles.footerText}>
-          Your profile is saved on this device.
-        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-// =====================================================
-// Statistic Card
-// =====================================================
-
-type StatCardProps = {
-  emoji: string;
-  value: string | number;
-  label: string;
-};
-
-function StatCard({
-  emoji,
-  value,
-  label,
-}: StatCardProps) {
+function SectionStamp({
+  text,
+  accent,
+}: {
+  text: string;
+  accent: string;
+}) {
   return (
-    <View style={styles.statCard}>
-      <Text style={styles.statEmoji}>
-        {emoji}
-      </Text>
+    <View style={styles.sectionStampWrap}>
+      <StampLabel
+        text={text}
+        color={accent}
+        rotate={-1.5}
+      />
+    </View>
+  );
+}
 
-      <Text style={styles.statValue}>
+function Receipt({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string | number;
+  accent: string;
+}) {
+  return (
+    <View style={styles.receipt}>
+      <View
+        style={[
+          styles.receiptMark,
+          {
+            backgroundColor:
+              accent,
+          },
+        ]}
+      />
+
+      <Text style={styles.receiptValue}>
         {value}
       </Text>
 
-      <Text style={styles.statLabel}>
+      <Text style={styles.receiptLabel}>
         {label}
       </Text>
     </View>
   );
 }
 
-// =====================================================
-// Verdict Row
-// =====================================================
-
-type VerdictRowProps = {
-  emoji: string;
-  label: string;
-  count: number;
-  percentage: number;
-  fillColor: string;
-};
-
-function VerdictRow({
-  emoji,
-  label,
-  count,
-  percentage,
-  fillColor,
-}: VerdictRowProps) {
-  return (
-    <View>
-      <View style={styles.verdictTopRow}>
-        <View style={styles.verdictName}>
-          <Text style={styles.verdictEmoji}>
-            {emoji}
-          </Text>
-
-          <Text style={styles.verdictLabel}>
-            {label}
-          </Text>
-        </View>
-
-        <View style={styles.verdictNumbers}>
-          <Text style={styles.verdictCount}>
-            {count}
-          </Text>
-
-          <Text style={styles.verdictPercentage}>
-            {percentage}%
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.verdictTrack}>
-        <View
-          style={[
-            styles.verdictFill,
-
-            {
-              width: `${percentage}%`,
-              backgroundColor:
-                fillColor,
-            },
-          ]}
-        />
-      </View>
-    </View>
-  );
-}
-
-// =====================================================
-// Achievement Card
-// =====================================================
-
-type AchievementCardProps = {
-  achievement: Achievement;
-};
-
-function AchievementCard({
+function AchievementRow({
   achievement,
-}: AchievementCardProps) {
+}: {
+  achievement:
+    Achievement;
+}) {
   return (
     <View
       style={[
-        styles.achievementCard,
-
+        styles.achievementRow,
         !achievement.unlocked &&
-          styles.lockedAchievementCard,
+          styles.achievementLocked,
       ]}
     >
-      <View style={styles.achievementIconRow}>
-        <Text
-          style={[
-            styles.achievementEmoji,
-
-            !achievement.unlocked &&
-              styles.lockedAchievementContent,
-          ]}
-        >
-          {achievement.unlocked
-            ? achievement.emoji
-            : "🔒"}
-        </Text>
-
-        {achievement.unlocked && (
-          <View style={styles.unlockedBadge}>
-            <Text style={styles.unlockedBadgeText}>
-              UNLOCKED
-            </Text>
-          </View>
-        )}
+      <View style={styles.achievementIcon}>
+        <AchievementIcon
+          type={
+            achievement.icon
+          }
+        />
       </View>
 
-      <Text
-        style={[
-          styles.achievementTitle,
+      <View style={styles.achievementCopy}>
+        <Text style={styles.achievementTitle}>
+          {achievement.title}
+        </Text>
 
-          !achievement.unlocked &&
-            styles.lockedAchievementContent,
-        ]}
-      >
-        {achievement.title}
-      </Text>
+        <Text style={styles.achievementDescription}>
+          {achievement.description}
+        </Text>
+      </View>
 
-      <Text
-        style={[
-          styles.achievementDescription,
-
-          !achievement.unlocked &&
-            styles.lockedAchievementDescription,
-        ]}
-      >
-        {achievement.description}
+      <Text style={styles.achievementStatus}>
+        {achievement.unlocked
+          ? "UNLOCKED"
+          : "LOCKED"}
       </Text>
     </View>
   );
 }
 
-// =====================================================
-// Achievement Rules
-// =====================================================
+function AchievementIcon({
+  type,
+}: {
+  type:
+    AchievementIcon;
+}) {
+  if (type === "roast") {
+    return (
+      <VoteMark
+        type="roast"
+        size="small"
+      />
+    );
+  }
+
+  if (type === "toast") {
+    return (
+      <VoteMark
+        type="toast"
+        size="small"
+      />
+    );
+  }
+
+  if (type === "heat") {
+    return (
+      <HeatMark
+        size="small"
+      />
+    );
+  }
+
+  const iconName =
+    type === "verdict"
+      ? "checkmark-circle-outline"
+      : type === "streak"
+        ? "trending-up-outline"
+        : type === "crowd"
+          ? "people-outline"
+          : type === "opinions"
+            ? "chatbubble-ellipses-outline"
+            : "ribbon-outline";
+
+  return (
+    <Ionicons
+      name={iconName}
+      size={20}
+      color={
+        Colors.textPrimary
+      }
+    />
+  );
+}
 
 function getAchievements(
-  progress: PlayerProgress,
+  progress:
+    PlayerProgress,
 ): Achievement[] {
   return [
     {
       id: "first-verdict",
-      emoji: "⚖️",
+      icon: "verdict",
       title: "First Verdict",
       description:
         "Judge your first Moment.",
       unlocked:
         progress.momentsCompleted >= 1,
     },
-
     {
       id: "professional-roaster",
-      emoji: "🔥",
+      icon: "roast",
       title: "Professional Roaster",
       description:
         "Choose Roast 25 times.",
       unlocked:
         progress.roastCount >= 25,
     },
-
     {
       id: "soft-spot",
-      emoji: "♥",
+      icon: "toast",
       title: "Soft Spot",
       description:
         "Choose Toast 25 times.",
       unlocked:
         progress.toastCount >= 25,
     },
-
     {
       id: "hot-streak",
-      emoji: "⚡",
+      icon: "streak",
       title: "Hot Streak",
       description:
         "Reach a 5-answer crowd streak.",
       unlocked:
         progress.bestStreak >= 5,
     },
-
     {
       id: "crowd-whisperer",
-      emoji: "🎯",
+      icon: "crowd",
       title: "Crowd Whisperer",
       description:
         "Correctly predict the crowd 5 times.",
       unlocked:
         progress.correctCrowdGuesses >= 5,
     },
-
     {
       id: "heat-check",
-      emoji: "🌶️",
+      icon: "heat",
       title: "Heat Check",
       description:
         "Collect 500 total Heat.",
       unlocked:
         progress.totalHeat >= 500,
     },
-
     {
       id: "opinion-machine",
-      emoji: "🗣️",
+      icon: "opinions",
       title: "Opinion Machine",
       description:
         "Judge 100 Moments.",
       unlocked:
         progress.momentsCompleted >= 100,
     },
-
     {
       id: "certified-instigator",
-      emoji: "😈",
+      icon: "level",
       title: "Certified Instigator",
       description:
         "Reach Level 10.",
@@ -1063,10 +931,6 @@ function getAchievements(
   ];
 }
 
-// =====================================================
-// Styles
-// =====================================================
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -1075,7 +939,7 @@ const styles = StyleSheet.create({
       Colors.background,
   },
 
-  loadingContainer: {
+  loading: {
     flex: 1,
 
     backgroundColor:
@@ -1085,45 +949,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  loadingEmoji: {
-    fontSize: 44,
-    marginBottom: 14,
-  },
-
   loadingText: {
     color:
       Colors.textPrimary,
 
-    fontSize: 19,
+    fontSize: 17,
     fontWeight: "900",
+
+    marginTop: 12,
   },
 
   header: {
-    paddingTop: 60,
+    paddingTop: 58,
     paddingBottom: 12,
     paddingHorizontal:
       Spacing.lg,
 
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent:
+      "space-between",
 
-    zIndex: 5,
+    borderBottomColor:
+      Colors.borderStrong,
+    borderBottomWidth: 1,
   },
 
   headerButton: {
-    width: 43,
-    height: 43,
-
-    backgroundColor:
-      Colors.surface,
+    width: 42,
+    height: 42,
 
     borderColor:
-      Colors.border,
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.pill,
+      Colors.textPrimary,
+    borderWidth: 1.2,
 
     alignItems: "center",
     justifyContent: "center",
@@ -1133,48 +991,57 @@ const styles = StyleSheet.create({
     color:
       Colors.textPrimary,
 
-    fontSize: 18,
+    fontSize: 9,
     fontWeight: "900",
+
+    letterSpacing: 1.5,
   },
 
   scrollContent: {
     paddingHorizontal:
       Spacing.lg,
 
-    paddingTop: 17,
+    paddingTop: 20,
     paddingBottom: 55,
   },
 
-  introBadge: {
+  profileHeading: {
+    marginTop: 16,
+    marginBottom: 8,
+  },
+
+  sectionStampWrap: {
+    marginTop: 17,
+    marginBottom: 10,
+  },
+
+  introStamp: {
     alignSelf: "flex-start",
 
     borderColor:
       Colors.roast,
+    borderWidth: 2,
 
-    borderWidth: 1.5,
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 7,
-    paddingHorizontal: 14,
-
-    marginBottom: 19,
+    paddingVertical: 6,
+    paddingHorizontal: 13,
 
     transform: [
       {
         rotate: "-2deg",
       },
     ],
+
+    marginBottom: 14,
   },
 
-  introBadgeText: {
+  introStampText: {
     color:
       Colors.roast,
 
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: "900",
 
-    letterSpacing: 1.4,
+    letterSpacing: 1.3,
   },
 
   heading: {
@@ -1184,219 +1051,184 @@ const styles = StyleSheet.create({
     fontSize: 39,
     fontWeight: "900",
 
+    lineHeight: 40,
     letterSpacing: -1.7,
-    lineHeight: 44,
   },
 
   subheading: {
     color:
       Colors.textSecondary,
 
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "700",
 
-    marginTop: 4,
-    marginBottom: 25,
+    marginTop: 5,
+    marginBottom: 8,
   },
 
-  identityCard: {
-    backgroundColor:
-      Colors.textPrimary,
+  identityPaper: {
+    minHeight: 330,
 
-    borderRadius:
-      Radius.lg,
+    paddingVertical: 52,
+    paddingHorizontal: 40,
 
-    padding: 19,
-    marginBottom: 26,
-
-    overflow: "hidden",
-  },
-
-  identityTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  avatar: {
-    width: 58,
-    height: 58,
-
-    backgroundColor:
-      "#3A2724",
-
-    borderRadius: 29,
-
-    alignItems: "center",
     justifyContent: "center",
 
-    marginRight: 14,
-  },
-
-  avatarEmoji: {
-    fontSize: 29,
-  },
-
-  identityText: {
-    flex: 1,
+    marginHorizontal: -5,
+    marginBottom: 5,
   },
 
   nickname: {
     color:
-      Colors.white,
+      Colors.textPrimary,
 
-    fontSize: 22,
+    fontSize: 27,
     fontWeight: "900",
+
+    letterSpacing: -0.8,
   },
 
-  editNicknameButton: {
-    alignSelf: "flex-start",
-
+  editNickname: {
     flexDirection: "row",
     alignItems: "center",
 
-    marginTop: 5,
+    gap: 5,
+
+    marginTop: 4,
   },
 
   editNicknameText: {
     color:
       Colors.roast,
 
-    fontSize: 11,
-    fontWeight: "800",
+    fontSize: 7,
+    fontWeight: "900",
 
-    marginLeft: 5,
+    letterSpacing: 1,
   },
 
   editor: {
-    width: "100%",
+    marginBottom: 5,
   },
 
   nicknameInput: {
-    backgroundColor:
-      "#353538",
-
     borderColor:
-      "#56565B",
+      Colors.textPrimary,
+    borderWidth: 1.5,
 
-    borderWidth: 1,
-    borderRadius:
-      Radius.lg,
+    minHeight: 44,
+
+    paddingHorizontal: 10,
 
     color:
-      Colors.white,
+      Colors.textPrimary,
 
     fontSize: 16,
     fontWeight: "800",
-
-    paddingVertical: 10,
-    paddingHorizontal: 12,
   },
 
   editorActions: {
     flexDirection: "row",
-    justifyContent: "flex-end",
 
     gap: 8,
 
-    marginTop: 9,
+    marginTop: 8,
   },
 
-  cancelButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+  editorAction: {
+    borderColor:
+      Colors.textPrimary,
+    borderWidth: 1,
+
+    paddingVertical: 7,
+    paddingHorizontal: 11,
   },
 
-  cancelButtonText: {
-    color: "#CFCFCF",
+  editorActionText: {
+    color:
+      Colors.textPrimary,
 
-    fontSize: 12,
-    fontWeight: "800",
+    fontSize: 8,
+    fontWeight: "900",
   },
 
-  saveButton: {
+  editorSave: {
     backgroundColor:
-      Colors.roast,
-
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 8,
-    paddingHorizontal: 15,
+      Colors.textPrimary,
   },
 
-  saveButtonText: {
+  editorSaveText: {
     color:
       Colors.white,
 
-    fontSize: 12,
+    fontSize: 8,
     fontWeight: "900",
   },
 
-  disabledButton: {
-    opacity: 0.5,
-  },
-
-  identityDivider: {
-    height: 1,
+  identityRule: {
+    height: 2,
 
     backgroundColor:
-      "#424246",
+      Colors.textPrimary,
 
-    marginVertical: 17,
+    opacity: 0.45,
+
+    marginVertical: 18,
   },
 
-  titleEyebrow: {
+  energyLabel: {
     color:
       Colors.roast,
 
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: "900",
 
-    letterSpacing: 1.5,
+    letterSpacing: 1.3,
 
-    marginBottom: 6,
+    marginBottom: 4,
   },
 
   playerTitle: {
     color:
-      Colors.white,
+      Colors.textPrimary,
 
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: "900",
   },
 
   levelRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    justifyContent:
+      "space-between",
 
-    marginTop: 10,
-    marginBottom: 7,
+    marginTop: 9,
   },
 
   levelText: {
     color:
-      Colors.white,
+      Colors.textMuted,
 
-    fontSize: 13,
-    fontWeight: "800",
+    fontSize: 8,
+    fontWeight: "900",
+
+    letterSpacing: 1,
   },
 
   levelHeat: {
-    color: "#CFCFCF",
+    color:
+      Colors.textMuted,
 
-    fontSize: 10,
-    fontWeight: "700",
+    fontSize: 8,
+    fontWeight: "900",
   },
 
   levelTrack: {
     height: 7,
 
     backgroundColor:
-      "#3B3B3F",
+      "rgba(29,29,31,0.13)",
 
-    borderRadius:
-      Radius.pill,
+    marginTop: 6,
 
     overflow: "hidden",
   },
@@ -1406,195 +1238,55 @@ const styles = StyleSheet.create({
 
     backgroundColor:
       Colors.roast,
-
-    borderRadius:
-      Radius.pill,
   },
 
-  sectionTitle: {
-    color:
-      Colors.textPrimary,
+  sectionStamp: {
+    alignSelf: "flex-start",
 
-    fontSize: 18,
+    borderWidth: 1.6,
+
+    paddingVertical: 5,
+    paddingHorizontal: 11,
+
+    marginTop: 17,
+    marginBottom: 10,
+
+    transform: [
+      {
+        rotate: "-1.5deg",
+      },
+    ],
+  },
+
+  sectionStampText: {
+    fontSize: 7.5,
     fontWeight: "900",
 
-    marginBottom: 13,
+    letterSpacing: 1.2,
   },
 
-  // =====================================================
-  // Daily Streak
-  // =====================================================
-
-  dailyStreakCard: {
-    backgroundColor:
-      "#FFF1EC",
-
-    borderColor:
-      "#F4C9BE",
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.lg,
-
-    padding: 16,
-    marginBottom: 27,
+  streakStrip: {
+    minHeight: 76,
 
     flexDirection: "row",
     alignItems: "center",
+
+    borderTopColor:
+      Colors.borderStrong,
+    borderBottomColor:
+      Colors.borderStrong,
+
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+
+    paddingHorizontal: 5,
   },
 
-  dailyStreakIcon: {
-    width: 48,
-    height: 48,
-
-    backgroundColor:
-      Colors.white,
-
-    borderRadius: 24,
-
-    alignItems: "center",
-    justifyContent: "center",
-
-    marginRight: 12,
+  streakCopy: {
+    marginLeft: 9,
   },
 
-  dailyStreakEmoji: {
-    fontSize: 25,
-  },
-
-  dailyStreakText: {
-    flex: 1,
-  },
-
-  dailyStreakValue: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 20,
-    fontWeight: "900",
-  },
-
-  dailyStreakDescription: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 10,
-    fontWeight: "700",
-    lineHeight: 15,
-
-    marginTop: 3,
-  },
-
-  dailyBest: {
-    alignItems: "flex-end",
-
-    marginLeft: 10,
-  },
-
-  dailyBestValue: {
-    color:
-      Colors.roast,
-
-    fontSize: 21,
-    fontWeight: "900",
-  },
-
-  dailyBestLabel: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 8,
-    fontWeight: "900",
-
-    letterSpacing: 0.8,
-  },
-
-  // =====================================================
-  // Stats
-  // =====================================================
-
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-
-    gap: 12,
-
-    marginBottom: 27,
-  },
-
-  statCard: {
-    width: "48%",
-
-    backgroundColor:
-      Colors.surface,
-
-    borderColor:
-      Colors.border,
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.lg,
-
-    padding: 16,
-  },
-
-  statEmoji: {
-    fontSize: 21,
-    marginBottom: 7,
-  },
-
-  statValue: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 25,
-    fontWeight: "900",
-  },
-
-  statLabel: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 11,
-    fontWeight: "700",
-
-    marginTop: 3,
-  },
-
-  verdictCard: {
-    backgroundColor:
-      Colors.surface,
-
-    borderColor:
-      Colors.border,
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.lg,
-
-    padding: 17,
-    marginBottom: 27,
-  },
-
-  verdictTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-
-    marginBottom: 9,
-  },
-
-  verdictName: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  verdictEmoji: {
-    fontSize: 17,
-    marginRight: 7,
-  },
-
-  verdictLabel: {
+  streakDay: {
     color:
       Colors.textPrimary,
 
@@ -1602,121 +1294,25 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
 
-  verdictNumbers: {
-    flexDirection: "row",
-    alignItems: "baseline",
-  },
-
-  verdictCount: {
+  streakDescription: {
     color:
       Colors.textSecondary,
 
-    fontSize: 11,
-    fontWeight: "700",
-
-    marginRight: 8,
-  },
-
-  verdictPercentage: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 15,
-    fontWeight: "900",
-  },
-
-  verdictTrack: {
-    height: 8,
-
-    backgroundColor:
-      Colors.surfaceAlt,
-
-    borderRadius:
-      Radius.pill,
-
-    overflow: "hidden",
-  },
-
-  verdictFill: {
-    height: "100%",
-
-    borderRadius:
-      Radius.pill,
-  },
-
-  verdictDivider: {
-    height: 1,
-
-    backgroundColor:
-      Colors.border,
-
-    marginVertical: 17,
-  },
-
-  crowdCard: {
-    backgroundColor:
-      "#FFF1EC",
-
-    borderColor:
-      "#F4C9BE",
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.lg,
-
-    padding: 16,
-    marginBottom: 27,
-
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  crowdIconContainer: {
-    width: 45,
-    height: 45,
-
-    backgroundColor:
-      Colors.white,
-
-    borderRadius: 23,
-
-    alignItems: "center",
-    justifyContent: "center",
-
-    marginRight: 12,
-  },
-
-  crowdIcon: {
-    fontSize: 22,
-  },
-
-  crowdTextContainer: {
-    flex: 1,
-  },
-
-  crowdValue: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 17,
-    fontWeight: "900",
-  },
-
-  crowdLabel: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: "700",
 
     marginTop: 2,
+
+    maxWidth: 220,
   },
 
-  crowdAccuracy: {
-    alignItems: "flex-end",
+  bestWrap: {
+    marginLeft: "auto",
+
+    alignItems: "center",
   },
 
-  crowdAccuracyValue: {
+  bestValue: {
     color:
       Colors.roast,
 
@@ -1724,350 +1320,231 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
 
-  crowdAccuracyLabel: {
+  bestLabel: {
     color:
-      Colors.textSecondary,
-
-    fontSize: 8,
-    fontWeight: "900",
-
-    letterSpacing: 0.8,
-  },
-
-  // =====================================================
-  // Achievements
-  // =====================================================
-
-  achievementHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
-  achievementCount: {
-    color:
-      Colors.roast,
-
-    fontSize: 12,
-    fontWeight: "900",
-
-    marginBottom: 13,
-  },
-
-  achievementsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-
-    gap: 12,
-  },
-
-  achievementCard: {
-    width: "48%",
-    minHeight: 153,
-
-    backgroundColor:
-      Colors.surface,
-
-    borderColor:
-      Colors.roast,
-
-    borderWidth: 1.25,
-    borderRadius:
-      Radius.lg,
-
-    padding: 15,
-  },
-
-  lockedAchievementCard: {
-    borderColor:
-      Colors.border,
-
-    backgroundColor:
-      Colors.surfaceAlt,
-  },
-
-  achievementIconRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-
-    marginBottom: 12,
-  },
-
-  achievementEmoji: {
-    fontSize: 24,
-  },
-
-  unlockedBadge: {
-    backgroundColor:
-      "#FFF1EC",
-
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 4,
-    paddingHorizontal: 7,
-  },
-
-  unlockedBadgeText: {
-    color:
-      Colors.roast,
+      Colors.textMuted,
 
     fontSize: 7,
     fontWeight: "900",
 
-    letterSpacing: 0.6,
+    letterSpacing: 1,
+  },
+
+  receipts: {
+    borderTopColor:
+      Colors.textPrimary,
+    borderBottomColor:
+      Colors.textPrimary,
+
+    borderTopWidth: 1.4,
+    borderBottomWidth: 1.4,
+  },
+
+  receipt: {
+    position: "relative",
+
+    minHeight: 72,
+
+    borderBottomColor:
+      Colors.borderStrong,
+    borderBottomWidth: 1,
+
+    justifyContent: "center",
+
+    paddingLeft: 18,
+  },
+
+  receiptMark: {
+    position: "absolute",
+
+    width: 5,
+
+    left: 0,
+    top: 12,
+    bottom: 12,
+  },
+
+  receiptValue: {
+    color:
+      Colors.textPrimary,
+
+    fontSize: 24,
+    fontWeight: "900",
+  },
+
+  receiptLabel: {
+    color:
+      Colors.textMuted,
+
+    fontSize: 7.5,
+    fontWeight: "900",
+
+    letterSpacing: 1,
+
+    marginTop: 1,
+  },
+
+  verdictBattle: {
+    flexDirection: "row",
+
+    height: 190,
+
+    marginBottom: 10,
+  },
+
+  roastVerdict: {
+    flex: 1,
+
+    backgroundColor:
+      Colors.roast,
+
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  toastVerdict: {
+    flex: 1,
+
+    backgroundColor:
+      Colors.toast,
+
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  verdictPercent: {
+    color:
+      Colors.white,
+
+    fontSize: 36,
+    fontWeight: "900",
+
+    marginTop: 4,
+  },
+
+  verdictLabel: {
+    color:
+      Colors.white,
+
+    fontSize: 8,
+    fontWeight: "900",
+
+    letterSpacing: 1.2,
+  },
+
+  crowdEditorial: {
+    backgroundColor:
+      Colors.toastWash,
+
+    borderLeftColor:
+      Colors.toast,
+    borderLeftWidth: 6,
+
+    paddingVertical: 15,
+    paddingHorizontal: 17,
+
+    marginBottom: 5,
+  },
+
+  crowdEditorialLabel: {
+    color:
+      Colors.toastDark,
+
+    fontSize: 8,
+    fontWeight: "900",
+
+    letterSpacing: 1.1,
+  },
+
+  crowdEditorialValue: {
+    color:
+      Colors.toastDark,
+
+    fontSize: 31,
+    fontWeight: "900",
+
+    marginTop: 3,
+  },
+
+  crowdEditorialCopy: {
+    color:
+      Colors.textPrimary,
+
+    fontSize: 11,
+    fontWeight: "700",
+
+    lineHeight: 16,
+
+    marginTop: 2,
+  },
+
+  achievementList: {
+    borderTopColor:
+      Colors.textPrimary,
+    borderTopWidth: 1.4,
+  },
+
+  achievementRow: {
+    minHeight: 82,
+
+    borderBottomColor:
+      Colors.borderStrong,
+    borderBottomWidth: 1,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    paddingVertical: 10,
+  },
+
+  achievementLocked: {
+    opacity: 0.38,
+  },
+
+  achievementIcon: {
+    width: 42,
+
+    alignItems: "center",
+  },
+
+  achievementCopy: {
+    flex: 1,
   },
 
   achievementTitle: {
     color:
       Colors.textPrimary,
 
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "900",
-
-    lineHeight: 18,
-
-    marginBottom: 5,
   },
 
   achievementDescription: {
     color:
       Colors.textSecondary,
 
-    fontSize: 10,
-    fontWeight: "600",
+    fontSize: 9.5,
+    fontWeight: "700",
 
-    lineHeight: 15,
+    marginTop: 2,
   },
 
-  lockedAchievementContent: {
-    opacity: 0.45,
-  },
-
-  lockedAchievementDescription: {
-    opacity: 0.55,
-  },
-
-  // =====================================================
-  // Community Preview
-  // =====================================================
-
-  communitySectionTitle: {
+  achievementStatus: {
     color:
-      Colors.textPrimary,
+      Colors.textMuted,
 
-    fontSize: 18,
+    fontSize: 6.5,
     fontWeight: "900",
 
-    marginTop: 28,
-    marginBottom: 13,
+    letterSpacing: 0.9,
   },
 
-  suggestionCard: {
-    backgroundColor:
-      Colors.textPrimary,
-
-    borderRadius:
-      Radius.lg,
-
-    padding: 19,
-
-    overflow: "hidden",
-  },
-
-  suggestionTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-
-    marginBottom: 15,
-  },
-
-  suggestionIcon: {
-    width: 45,
-    height: 45,
-
-    backgroundColor:
-      "#3A2724",
-
-    borderRadius: 23,
-
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  comingSoonBadge: {
-    borderColor:
-      Colors.toast,
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 5,
-    paddingHorizontal: 9,
-  },
-
-  comingSoonText: {
-    color:
-      Colors.toast,
-
-    fontSize: 8,
-    fontWeight: "900",
-
-    letterSpacing: 1,
-  },
-
-  suggestionTitle: {
-    color:
-      Colors.white,
-
-    fontSize: 23,
-    fontWeight: "900",
-
-    marginBottom: 7,
-  },
-
-  suggestionDescription: {
-    color: "#CFCFCF",
-
-    fontSize: 11,
-    fontWeight: "600",
-    lineHeight: 18,
-
-    marginBottom: 16,
-  },
-
-  weeklyWinnerPreview: {
-    backgroundColor:
-      "#303034",
-
-    borderRadius:
-      Radius.lg,
-
-    padding: 13,
-
-    flexDirection: "row",
-    alignItems: "center",
-
-    marginBottom: 14,
-  },
-
-  weeklyWinnerEmoji: {
-    fontSize: 22,
-    marginRight: 10,
-  },
-
-  weeklyWinnerText: {
-    flex: 1,
-  },
-
-  weeklyWinnerTitle: {
-    color:
-      Colors.white,
-
-    fontSize: 12,
-    fontWeight: "900",
-  },
-
-  weeklyWinnerDescription: {
-    color: "#AFAFB4",
-
-    fontSize: 9,
-    fontWeight: "600",
-
-    marginTop: 3,
-  },
-
-  disabledSuggestionButton: {
-    backgroundColor:
-      "#3A3A3E",
-
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 13,
-    paddingHorizontal: 17,
-
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-
-    opacity: 0.75,
-  },
-
-  disabledSuggestionButtonText: {
-    color: "#AFAFB4",
-
-    fontSize: 13,
-    fontWeight: "900",
-  },
-
-  footerText: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 11,
-    fontWeight: "600",
-
-    textAlign: "center",
-
-    marginTop: 24,
-  },
-
-  buttonPressed: {
-    opacity: 0.68,
+  pressed: {
+    opacity: 0.7,
 
     transform: [
       {
-        scale: 0.96,
-      },
-    ],
-  },
-
-  smallButtonPressed: {
-    opacity: 0.68,
-  },
-
-  roastBackdrop: {
-    position: "absolute",
-
-    top: 160,
-    right: -54,
-
-    color:
-      Colors.roast,
-
-    fontSize: 94,
-    fontWeight: "900",
-
-    opacity: 0.055,
-
-    transform: [
-      {
-        rotate: "8deg",
-      },
-    ],
-  },
-
-  toastBackdrop: {
-    position: "absolute",
-
-    bottom: 45,
-    left: -47,
-
-    color:
-      Colors.toast,
-
-    fontSize: 91,
-    fontWeight: "900",
-
-    opacity: 0.055,
-
-    transform: [
-      {
-        rotate: "-8deg",
+        scale: 0.985,
       },
     ],
   },

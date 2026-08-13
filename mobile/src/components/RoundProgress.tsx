@@ -44,6 +44,8 @@ import {
   Radius,
 } from "../theme";
 
+import HeatMark from "./HeatMark";
+
 // Information required by the round progress display.
 type RoundProgressProps = {
   roundMode: RoundMode;
@@ -319,7 +321,7 @@ function FiniteRoundProgress({
           {safeCompletedMoments <
           momentLimit
             ? `${momentLimit - safeCompletedMoments} left`
-            : "🔥"}
+            : "DONE"}
         </Text>
       </View>
     </View>
@@ -431,9 +433,7 @@ function EndlessProgress({
           },
         ]}
       >
-        <Text style={styles.endlessIcon}>
-          ∞
-        </Text>
+        <HeatMark size="small" />
       </Animated.View>
 
       {/* Endless mode text */}
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
   },
 
   modeDot: {
-    color: Colors.roast,
+    color: Colors.heat,
 
     fontSize: 18,
     fontWeight: "900",
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
 
     backgroundColor:
-      Colors.roast,
+      Colors.heat,
 
     borderRadius:
       Radius.pill,
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     height: "100%",
 
     backgroundColor:
-      Colors.roast,
+      Colors.heat,
 
     borderRadius:
       Radius.pill,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
       Colors.white,
 
     borderColor:
-      Colors.roast,
+      Colors.heat,
 
     borderWidth: 2,
   },
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
   },
 
   remainingText: {
-    color: Colors.roast,
+    color: Colors.heat,
 
     fontSize: 9,
     fontWeight: "900",
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
     borderRadius: 19,
 
     backgroundColor:
-      "#FFF1EC",
+      Colors.heatSoft,
 
     alignItems: "center",
     justifyContent: "center",
@@ -661,14 +661,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 
-  endlessIcon: {
-    color: Colors.roast,
-
-    fontSize: 25,
-    fontWeight: "900",
-
-    marginTop: -2,
-  },
 
   endlessTextContainer: {
     flex: 1,
@@ -701,7 +693,7 @@ const styles = StyleSheet.create({
   },
 
   endlessCount: {
-    color: Colors.roast,
+    color: Colors.heat,
 
     fontSize: 18,
     fontWeight: "900",

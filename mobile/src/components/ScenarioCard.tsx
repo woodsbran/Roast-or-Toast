@@ -2,27 +2,42 @@
 // File: ScenarioCard.tsx
 //
 // Purpose:
-// Displays the current category badge and Moment.
+// Displays the category and the current Moment.
 //
-// Before voting, the Moment is large and visually bold.
-// After voting, compact mode reduces the question size
-// so the results fit more comfortably on the screen.
+// Version 1.1 — Screen Composition Rebuild
+//
+// I am treating the paper like a fixed game board now.
+//
+// The last version let the question keep growing until the
+// whole paper became huge. That pushed the vote choices off
+// the screen and made the game feel like a webpage.
+//
+// What I am doing here:
+// • I size the text based on the Moment length
+// • Long Moments get smaller before the paper gets taller
+// • The category stays compact
+// • The question always stays centered inside the artwork
+//
+// The paper texture itself still comes from scenario.tsx.
 //
 // Project: Roast or Toast
 // =====================================================
 
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
-import { Colors, Radius } from "../theme";
+import {
+  Colors,
+} from "../theme";
 
-// Information required to display one Moment.
 type ScenarioCardProps = {
   categoryLabel: string;
   categoryAccent: string;
   categorySoft: string;
   question: string;
-
-  // Compact mode is used after the player votes.
   compact?: boolean;
 };
 
@@ -31,85 +46,149 @@ export default function ScenarioCard({
   categoryAccent,
   categorySoft,
   question,
-  compact = false,
 }: ScenarioCardProps) {
+  // I shrink longer Moments before I ever let them break the
+  // composition. The goal is for every Moment to feel like it
+  // belongs to the same physical game board.
+  const questionLength =
+    question.length;
+
+  const questionStyle =
+    questionLength > 150
+      ? styles.scenarioTextSmall
+      : questionLength > 105
+        ? styles.scenarioTextMedium
+        : styles.scenarioTextLarge;
+
   return (
-    <View>
-      {/* Category badge changes with the current Moment */}
+    <View style={styles.container}>
+      {/* =================================================
+          Category Stamp
+      ================================================= */}
+
       <View
         style={[
-          styles.categoryBadge,
+          styles.categoryStamp,
           {
-            backgroundColor: categorySoft,
-            borderColor: categoryAccent,
+            backgroundColor:
+              categorySoft,
+
+            borderColor:
+              categoryAccent,
           },
-          compact && styles.compactCategoryBadge,
         ]}
       >
         <Text
           style={[
-            styles.categoryBadgeText,
+            styles.categoryStampText,
             {
-              color: categoryAccent,
+              color:
+                categoryAccent,
             },
           ]}
         >
-          {categoryLabel}
+          {categoryLabel.toUpperCase()}
         </Text>
       </View>
 
-      {/* Main Moment text */}
+      {/* =================================================
+          Moment
+
+          The font changes before the paper size changes.
+          That is what keeps the board consistent.
+      ================================================= */}
+
       <Text
         style={[
           styles.scenarioText,
-          compact && styles.compactScenarioText,
+          questionStyle,
         ]}
+        numberOfLines={8}
+        adjustsFontSizeToFit
+        minimumFontScale={0.78}
       >
         {question}
       </Text>
+
+      <View style={styles.bottomScratch} />
     </View>
   );
 }
 
-// =====================================================
-// Styles
-// =====================================================
+const styles =
+  StyleSheet.create({
+    container: {
+      flex: 1,
 
-const styles = StyleSheet.create({
-  categoryBadge: {
-    alignSelf: "flex-start",
-    borderWidth: 1.5,
-    borderRadius: Radius.pill,
-    paddingVertical: 7,
-    paddingHorizontal: 15,
-    marginBottom: 25,
-    transform: [{ rotate: "-2deg" }],
-  },
+      width: "100%",
 
-  compactCategoryBadge: {
-    marginBottom: 16,
-  },
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  categoryBadgeText: {
-    fontSize: 11,
-    fontWeight: "900",
-    letterSpacing: 1.7,
-  },
+    categoryStamp: {
+      borderWidth: 1.5,
 
-  scenarioText: {
-    color: Colors.textPrimary,
-    fontSize: 37,
-    fontWeight: "900",
-    letterSpacing: -1.6,
-    lineHeight: 47,
-    marginBottom: 30,
-  },
+      paddingVertical: 5,
+      paddingHorizontal: 13,
 
-  // Results do not need the question to remain enormous.
-  compactScenarioText: {
-    fontSize: 28,
-    lineHeight: 36,
-    letterSpacing: -1.1,
-    marginBottom: 24,
-  },
-});
+      marginBottom: 15,
+
+      transform: [
+        {
+          rotate: "-3deg",
+        },
+      ],
+    },
+
+    categoryStampText: {
+      fontSize: 9,
+      fontWeight: "900",
+
+      letterSpacing: 1.45,
+    },
+
+    scenarioText: {
+      color:
+        Colors.textPrimary,
+
+      fontWeight: "900",
+
+      textAlign: "center",
+
+      letterSpacing: -1,
+    },
+
+    scenarioTextLarge: {
+      fontSize: 26,
+      lineHeight: 32,
+    },
+
+    scenarioTextMedium: {
+      fontSize: 22,
+      lineHeight: 28,
+    },
+
+    scenarioTextSmall: {
+      fontSize: 18.5,
+      lineHeight: 24,
+    },
+
+    bottomScratch: {
+      width: "68%",
+      height: 3,
+
+      backgroundColor:
+        Colors.textPrimary,
+
+      opacity: 0.65,
+
+      marginTop: 16,
+
+      transform: [
+        {
+          rotate: "-1deg",
+        },
+      ],
+    },
+  });

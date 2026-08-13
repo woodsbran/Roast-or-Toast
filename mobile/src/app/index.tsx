@@ -1,1093 +1,391 @@
 // =====================================================
 // File: index.tsx
-//
 // Screen: Home
-//
-// Purpose:
-// Introduces Roast or Toast and provides:
-//
-// • Continue Session
-// • New Round
-// • My Profile
-// • Settings
-// • Daily return streak
-//
-// A locally saved nickname appears as a subtle greeting.
-//
-// Project: Roast or Toast
+// Version 1.1 — Cover / Poster Redesign
 // =====================================================
 
 import { Ionicons } from "@expo/vector-icons";
-
-import {
-  router,
-  useFocusEffect,
-} from "expo-router";
-
-import {
-  useCallback,
-  useRef,
-  useState,
-} from "react";
-
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import {
   DEFAULT_PLAYER_NICKNAME,
   loadPlayerProfile,
 } from "../game/profileStorage";
+import { loadGameSession } from "../game/sessionStorage";
+import { useDailyStreak } from "../hooks/useDailyStreak";
+import { Colors, Spacing } from "../theme";
 
-import {
-  loadGameSession,
-} from "../game/sessionStorage";
-
-import {
-  useDailyStreak,
-} from "../hooks/useDailyStreak";
-
-import {
-  Colors,
-  Radius,
-  Spacing,
-} from "../theme";
+import BrandMark from "../components/BrandMark";
+import HeatMark from "../components/HeatMark";
+import InkUnderline from "../components/InkUnderline";
+import StampLabel from "../components/StampLabel";
 
 export default function HomeScreen() {
-  const buttonScale = useRef(
-    new Animated.Value(1),
-  ).current;
-
-  const [
-    hasSavedSession,
-    setHasSavedSession,
-  ] = useState(false);
-
-  const [
-    isCheckingSession,
-    setIsCheckingSession,
-  ] = useState(true);
-
-  const [
-    nickname,
-    setNickname,
-  ] = useState(
-    DEFAULT_PLAYER_NICKNAME,
-  );
-
-  // Daily return streak stored locally.
-  const {
-    dailyStreak,
-    hasLoadedDailyStreak,
-  } = useDailyStreak();
-
-  // =====================================================
-  // Restore Home Data
-  // =====================================================
+  const [hasSavedSession, setHasSavedSession] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [nickname, setNickname] = useState(DEFAULT_PLAYER_NICKNAME);
+  const { dailyStreak, hasLoadedDailyStreak } = useDailyStreak();
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
 
-      const restoreHomeData =
-        async () => {
-          setIsCheckingSession(true);
+      const restoreHomeData = async () => {
+        setIsCheckingSession(true);
+        const [savedSession, savedProfile] = await Promise.all([
+          loadGameSession(),
+          loadPlayerProfile(),
+        ]);
 
-          const [
-            savedSession,
-            savedProfile,
-          ] = await Promise.all([
-            loadGameSession(),
-            loadPlayerProfile(),
-          ]);
+        if (!isActive) return;
 
-          if (!isActive) {
-            return;
-          }
-
-          setHasSavedSession(
-            Boolean(
-              savedSession?.hasActiveSession,
-            ),
-          );
-
-          setNickname(
-            savedProfile.nickname,
-          );
-
-          setIsCheckingSession(false);
-        };
+        setHasSavedSession(Boolean(savedSession?.hasActiveSession));
+        setNickname(savedProfile.nickname);
+        setIsCheckingSession(false);
+      };
 
       void restoreHomeData();
-
       return () => {
         isActive = false;
       };
     }, []),
   );
 
-  // =====================================================
-  // Button Animation
-  // =====================================================
-
-  const handlePressIn = () => {
-    Animated.spring(
-      buttonScale,
-      {
-        toValue: 0.96,
-        useNativeDriver: true,
-        speed: 30,
-        bounciness: 4,
-      },
-    ).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(
-      buttonScale,
-      {
-        toValue: 1,
-        useNativeDriver: true,
-        speed: 30,
-        bounciness: 5,
-      },
-    ).start();
-  };
-
-  // =====================================================
-  // Navigation
-  // =====================================================
-
   const handleContinueSession = () => {
-    router.push({
-      pathname: "/scenario",
-
-      params: {
-        mode: "continue",
-      },
-    });
+    router.push({ pathname: "/scenario", params: { mode: "continue" } });
   };
 
-  const handleNewRound = () => {
-    router.push(
-      "/mode-select",
-    );
-  };
+  const handleNewRound = () => router.push("/mode-select");
+  const handleProfilePress = () => router.push("/profile");
+  const handleSettingsPress = () => router.push("/settings");
 
-  const handleProfilePress = () => {
-    router.push(
-      "/profile",
-    );
-  };
-
-  const handleSettingsPress = () => {
-    router.push(
-      "/settings",
-    );
-  };
-
-  const hasCustomNickname =
-    nickname !==
-    DEFAULT_PLAYER_NICKNAME;
+  const hasCustomNickname = nickname !== DEFAULT_PLAYER_NICKNAME;
 
   return (
     <View style={styles.container}>
-      {/* =================================================
-          Themed Background
-      ================================================= */}
+      {/* The top now behaves like the game's masthead, not an app dashboard. */}
+      <View style={styles.masthead}>
+        <View style={styles.utilityRow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open player profile"
+            onPress={handleProfilePress}
+            style={({ pressed }) => [styles.utilityButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="person-outline" size={17} color={Colors.white} />
+            <Text style={styles.utilityText}>PROFILE</Text>
+          </Pressable>
 
-      <View style={styles.roastBackdrop}>
-        <Text style={styles.roastSymbol}>
-          🔥
-        </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open settings"
+            onPress={handleSettingsPress}
+            style={({ pressed }) => [styles.utilityIconButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="settings-outline" size={19} color={Colors.white} />
+          </Pressable>
+        </View>
 
-        <Text style={styles.roastBackdropText}>
-          ROAST
-        </Text>
+        <Text style={styles.alright}>Alright...</Text>
+        <Text style={styles.title}>LET&apos;S BE HONEST.</Text>
+
+        <View style={styles.underlineRow}>
+          <InkUnderline color={Colors.roast} width={58} rotate={-7} />
+          <InkUnderline color={Colors.toast} width={58} rotate={7} />
+        </View>
       </View>
 
-      <View style={styles.toastBackdrop}>
-        <Text style={styles.toastBackdropText}>
-          TOAST
-        </Text>
+      {/* No giant parchment sheet. The cream page itself is the canvas. */}
+      <View style={styles.body}>
+        <View style={styles.identityRow}>
+          <View style={[styles.identitySide, styles.roastIdentity]}>
+            <BrandMark type="roast" size="large" />
+            <Text style={styles.roastWord}>ROAST</Text>
+          </View>
 
-        <Text style={styles.toastSymbol}>
-          ♥
-        </Text>
-      </View>
+          <View style={styles.orPuck}>
+            <Text style={styles.orText}>OR</Text>
+          </View>
 
-      <View style={styles.hotTakeBadge}>
-        <Text style={styles.hotTakeText}>
-          HOT TAKE
-        </Text>
-      </View>
-
-      <View style={styles.verdictBadge}>
-        <Text style={styles.verdictText}>
-          YOUR VERDICT
-        </Text>
-      </View>
-
-      {/* =================================================
-          Top Navigation
-      ================================================= */}
-
-      <View style={styles.topActions}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Open player profile"
-          onPress={
-            handleProfilePress
-          }
-          style={({ pressed }) => [
-            styles.profileButton,
-
-            pressed &&
-              styles.topButtonPressed,
-          ]}
-        >
-          <Ionicons
-            name="person-outline"
-            size={18}
-            color={
-              Colors.textPrimary
-            }
-          />
-
-          <Text style={styles.profileButtonText}>
-            My Profile
-          </Text>
-        </Pressable>
-
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Open Settings"
-          onPress={
-            handleSettingsPress
-          }
-          style={({ pressed }) => [
-            styles.settingsButton,
-
-            pressed &&
-              styles.topButtonPressed,
-          ]}
-        >
-          <Ionicons
-            name="settings-outline"
-            size={20}
-            color={
-              Colors.textPrimary
-            }
-          />
-        </Pressable>
-      </View>
-
-      {/* =================================================
-          Main Content
-      ================================================= */}
-
-      <View style={styles.content}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoPrimary}>
-            Roast
-          </Text>
-
-          <View style={styles.logoSecondLine}>
-            <Text style={styles.logoOr}>
-              or
-            </Text>
-
-            <Text style={styles.logoSecondary}>
-              Toast
-            </Text>
+          <View style={[styles.identitySide, styles.toastIdentity]}>
+            <BrandMark type="toast" size="large" />
+            <Text style={styles.toastWord}>TOAST</Text>
           </View>
         </View>
 
-        <View style={styles.taglineContainer}>
-          {hasCustomNickname && (
-            <Text style={styles.nicknameGreeting}>
-              Welcome back, {nickname}.
-            </Text>
-          )}
+        <View style={styles.rule} />
 
-          <Text style={styles.tagline}>
-            Alright...
-          </Text>
+        {hasCustomNickname && (
+          <Text style={styles.greeting}>WELCOME BACK, {nickname.toUpperCase()}.</Text>
+        )}
 
-          <Text style={styles.taglineEmphasis}>
-            let&apos;s be honest.
-          </Text>
-        </View>
-
-        {/* Daily return streak */}
         {hasLoadedDailyStreak && (
-          <View style={styles.dailyStreakCard}>
-            <View style={styles.dailyStreakIcon}>
-              <Text style={styles.dailyStreakEmoji}>
-                🔥
-              </Text>
+          <View style={styles.streakStrip}>
+            <View style={styles.streakLead}>
+              <HeatMark size="small" />
+              <View style={styles.streakCopy}>
+                <Text style={styles.streakDay}>DAY {dailyStreak.currentStreak}</Text>
+                <Text style={styles.streakLabel}>DAILY OPINION STREAK</Text>
+              </View>
             </View>
 
-            <View style={styles.dailyStreakText}>
-              <Text style={styles.dailyStreakValue}>
-                Day {dailyStreak.currentStreak}
-              </Text>
-
-              <Text style={styles.dailyStreakLabel}>
-                Daily opinion streak
-              </Text>
-            </View>
-
-            <View style={styles.bestStreakContainer}>
-              <Text style={styles.bestStreakValue}>
-                {dailyStreak.bestStreak}
-              </Text>
-
-              <Text style={styles.bestStreakLabel}>
-                BEST
-              </Text>
+            <View style={styles.bestBlock}>
+              <Text style={styles.bestValue}>{dailyStreak.bestStreak}</Text>
+              <Text style={styles.bestLabel}>BEST</Text>
             </View>
           </View>
         )}
 
-        {isCheckingSession && (
-          <Text style={styles.loadingText}>
-            Checking your last round...
-          </Text>
+        {isCheckingSession ? (
+          <Text style={styles.loadingText}>CHECKING YOUR LAST ROUND...</Text>
+        ) : hasSavedSession ? (
+          <View style={styles.actionStack}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Continue session"
+              onPress={handleContinueSession}
+              style={({ pressed }) => [styles.heroAction, pressed && styles.pressed]}
+            >
+              <View>
+                <Text style={styles.heroEyebrow}>PICK UP WHERE YOU LEFT OFF</Text>
+                <Text style={styles.heroActionText}>CONTINUE SESSION</Text>
+              </View>
+              <Text style={styles.heroArrow}>→</Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Choose a new round"
+              onPress={handleNewRound}
+              style={({ pressed }) => [styles.secondaryAction, pressed && styles.pressed]}
+            >
+              <View>
+                <StampLabel text="NEW ROUND" color={Colors.roast} rotate={-2} />
+                <Text style={styles.secondaryCopy}>Quick 10, Standard 20, or Endless</Text>
+              </View>
+              <Text style={styles.secondaryArrow}>→</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Choose a new Roast or Toast round"
+            onPress={handleNewRound}
+            style={({ pressed }) => [styles.startBlock, pressed && styles.pressed]}
+          >
+            <View>
+              <StampLabel text="NEW ROUND" color={Colors.roast} rotate={-2} />
+              <Text style={styles.startTitle}>READY?</Text>
+              <Text style={styles.startCopy}>Pick a round. Pick a side.</Text>
+            </View>
+            <Text style={styles.startArrow}>→</Text>
+          </Pressable>
         )}
 
-        {!isCheckingSession &&
-          !hasSavedSession && (
-            <Animated.View
-              style={[
-                styles.buttonWrapper,
-
-                {
-                  transform: [
-                    {
-                      scale:
-                        buttonScale,
-                    },
-                  ],
-                },
-              ]}
-            >
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Choose a new Roast or Toast round"
-                onPress={
-                  handleNewRound
-                }
-                onPressIn={
-                  handlePressIn
-                }
-                onPressOut={
-                  handlePressOut
-                }
-                style={({ pressed }) => [
-                  styles.primaryButton,
-
-                  pressed &&
-                    styles.primaryButtonPressed,
-                ]}
-              >
-                <Text style={styles.primaryButtonText}>
-                  Ready
-                </Text>
-
-                <Text style={styles.primaryButtonArrow}>
-                  →
-                </Text>
-              </Pressable>
-            </Animated.View>
-          )}
-
-        {!isCheckingSession &&
-          hasSavedSession && (
-            <View style={styles.sessionActions}>
-              <Animated.View
-                style={[
-                  styles.fullWidthButtonWrapper,
-
-                  {
-                    transform: [
-                      {
-                        scale:
-                          buttonScale,
-                      },
-                    ],
-                  },
-                ]}
-              >
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Continue saved game session"
-                  onPress={
-                    handleContinueSession
-                  }
-                  onPressIn={
-                    handlePressIn
-                  }
-                  onPressOut={
-                    handlePressOut
-                  }
-                  style={({ pressed }) => [
-                    styles.primaryButton,
-                    styles.fullWidthButton,
-
-                    pressed &&
-                      styles.primaryButtonPressed,
-                  ]}
-                >
-                  <View style={styles.actionText}>
-                    <Text style={styles.primaryButtonText}>
-                      Continue Session
-                    </Text>
-
-                    <Text style={styles.primaryButtonSubtext}>
-                      Pick up where you left off.
-                    </Text>
-                  </View>
-
-                  <Text style={styles.primaryButtonArrow}>
-                    →
-                  </Text>
-                </Pressable>
-              </Animated.View>
-
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Choose a new round"
-                onPress={
-                  handleNewRound
-                }
-                style={({ pressed }) => [
-                  styles.newRoundButton,
-
-                  pressed &&
-                    styles.secondaryButtonPressed,
-                ]}
-              >
-                <View style={styles.actionText}>
-                  <Text style={styles.newRoundButtonText}>
-                    New Round
-                  </Text>
-
-                  <Text style={styles.newRoundButtonSubtext}>
-                    Choose Quick 10, Standard 20, or Endless.
-                  </Text>
-                </View>
-
-                <Text style={styles.newRoundButtonArrow}>
-                  →
-                </Text>
-              </Pressable>
-            </View>
-          )}
+        <View style={styles.bottomNote}>
+          <View style={styles.bottomRule} />
+          <Text style={styles.bottomText}>JUDGE THE MOMENT. OWN THE TAKE.</Text>
+        </View>
       </View>
     </View>
   );
 }
 
-// =====================================================
-// Styles
-// =====================================================
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  container: { flex: 1, backgroundColor: Colors.background },
 
-    backgroundColor:
-      Colors.background,
-
-    paddingHorizontal:
-      Spacing.lg,
-
-    overflow: "hidden",
+  masthead: {
+    backgroundColor: "#1D1D1F",
+    paddingTop: 56,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: 25,
   },
-
-  content: {
-    flex: 1,
-
-    justifyContent: "center",
-
-    zIndex: 2,
-  },
-
-  // =====================================================
-  // Top Navigation
-  // =====================================================
-
-  topActions: {
-    position: "absolute",
-
-    top: 60,
-    right: Spacing.lg,
-
-    zIndex: 10,
-
+  utilityRow: {
     flexDirection: "row",
     alignItems: "center",
-
-    gap: 9,
+    justifyContent: "space-between",
+    marginBottom: 16,
   },
-
-  profileButton: {
-    minHeight: 42,
-
-    backgroundColor:
-      Colors.surface,
-
-    borderColor:
-      Colors.border,
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-
+  utilityButton: {
+    minHeight: 34,
     flexDirection: "row",
     alignItems: "center",
-
-    shadowColor: "#1D1D1F",
-
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    shadowOpacity: 0.08,
-    shadowRadius: 9,
-
-    elevation: 2,
+    borderBottomColor: "#66666A",
+    borderBottomWidth: 1,
+    paddingHorizontal: 2,
   },
-
-  profileButtonText: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 12,
-    fontWeight: "900",
-
-    marginLeft: 6,
-  },
-
-  settingsButton: {
-    width: 42,
-    height: 42,
-
-    backgroundColor:
-      Colors.surface,
-
-    borderColor:
-      Colors.border,
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.pill,
-
+  utilityIconButton: {
+    width: 34,
+    height: 34,
     alignItems: "center",
     justifyContent: "center",
-
-    shadowColor: "#1D1D1F",
-
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    shadowOpacity: 0.08,
-    shadowRadius: 9,
-
-    elevation: 2,
+    borderBottomColor: "#66666A",
+    borderBottomWidth: 1,
   },
-
-  topButtonPressed: {
-    opacity: 0.68,
-
-    transform: [
-      {
-        scale: 0.96,
-      },
-    ],
-  },
-
-  // =====================================================
-  // Logo
-  // =====================================================
-
-  logoContainer: {
-    marginBottom: 38,
-  },
-
-  logoPrimary: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 66,
-    fontWeight: "900",
-
-    letterSpacing: -3,
-    lineHeight: 69,
-  },
-
-  logoSecondLine: {
-    flexDirection: "row",
-    alignItems: "baseline",
-
-    marginLeft: 52,
-  },
-
-  logoOr: {
-    color:
-      Colors.roast,
-
-    fontSize: 27,
-    fontWeight: "800",
-
-    marginRight: 9,
-  },
-
-  logoSecondary: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 52,
-    fontWeight: "850",
-
-    letterSpacing: -2.5,
-    lineHeight: 57,
-  },
-
-  // =====================================================
-  // Greeting
-  // =====================================================
-
-  taglineContainer: {
-    marginBottom: 22,
-  },
-
-  nicknameGreeting: {
-    color:
-      Colors.roast,
-
-    fontSize: 13,
-    fontWeight: "900",
-
-    marginBottom: 8,
-  },
-
-  tagline: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 25,
-    fontWeight: "500",
-
-    lineHeight: 34,
-  },
-
-  taglineEmphasis: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 31,
-    fontWeight: "800",
-
-    lineHeight: 41,
-  },
-
-  loadingText: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 14,
-    fontWeight: "700",
-  },
-
-  // =====================================================
-  // Daily Streak
-  // =====================================================
-
-  dailyStreakCard: {
-    backgroundColor:
-      "#FFF1EC",
-
-    borderColor:
-      "#F4C9BE",
-
-    borderWidth: 1,
-    borderRadius:
-      Radius.lg,
-
-    paddingVertical: 11,
-    paddingHorizontal: 13,
-
-    marginBottom: 18,
-
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  dailyStreakIcon: {
-    width: 40,
-    height: 40,
-
-    backgroundColor:
-      Colors.white,
-
-    borderRadius: 20,
-
-    alignItems: "center",
-    justifyContent: "center",
-
-    marginRight: 11,
-  },
-
-  dailyStreakEmoji: {
-    fontSize: 21,
-  },
-
-  dailyStreakText: {
-    flex: 1,
-  },
-
-  dailyStreakValue: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 15,
-    fontWeight: "900",
-  },
-
-  dailyStreakLabel: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 10,
-    fontWeight: "700",
-
-    marginTop: 2,
-  },
-
-  bestStreakContainer: {
-    alignItems: "flex-end",
-  },
-
-  bestStreakValue: {
-    color:
-      Colors.roast,
-
-    fontSize: 17,
-    fontWeight: "900",
-  },
-
-  bestStreakLabel: {
-    color:
-      Colors.textSecondary,
-
+  utilityText: {
+    color: Colors.white,
     fontSize: 8,
     fontWeight: "900",
-
-    letterSpacing: 0.8,
+    letterSpacing: 1.4,
+    marginLeft: 6,
+  },
+  alright: {
+    color: Colors.toast,
+    fontSize: 18,
+    fontWeight: "800",
+    textAlign: "center",
+    transform: [{ rotate: "-3deg" }],
+  },
+  title: {
+    color: Colors.white,
+    fontSize: 43,
+    lineHeight: 46,
+    fontWeight: "900",
+    letterSpacing: -2,
+    textAlign: "center",
+  },
+  underlineRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 42,
+    marginTop: 4,
   },
 
-  // =====================================================
-  // Gameplay Actions
-  // =====================================================
-
-  sessionActions: {
-    width: "100%",
-    gap: 14,
-  },
-
-  buttonWrapper: {
-    alignSelf: "flex-start",
-  },
-
-  fullWidthButtonWrapper: {
-    width: "100%",
-  },
-
-  fullWidthButton: {
-    width: "100%",
-  },
-
-  actionText: {
+  body: {
     flex: 1,
-    paddingRight: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 24,
+    paddingBottom: 24,
   },
-
-  primaryButton: {
-    minWidth: 188,
-
-    backgroundColor:
-      Colors.textPrimary,
-
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 17,
-    paddingHorizontal: 27,
-
+  identityRow: {
+    minHeight: 128,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-
-    shadowColor: "#1D1D1F",
-
-    shadowOffset: {
-      width: 0,
-      height: 9,
-    },
-
-    shadowOpacity: 0.17,
-    shadowRadius: 16,
-
-    elevation: 6,
+    position: "relative",
   },
-
-  primaryButtonPressed: {
-    backgroundColor:
-      Colors.roast,
-  },
-
-  primaryButtonText: {
-    color:
-      Colors.white,
-
+  identitySide: { flex: 1, alignItems: "center", justifyContent: "center" },
+  roastIdentity: { transform: [{ rotate: "-1.5deg" }] },
+  toastIdentity: { transform: [{ rotate: "1.5deg" }] },
+  roastWord: {
+    color: Colors.roastDark,
     fontSize: 18,
     fontWeight: "900",
-  },
-
-  primaryButtonSubtext: {
-    color: "#CFCFCF",
-
-    fontSize: 12,
-    fontWeight: "600",
-
+    letterSpacing: 1.3,
     marginTop: 3,
   },
-
-  primaryButtonArrow: {
-    color:
-      Colors.white,
-
-    fontSize: 24,
-    fontWeight: "600",
-
-    marginLeft:
-      Spacing.xl,
+  toastWord: {
+    color: Colors.toastDark,
+    fontSize: 18,
+    fontWeight: "900",
+    letterSpacing: 1.3,
+    marginTop: 3,
+  },
+  orPuck: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.textPrimary,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
+  },
+  orText: { color: Colors.white, fontSize: 8, fontWeight: "900", letterSpacing: 0.5 },
+  rule: { height: 2, backgroundColor: Colors.textPrimary, marginBottom: 13 },
+  greeting: {
+    color: Colors.textMuted,
+    fontSize: 8,
+    fontWeight: "900",
+    letterSpacing: 1.1,
+    textAlign: "center",
+    marginBottom: 10,
   },
 
-  newRoundButton: {
-    width: "100%",
-
-    backgroundColor:
-      Colors.surface,
-
-    borderColor:
-      Colors.border,
-
-    borderWidth: 1.5,
-    borderRadius:
-      Radius.lg,
-
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-
+  streakStrip: {
+    minHeight: 70,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    borderBottomColor: Colors.borderStrong,
+    borderBottomWidth: 1,
+    paddingHorizontal: 6,
+    paddingBottom: 12,
+    marginBottom: 17,
   },
-
-  newRoundButtonText: {
-    color:
-      Colors.textPrimary,
-
-    fontSize: 17,
+  streakLead: { flexDirection: "row", alignItems: "center" },
+  streakCopy: { marginLeft: 10 },
+  streakDay: { color: Colors.textPrimary, fontSize: 16, fontWeight: "900" },
+  streakLabel: {
+    color: Colors.textMuted,
+    fontSize: 7,
     fontWeight: "900",
+    letterSpacing: 1.2,
+    marginTop: 1,
   },
-
-  newRoundButtonSubtext: {
-    color:
-      Colors.textSecondary,
-
-    fontSize: 12,
-    fontWeight: "600",
-
-    marginTop: 3,
-  },
-
-  newRoundButtonArrow: {
-    color:
-      Colors.roast,
-
-    fontSize: 23,
-    fontWeight: "800",
-  },
-
-  secondaryButtonPressed: {
-    opacity: 0.68,
-
-    transform: [
-      {
-        scale: 0.985,
-      },
-    ],
-  },
-
-  // =====================================================
-  // Background Decorations
-  // =====================================================
-
-  roastBackdrop: {
-    position: "absolute",
-
-    top: 72,
-    right: -47,
-
-    transform: [
-      {
-        rotate: "8deg",
-      },
-    ],
-
-    alignItems: "flex-end",
-  },
-
-  roastBackdropText: {
-    color:
-      Colors.roast,
-
-    fontSize: 96,
+  bestBlock: { alignItems: "center", paddingLeft: 14 },
+  bestValue: { color: Colors.heatDark, fontSize: 22, fontWeight: "900" },
+  bestLabel: { color: Colors.textMuted, fontSize: 7, fontWeight: "900", letterSpacing: 1.1 },
+  loadingText: {
+    color: Colors.textMuted,
+    fontSize: 9,
     fontWeight: "900",
-
-    letterSpacing: -5,
-    opacity: 0.09,
+    letterSpacing: 1,
+    textAlign: "center",
+    marginVertical: 22,
   },
 
-  roastSymbol: {
-    fontSize: 46,
-
-    opacity: 0.15,
-
-    marginRight: 54,
-    marginBottom: -20,
-  },
-
-  toastBackdrop: {
-    position: "absolute",
-
-    bottom: 68,
-    left: -42,
-
-    transform: [
-      {
-        rotate: "-8deg",
-      },
-    ],
-
+  actionStack: { gap: 13 },
+  heroAction: {
+    minHeight: 104,
+    backgroundColor: Colors.textPrimary,
+    borderBottomColor: Colors.toast,
+    borderBottomWidth: 6,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    transform: [{ rotate: "-0.6deg" }],
   },
-
-  toastBackdropText: {
-    color:
-      Colors.toast,
-
-    fontSize: 94,
+  heroEyebrow: {
+    color: Colors.roast,
+    fontSize: 7,
     fontWeight: "900",
-
-    letterSpacing: -5,
-    opacity: 0.09,
+    letterSpacing: 1.4,
+    marginBottom: 7,
   },
-
-  toastSymbol: {
-    color:
-      Colors.toast,
-
-    fontSize: 53,
-    fontWeight: "900",
-
-    opacity: 0.15,
-
-    marginLeft: 10,
+  heroActionText: { color: Colors.white, fontSize: 18, fontWeight: "900", letterSpacing: 1.1 },
+  heroArrow: { color: Colors.white, fontSize: 32, fontWeight: "700" },
+  secondaryAction: {
+    minHeight: 88,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderTopColor: Colors.textPrimary,
+    borderBottomColor: Colors.textPrimary,
+    borderTopWidth: 1.5,
+    borderBottomWidth: 1.5,
+    paddingHorizontal: 8,
   },
-
-  hotTakeBadge: {
-    position: "absolute",
-
-    top: 205,
-    left: -18,
-
-    borderColor:
-      Colors.roast,
-
-    borderWidth: 1.5,
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 7,
-    paddingHorizontal: 16,
-
-    opacity: 0.28,
-
-    transform: [
-      {
-        rotate: "-8deg",
-      },
-    ],
+  secondaryCopy: { color: Colors.textSecondary, fontSize: 11, fontWeight: "700", marginTop: 8 },
+  secondaryArrow: { color: Colors.textPrimary, fontSize: 30, fontWeight: "700" },
+  startBlock: {
+    minHeight: 145,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderTopColor: Colors.textPrimary,
+    borderBottomColor: Colors.textPrimary,
+    borderTopWidth: 2,
+    borderBottomWidth: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 18,
   },
-
-  hotTakeText: {
-    color:
-      Colors.roast,
-
-    fontSize: 11,
-    fontWeight: "900",
-
-    letterSpacing: 1.7,
-  },
-
-  verdictBadge: {
-    position: "absolute",
-
-    bottom: 215,
-    right: -24,
-
-    borderColor:
-      Colors.toast,
-
-    borderWidth: 1.5,
-    borderRadius:
-      Radius.pill,
-
-    paddingVertical: 7,
-    paddingHorizontal: 16,
-
-    opacity: 0.3,
-
-    transform: [
-      {
-        rotate: "7deg",
-      },
-    ],
-  },
-
-  verdictText: {
-    color:
-      Colors.toast,
-
-    fontSize: 11,
-    fontWeight: "900",
-
-    letterSpacing: 1.5,
-  },
+  startTitle: { color: Colors.textPrimary, fontSize: 38, fontWeight: "900", letterSpacing: -1.5, marginTop: 9 },
+  startCopy: { color: Colors.textSecondary, fontSize: 12, fontWeight: "700", marginTop: 2 },
+  startArrow: { color: Colors.roast, fontSize: 38, fontWeight: "700" },
+  bottomNote: { marginTop: "auto", paddingTop: 18 },
+  bottomRule: { width: 62, height: 4, backgroundColor: Colors.toast, marginBottom: 8, transform: [{ rotate: "-3deg" }] },
+  bottomText: { color: Colors.textMuted, fontSize: 7, fontWeight: "900", letterSpacing: 1.4 },
+  pressed: { opacity: 0.72 },
 });

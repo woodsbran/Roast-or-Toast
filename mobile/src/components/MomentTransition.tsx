@@ -2,22 +2,35 @@
 // File: MomentTransition.tsx
 //
 // Purpose:
-// Animates regular Roast or Toast Moment content.
+// Handles the transition between regular Moments.
 //
-// Transition Sequence:
-// • Current Moment slides left and fades out
-// • Gameplay advances to the next Moment
-// • New Moment enters from the right
+// Version 1.1 — Reduce Motion Hotfix
 //
-// The component exposes playExit() so scenario.tsx can
-// wait for the exit animation before changing questions.
+// I found one accessibility gap in the first pass:
+//
+// I updated Results, Guess the Crowd, and Intermissions to
+// respect Reduce Motion, but the OUTER Moment transition
+// was still responsible for displaying the full gameplay
+// board.
+//
+// When iOS Reduce Motion is on, I do not want this wrapper
+// sitting in an unfinished animation state and hiding the
+// Roast / Toast vote area.
+//
+// What I am doing now:
+// • normal motion = keep the slide / fade transition
+// • Reduce Motion = show the entire Moment immediately
+// • Reduce Motion = Next Moment advances immediately instead
+//   of trying to animate the old Moment off-screen
+//
+// The children and gameplay logic do not change.
 //
 // Project: Roast or Toast
 // =====================================================
 
 import {
   forwardRef,
-  ReactNode,
+  type ReactNode,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -29,202 +42,227 @@ import {
   StyleSheet,
 } from "react-native";
 
-// Functions scenario.tsx can call through the component
-// reference.
+import useReducedMotion from "../hooks/useReducedMotion";
+
 export type MomentTransitionHandle = {
-  // Plays the exit animation, runs the provided callback,
-  // and then animates the new content into view.
   playExit: (
-    onMomentChange: () => void,
+    onComplete: () => void,
   ) => void;
 };
 
 type MomentTransitionProps = {
-  children: ReactNode;
+  transitionKey:
+    string | number;
 
-  // Changes whenever a different Moment becomes active.
-  //
-  // This helps the component recognize restored sessions
-  // and other question changes.
-  transitionKey: string;
+  children:
+    ReactNode;
 };
 
-const MomentTransition = forwardRef<
-  MomentTransitionHandle,
-  MomentTransitionProps
->(function MomentTransition(
-  {
-    children,
-    transitionKey,
-  },
-  ref,
-) {
-  // Controls horizontal movement.
-  const translateX = useRef(
-    new Animated.Value(0),
-  ).current;
+const MomentTransition =
+  forwardRef<
+    MomentTransitionHandle,
+    MomentTransitionProps
+  >(
+    function MomentTransition(
+      {
+        transitionKey,
+        children,
+      },
+      ref,
+    ) {
+      const reduceMotion =
+        useReducedMotion();
 
-  // Controls content visibility.
-  const opacity = useRef(
-    new Animated.Value(1),
-  ).current;
+      // I keep opacity and position separate so the regular
+      // transition can stay subtle instead of flying across
+      // the whole screen.
+      const opacity =
+        useRef(
+          new Animated.Value(1),
+        ).current;
 
-  // Prevents Next from being triggered repeatedly while
-  // a transition is already running.
-  const isTransitioning = useRef(false);
+      const translateX =
+        useRef(
+          new Animated.Value(0),
+        ).current;
 
-  // Tracks the last Moment key so normal state updates do
-  // not accidentally replay the entrance animation.
-  const previousTransitionKey =
-    useRef(transitionKey);
+      // =================================================
+      // Moment Entrance
+      // =================================================
 
-  // =====================================================
-  // Entrance Animation
-  // =====================================================
+      useEffect(() => {
+        // This is the important fix.
+        //
+        // With Reduce Motion on, I force the wrapper into its
+        // finished visible state every time the Moment changes.
+        // Nothing inside the wrapper should disappear just
+        // because motion is disabled.
+        if (reduceMotion) {
+          opacity.stopAnimation();
+          translateX.stopAnimation();
 
-  const playEntrance = () => {
-    translateX.setValue(34);
-    opacity.setValue(0);
+          opacity.setValue(1);
+          translateX.setValue(0);
 
-    Animated.parallel([
-      Animated.spring(
-        translateX,
-        {
-          toValue: 0,
-          speed: 20,
-          bounciness: 4,
-          useNativeDriver: true,
-        },
-      ),
-
-      Animated.timing(
-        opacity,
-        {
-          toValue: 1,
-          duration: 230,
-          easing:
-            Easing.out(
-              Easing.cubic,
-            ),
-          useNativeDriver: true,
-        },
-      ),
-    ]).start(() => {
-      isTransitioning.current = false;
-    });
-  };
-
-  // =====================================================
-  // Exit Animation
-  // =====================================================
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      playExit(
-        onMomentChange,
-      ) {
-        if (
-          isTransitioning.current
-        ) {
           return;
         }
 
-        isTransitioning.current = true;
+        opacity.stopAnimation();
+        translateX.stopAnimation();
+
+        opacity.setValue(0);
+        translateX.setValue(18);
 
         Animated.parallel([
           Animated.timing(
-            translateX,
+            opacity,
             {
-              toValue: -42,
-              duration: 190,
+              toValue: 1,
+              duration: 180,
+
               easing:
-                Easing.in(
+                Easing.out(
                   Easing.cubic,
                 ),
+
               useNativeDriver: true,
             },
           ),
 
           Animated.timing(
-            opacity,
+            translateX,
             {
               toValue: 0,
-              duration: 170,
+              duration: 240,
+
               easing:
-                Easing.in(
-                  Easing.quad,
+                Easing.out(
+                  Easing.cubic,
                 ),
+
               useNativeDriver: true,
             },
           ),
-        ]).start(() => {
-          // Change the active Moment only after the old
-          // content has left the screen.
-          onMomentChange();
+        ]).start();
+      }, [
+        opacity,
+        reduceMotion,
+        transitionKey,
+        translateX,
+      ]);
 
-          // Give React one brief moment to render the new
-          // question before starting its entrance.
-          requestAnimationFrame(() => {
-            playEntrance();
-          });
-        });
-      },
-    }),
-  );
+      // =================================================
+      // Moment Exit
+      // =================================================
 
-  // If the Moment changes from another action, such as a
-  // restored session or special-mode continuation, make
-  // sure the content is visible and positioned correctly.
-  useEffect(() => {
-    if (
-      previousTransitionKey.current ===
-      transitionKey
-    ) {
-      return;
-    }
+      useImperativeHandle(
+        ref,
+        () => ({
+          playExit(
+            onComplete,
+          ) {
+            // If the player asked for less motion, I do not
+            // fake an invisible "animation." I just advance.
+            if (reduceMotion) {
+              opacity.stopAnimation();
+              translateX.stopAnimation();
 
-    previousTransitionKey.current =
-      transitionKey;
+              opacity.setValue(1);
+              translateX.setValue(0);
 
-    if (
-      !isTransitioning.current
-    ) {
-      playEntrance();
-    }
-  }, [
-    transitionKey,
-  ]);
+              onComplete();
+              return;
+            }
 
-  return (
-    <Animated.View
-      style={[
-        styles.container,
+            Animated.parallel([
+              Animated.timing(
+                opacity,
+                {
+                  toValue: 0,
+                  duration: 150,
 
-        {
+                  easing:
+                    Easing.in(
+                      Easing.cubic,
+                    ),
+
+                  useNativeDriver: true,
+                },
+              ),
+
+              Animated.timing(
+                translateX,
+                {
+                  toValue: -18,
+                  duration: 190,
+
+                  easing:
+                    Easing.in(
+                      Easing.cubic,
+                    ),
+
+                  useNativeDriver: true,
+                },
+              ),
+            ]).start(
+              ({
+                finished,
+              }) => {
+                // I still advance if React Native interrupts
+                // the animation. The transition should never
+                // trap the player on the same Moment.
+                if (
+                  finished
+                ) {
+                  onComplete();
+                  return;
+                }
+
+                onComplete();
+              },
+            );
+          },
+        }),
+        [
           opacity,
+          reduceMotion,
+          translateX,
+        ],
+      );
 
-          transform: [
+      return (
+        <Animated.View
+          // I deliberately do NOT use overflow: hidden here.
+          // The new Roast / Toast pieces overlap the Moment
+          // paper by design, so this wrapper must not clip them.
+          style={[
+            styles.container,
             {
-              translateX,
+              opacity,
+
+              transform: [
+                {
+                  translateX,
+                },
+              ],
             },
-          ],
-        },
-      ]}
-    >
-      {children}
-    </Animated.View>
+          ]}
+        >
+          {children}
+        </Animated.View>
+      );
+    },
   );
-});
 
 export default MomentTransition;
 
-// =====================================================
-// Styles
-// =====================================================
+const styles =
+  StyleSheet.create({
+    container: {
+      width: "100%",
 
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-  },
-});
+      // VoteButtons intentionally extends beyond parts of the
+      // paper composition, so I leave overflow visible.
+      overflow: "visible",
+    },
+  });

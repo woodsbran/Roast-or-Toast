@@ -6,20 +6,24 @@
 // Purpose:
 // Controls the complete Roast or Toast gameplay loop.
 //
-// Current Features:
-// • Quick 10, Standard 20, and Endless modes
-// • Smart category-balanced Moment deck
-// • Recently seen Moment avoidance
-// • Animated transitions between regular Moments
-// • Saved and restored round mode
-// • Round progress counter
-// • Round completion screen
-// • Heat, levels, streaks, and titles
-// • Guess the Crowd
-// • Quick Break
-// • Session Check-In
-// • Local session persistence
-// • Haptics and gameplay animations
+// Version 1.1 — Big Design Batch 1 / Integrated Game Flow
+//
+// I am keeping all of the gameplay logic that already works:
+// rounds, saved sessions, Heat, streaks, deck building,
+// intermissions, transitions, and navigation.
+//
+// The change in this file is the regular gameplay frame.
+// I want the player to feel like they opened a party game
+// instead of another clean app.
+//
+// What I am adding:
+// • A black poster header
+// • "Alright..." as the lead-in
+// • A huge LET'S BE HONEST. game title
+// • The Moment sitting on a paper-poster layer
+// • Small rough color marks instead of soft decorations
+//
+// I am not changing the actual game rules here.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -37,13 +41,16 @@ import {
 
 import {
   Animated,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import GuessTheCrowdCard from "../components/GuessTheCrowdCard";
+import HeatMark from "../components/HeatMark";
 import IntermissionCard from "../components/IntermissionCard";
 
 import MomentTransition, {
@@ -106,6 +113,8 @@ import {
   usePlayerProgress,
 } from "../hooks/usePlayerProgress";
 
+import useReducedMotion from "../hooks/useReducedMotion";
+
 import {
   CategoryName,
   CategoryThemes,
@@ -113,9 +122,20 @@ import {
   Spacing,
 } from "../theme";
 
-// A special event appears after every five regular
-// Moments.
-const INTERMISSION_FREQUENCY = 5;
+// I am deliberately putting breaks closer together now.
+//
+// Quick 10 should actually show the player that the game has
+// rhythm instead of making them answer ten Moments in a row.
+//
+// New Quick 10 rhythm:
+// • after Moment 3  -> Quick Break
+// • after Moment 6  -> Guess the Crowd
+// • after Moment 9  -> Session Check-In
+// • after Moment 10 -> Round Complete
+//
+// Standard and Endless keep repeating the same three-part
+// rhythm every three regular Moments.
+const INTERMISSION_FREQUENCY = 3;
 
 // Stores where regular gameplay resumes after Guess the
 // Crowd consumes a separate Moment.
@@ -262,6 +282,15 @@ function createSessionSnapshot({
 }
 
 export default function ScenarioScreen() {
+  // I read Reduce Motion here at the gameplay-controller level.
+  //
+  // This is the right place for it because scenario.tsx owns
+  // the transition from voting -> results -> next Moment.
+  // I do not want child components fighting animation values
+  // that were created by their parent.
+  const reduceMotion =
+    useReducedMotion();
+
   // Home sends either fresh or continue.
   //
   // Fresh rounds also include the selected round mode.
@@ -275,6 +304,12 @@ export default function ScenarioScreen() {
     getRoundMode(
       params.roundMode,
     );
+
+  // I use the actual phone height here because this screen
+  // needs to behave like one composition, not a long page.
+  const {
+    height: screenHeight,
+  } = useWindowDimensions();
 
   // =====================================================
   // Player Progress
@@ -437,6 +472,37 @@ export default function ScenarioScreen() {
   const resultsPosition = useRef(
     new Animated.Value(18),
   ).current;
+
+  // =====================================================
+  // Reduce Motion Result Safety
+  // =====================================================
+
+  useEffect(() => {
+    // If I already have a completed vote on screen and Reduce
+    // Motion is enabled, I force the parent result animation
+    // values into their finished state.
+    //
+    // This fixes the blank cream screen we were seeing after
+    // tapping Roast or Toast. The Results component existed,
+    // but its parent opacity could still be sitting at 0.
+    if (
+      reduceMotion &&
+      selectedVote &&
+      lastVoteResult
+    ) {
+      resultsOpacity.stopAnimation();
+      resultsPosition.stopAnimation();
+
+      resultsOpacity.setValue(1);
+      resultsPosition.setValue(0);
+    }
+  }, [
+    lastVoteResult,
+    reduceMotion,
+    resultsOpacity,
+    resultsPosition,
+    selectedVote,
+  ]);
 
   // =====================================================
   // Session Initialization
@@ -878,13 +944,10 @@ export default function ScenarioScreen() {
           styles.loadingContainer
         }
       >
-        <Text
-          style={
-            styles.loadingEmoji
-          }
-        >
-          🔥
-        </Text>
+        <HeatMark
+          size="hero"
+          style={styles.loadingMark}
+        />
 
         <Text
           style={
@@ -982,6 +1045,14 @@ export default function ScenarioScreen() {
   const animateVoteButton = (
     animation: Animated.Value,
   ) => {
+    // If the player asked iOS to reduce motion, I keep the
+    // vote completely functional and skip the scale bounce.
+    if (reduceMotion) {
+      animation.stopAnimation();
+      animation.setValue(1);
+      return;
+    }
+
     Animated.sequence([
       Animated.spring(
         animation,
@@ -1007,6 +1078,24 @@ export default function ScenarioScreen() {
 
   // Reveals results with a fade-and-rise animation.
   const revealResults = () => {
+    // This is the main Reduce Motion fix.
+    //
+    // scenario.tsx owns these two Animated.Values, so I set
+    // them to the finished visible state right here instead of
+    // expecting ResultsCard to repair them after the vote.
+    if (reduceMotion) {
+      resultsOpacity.stopAnimation();
+      resultsPosition.stopAnimation();
+
+      resultsOpacity.setValue(1);
+      resultsPosition.setValue(0);
+
+      return;
+    }
+
+    resultsOpacity.stopAnimation();
+    resultsPosition.stopAnimation();
+
     resultsOpacity.setValue(0);
     resultsPosition.setValue(18);
 
@@ -1275,34 +1364,34 @@ export default function ScenarioScreen() {
       return;
     }
 
-    // Break 1 = after 5 Moments.
-    // Break 2 = after 10 Moments.
-    // Break 3 = after 15 Moments.
+    // I want the first break to actually feel like a break,
+    // so Quick Break comes first instead of immediately
+    // throwing another voting mode at the player.
     const breakNumber =
       newCompletedTotal /
       INTERMISSION_FREQUENCY;
 
     // Repeating rhythm:
-    // 1. Guess the Crowd
-    // 2. Quick Break
+    // 1. Quick Break
+    // 2. Guess the Crowd
     // 3. Session Check-In
     const eventPosition =
-      breakNumber % 3;
+      (breakNumber - 1) % 3;
 
     if (
-      eventPosition === 1
-    ) {
-      prepareGuessTheCrowd();
-      return;
-    }
-
-    if (
-      eventPosition === 2
+      eventPosition === 0
     ) {
       setIntermissionType(
         "quick",
       );
 
+      return;
+    }
+
+    if (
+      eventPosition === 1
+    ) {
+      prepareGuessTheCrowd();
       return;
     }
 
@@ -1318,6 +1407,14 @@ export default function ScenarioScreen() {
   // Moment slides away.
   const handleAnimatedNextMoment =
     () => {
+      // With Reduce Motion on, I advance immediately.
+      // I do not send the old Moment through an exit animation
+      // just to arrive at the same next state.
+      if (reduceMotion) {
+        handleNextMoment();
+        return;
+      }
+
       const transition =
         momentTransitionRef.current;
 
@@ -1414,13 +1511,10 @@ export default function ScenarioScreen() {
           styles.loadingContainer
         }
       >
-        <Text
-          style={
-            styles.loadingEmoji
-          }
-        >
-          🔥
-        </Text>
+        <HeatMark
+          size="hero"
+          style={styles.loadingMark}
+        />
 
         <Text
           style={
@@ -1545,71 +1639,15 @@ export default function ScenarioScreen() {
   // Standard Gameplay
   // =====================================================
 
+  // I keep the pre-vote screen intentionally compact.
+  // The last version had the title, two progress cards,
+  // a giant paper, and the vote pieces all stacked like a
+  // webpage. This version treats the whole phone as one board.
+  const compactBoard =
+    !selectedVote;
+
   return (
     <View style={styles.container}>
-      {/* Category background word */}
-      <View
-        style={
-          styles.categoryBackdrop
-        }
-      >
-        <Text
-          style={[
-            styles.categoryBackdropText,
-
-            {
-              color:
-                categoryTheme.accent,
-            },
-          ]}
-        >
-          {categoryTheme.label}
-        </Text>
-      </View>
-
-      {/* Soft category circle */}
-      <View
-        style={[
-          styles.categoryCircle,
-
-          {
-            backgroundColor:
-              categoryTheme.soft,
-          },
-        ]}
-      />
-
-      {/* Roast background decoration */}
-      <View
-        style={
-          styles.roastBackdrop
-        }
-      >
-        <Text
-          style={
-            styles.roastBackdropText
-          }
-        >
-          ROAST
-        </Text>
-      </View>
-
-      {/* Toast background decoration */}
-      <View
-        style={
-          styles.toastBackdrop
-        }
-      >
-        <Text
-          style={
-            styles.toastBackdropText
-          }
-        >
-          TOAST
-        </Text>
-      </View>
-
-      {/* Shared Back, brand, and Home navigation */}
       <ScenarioHeader
         accentColor={
           categoryTheme.accent
@@ -1622,37 +1660,79 @@ export default function ScenarioScreen() {
         }
       />
 
-      {/* Main gameplay content */}
+      {/* =================================================
+          Compact Game Header
+
+          I am keeping the black LET'S BE HONEST section,
+          but it is much shorter now. It should introduce
+          the game, not take half the screen.
+      ================================================= */}
+
+      <View style={styles.posterHeader}>
+        <Text style={styles.posterLead}>
+          Alright...
+        </Text>
+
+        <Text style={styles.posterTitle}>
+          LET&apos;S BE HONEST.
+        </Text>
+
+        <View style={styles.headerScratchRow}>
+          <View style={styles.roastScratch} />
+          <View style={styles.toastScratch} />
+        </View>
+      </View>
+
+      {/* =================================================
+          Compact Status Strip
+
+          I am replacing the two large progress cards on the
+          voting screen with one thin strip. The information
+          is still here, but it no longer competes with the
+          Moment and the actual game choice.
+      ================================================= */}
+
+      <View style={styles.statusStrip}>
+          <Text style={styles.statusText}>
+            {roundMode.toUpperCase()}
+          </Text>
+
+          <Text style={styles.statusDivider}>
+            •
+          </Text>
+
+          <Text style={styles.statusText}>
+            {completedMoments + 1}
+            {roundConfig.momentLimit !== null
+              ? ` / ${roundConfig.momentLimit}`
+              : ""}
+          </Text>
+
+          <View style={styles.statusSpacer} />
+
+          <Text style={styles.statusText}>
+            LVL {progress.level}
+          </Text>
+
+          <Text style={styles.statusDivider}>
+            •
+          </Text>
+
+          <Text style={styles.statusText}>
+            {progress.currentStreak} STREAK
+          </Text>
+        </View>
+
       <ScrollView
-        showsVerticalScrollIndicator={
-          false
-        }
-        style={
-          styles.scrollView
-        }
-        contentContainerStyle={
-          styles.scrollContent
-        }
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContent,
+          !compactBoard &&
+            styles.resultsScrollContent,
+        ]}
       >
-        {/* Round progress remains fixed while the Moment
-            content slides between questions. */}
-        <RoundProgress
-          roundMode={
-            roundMode
-          }
-          completedMoments={
-            completedMoments
-          }
-        />
-
-        {/* Player progress also remains fixed. */}
-        <PlayerBadge
-          progress={
-            progress
-          }
-        />
-
-        {/* Animated regular Moment content */}
         <MomentTransition
           ref={
             momentTransitionRef
@@ -1661,52 +1741,82 @@ export default function ScenarioScreen() {
             currentMoment.id
           }
         >
-          {/* Current question */}
-          <ScenarioCard
-            categoryLabel={
-              categoryTheme.label
-            }
-            categoryAccent={
-              categoryTheme.accent
-            }
-            categorySoft={
-              categoryTheme.soft
-            }
-            question={
-              currentMoment.question
-            }
-            compact={
-              selectedVote !== null
-            }
-          />
+          {compactBoard ? (
+            <>
+              {/* =================================================
+                  One Center Moment
 
-          {/* Vote buttons */}
-          {!selectedVote && (
-            <VoteButtons
-              roastPhrase={
-                currentMoment.roastPhrase
-              }
-              toastPhrase={
-                currentMoment.toastPhrase
-              }
-              roastScale={
-                roastScale
-              }
-              toastScale={
-                toastScale
-              }
-              onRoastPress={
-                handleRoastVote
-              }
-              onToastPress={
-                handleToastVote
-              }
-            />
-          )}
+                  I keep the paper inside a fixed visual zone so
+                  every question stays part of the same board.
 
-          {/* Results */}
-          {selectedVote &&
-            lastVoteResult && (
+                  The paper is no longer allowed to grow until it
+                  pushes the vote choices off-screen.
+              ================================================= */}
+
+              <View
+                style={[
+                  styles.boardArea,
+                  screenHeight < 800 &&
+                    styles.boardAreaSmall,
+                ]}
+              >
+                <ImageBackground
+                  source={require("../../assets/game/paper/moment-paper.png")}
+                  resizeMode="stretch"
+                  style={[
+                    styles.momentPaper,
+                    screenHeight < 800 &&
+                      styles.momentPaperSmall,
+                  ]}
+                  imageStyle={styles.momentPaperImage}
+                >
+                  <ScenarioCard
+                    categoryLabel={
+                      categoryTheme.label
+                    }
+                    categoryAccent={
+                      categoryTheme.accent
+                    }
+                    categorySoft={
+                      categoryTheme.soft
+                    }
+                    question={
+                      currentMoment.question
+                    }
+                  />
+                </ImageBackground>
+
+                {/* The vote pieces overlap the bottom of the
+                    paper on purpose. This is the part that makes
+                    the screen feel like one composition. */}
+                <VoteButtons
+                  roastPhrase={
+                    currentMoment.roastPhrase
+                  }
+                  toastPhrase={
+                    currentMoment.toastPhrase
+                  }
+                  roastScale={
+                    roastScale
+                  }
+                  toastScale={
+                    toastScale
+                  }
+                  onRoastPress={
+                    handleRoastVote
+                  }
+                  onToastPress={
+                    handleToastVote
+                  }
+                />
+              </View>
+            </>
+          ) : (
+            <>
+              {/* I keep Results on the same compact game frame.
+                  The old version brought the two large progress
+                  cards back here, which immediately made the
+                  screen feel like the older app again. */}
               <ResultsCard
                 moment={
                   currentMoment
@@ -1718,16 +1828,16 @@ export default function ScenarioScreen() {
                   categoryTheme.accent
                 }
                 heatEarned={
-                  lastVoteResult.heatEarned
+                  lastVoteResult!.heatEarned
                 }
                 matchedMajority={
-                  lastVoteResult.matchedMajority
+                  lastVoteResult!.matchedMajority
                 }
                 leveledUp={
-                  lastVoteResult.leveledUp
+                  lastVoteResult!.leveledUp
                 }
                 currentLevel={
-                  lastVoteResult
+                  lastVoteResult!
                     .updatedProgress
                     .level
                 }
@@ -1743,7 +1853,8 @@ export default function ScenarioScreen() {
                   handleAnimatedNextMoment();
                 }}
               />
-            )}
+            </>
+          )}
         </MomentTransition>
       </ScrollView>
     </View>
@@ -1755,17 +1866,17 @@ export default function ScenarioScreen() {
 // =====================================================
 
 const styles = StyleSheet.create({
-  // Main screen.
   container: {
     flex: 1,
 
     backgroundColor:
       Colors.background,
-
-    overflow: "hidden",
   },
 
-  // Session loading screen.
+  // =====================================================
+  // Loading
+  // =====================================================
+
   loadingContainer: {
     flex: 1,
 
@@ -1779,8 +1890,7 @@ const styles = StyleSheet.create({
       Spacing.lg,
   },
 
-  loadingEmoji: {
-    fontSize: 44,
+  loadingMark: {
     marginBottom: 15,
   },
 
@@ -1794,34 +1904,76 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // Standard gameplay scroll area.
-  scrollView: {
-    flex: 1,
-    zIndex: 2,
-  },
-
-  scrollContent: {
-    flexGrow: 1,
-
-    justifyContent:
-      "center",
-
-    paddingHorizontal:
-      Spacing.lg,
-
-    paddingTop: 16,
-    paddingBottom: 42,
-  },
-
   // =====================================================
-  // Category Decorations
+  // Compact Poster Header
   // =====================================================
 
-  categoryBackdrop: {
-    position: "absolute",
+  posterHeader: {
+    height: 126,
 
-    top: 132,
-    right: -48,
+    backgroundColor:
+      Colors.textPrimary,
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    paddingTop: 5,
+  },
+
+  posterLead: {
+    color:
+      Colors.toast,
+
+    fontSize: 15,
+    fontWeight: "700",
+
+    transform: [
+      {
+        rotate: "-4deg",
+      },
+    ],
+
+    marginBottom: 1,
+  },
+
+  posterTitle: {
+    color:
+      Colors.background,
+
+    fontSize: 33,
+    fontWeight: "900",
+
+    letterSpacing: 0.2,
+  },
+
+  headerScratchRow: {
+    flexDirection: "row",
+
+    gap: 52,
+
+    marginTop: 8,
+  },
+
+  roastScratch: {
+    width: 34,
+    height: 3,
+
+    backgroundColor:
+      Colors.roast,
+
+    transform: [
+      {
+        rotate: "-8deg",
+      },
+    ],
+  },
+
+  toastScratch: {
+    width: 34,
+    height: 3,
+
+    backgroundColor:
+      Colors.toast,
 
     transform: [
       {
@@ -1830,76 +1982,118 @@ const styles = StyleSheet.create({
     ],
   },
 
-  categoryBackdropText: {
-    fontSize: 76,
+  // =====================================================
+  // Compact Status
+  // =====================================================
+
+  statusStrip: {
+    minHeight: 40,
+
+    flexDirection: "row",
+    alignItems: "center",
+
+    paddingHorizontal:
+      Spacing.lg,
+
+    borderBottomWidth: 1,
+    borderBottomColor:
+      Colors.border,
+
+    backgroundColor:
+      Colors.background,
+  },
+
+  statusText: {
+    color:
+      Colors.textSecondary,
+
+    fontSize: 9,
     fontWeight: "900",
-    letterSpacing: -4,
 
-    opacity: 0.09,
+    letterSpacing: 1,
   },
 
-  categoryCircle: {
-    position: "absolute",
-
-    width: 235,
-    height: 235,
-    borderRadius: 118,
-
-    bottom: -105,
-    right: -90,
-
-    opacity: 0.75,
-  },
-
-  // =====================================================
-  // Brand Decorations
-  // =====================================================
-
-  roastBackdrop: {
-    position: "absolute",
-
-    top: 225,
-    left: -40,
-
-    transform: [
-      {
-        rotate: "-8deg",
-      },
-    ],
-  },
-
-  roastBackdropText: {
+  statusDivider: {
     color:
       Colors.roast,
 
-    fontSize: 70,
+    fontSize: 10,
     fontWeight: "900",
-    letterSpacing: -4,
 
-    opacity: 0.04,
+    marginHorizontal: 7,
   },
 
-  toastBackdrop: {
-    position: "absolute",
+  statusSpacer: {
+    flex: 1,
+  },
 
-    bottom: 35,
-    left: -42,
+  // =====================================================
+  // Main Board
+  // =====================================================
 
+  scrollView: {
+    flex: 1,
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+
+    paddingHorizontal:
+      Spacing.lg,
+
+    paddingBottom: 18,
+  },
+
+  resultsScrollContent: {
+    paddingTop: 12,
+    paddingBottom: 30,
+  },
+
+  boardArea: {
+    minHeight: 625,
+
+    justifyContent: "flex-start",
+
+    paddingTop: 8,
+  },
+
+  boardAreaSmall: {
+    minHeight: 570,
+  },
+
+  // I keep the paper in a controlled zone now. Long Moments
+  // shrink inside ScenarioCard instead of making the entire
+  // page grow taller and taller.
+  // I trim the paper a little here because the vote pieces
+  // need more room than they had in C2. The Moment still owns
+  // the center, but Roast / Toast should not feel squeezed.
+  momentPaper: {
+    height: 284,
+
+    paddingTop: 30,
+    paddingBottom: 30,
+    paddingHorizontal: 30,
+
+    justifyContent: "center",
+
+    marginHorizontal: -2,
+
+    zIndex: 3,
+  },
+
+  momentPaperSmall: {
+    height: 260,
+
+    paddingTop: 26,
+    paddingBottom: 26,
+  },
+
+  momentPaperImage: {
     transform: [
       {
-        rotate: "-8deg",
+        rotate: "-0.25deg",
       },
     ],
   },
 
-  toastBackdropText: {
-    color:
-      Colors.toast,
-
-    fontSize: 78,
-    fontWeight: "900",
-    letterSpacing: -4,
-
-    opacity: 0.055,
-  },
 });

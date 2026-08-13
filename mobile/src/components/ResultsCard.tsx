@@ -2,17 +2,25 @@
 // File: ResultsCard.tsx
 //
 // Purpose:
-// Displays the results after a regular Roast or Toast
-// vote.
+// Displays the regular Roast / Toast result.
 //
-// Version 1.1 gives the result screen a stronger
-// Roast-vs-Toast identity.
+// Version 1.1 — Design + Motion Pass 1
 //
-// Instead of treating both percentages like ordinary
-// progress bars, the screen presents them as opposing
-// sides of the same decision.
+// I am keeping the result design we already liked.
 //
-// The flame is reserved for Heat and progression.
+// What I am adding:
+// • THE PEOPLE stamp lands first
+// • HAVE SPOKEN follows behind it
+// • the coral / teal result field starts at 50 / 50
+// • both sides physically fight for space before settling
+// • the percentages count into place
+// • the player's pick stamps in
+// • Heat lands after the verdict instead of everything
+//   appearing at the exact same time
+//
+// I am intentionally NOT turning this into a cartoon.
+// The motion should feel like printed game pieces landing
+// on a table.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -24,6 +32,7 @@ import {
 } from "react";
 
 import {
+  AccessibilityInfo,
   Animated,
   Easing,
   Pressable,
@@ -38,16 +47,17 @@ import type {
 
 import {
   Colors,
-  Radius,
 } from "../theme";
 
-import FloatingHeat from "./FloatingHeat";
+import HeatMark from "./HeatMark";
 import LevelUpCard from "./LevelUpCard";
 import VoteMark from "./VoteMark";
 
 import type {
   VoteChoice,
 } from "./VoteButtons";
+
+import useReducedMotion from "../hooks/useReducedMotion";
 
 type ResultsCardProps = {
   moment: Moment;
@@ -83,11 +93,140 @@ export default function ResultsCard({
   translateY,
   onNextPress,
 }: ResultsCardProps) {
+  const reduceMotion =
+    useReducedMotion();
+
+  // I stagger the pieces instead of making the whole result
+  // fade in as one flat screenshot.
+  const stampIn =
+    useRef(
+      new Animated.Value(0),
+    ).current;
+
+  const headingIn =
+    useRef(
+      new Animated.Value(0),
+    ).current;
+
+  const pickIn =
+    useRef(
+      new Animated.Value(0),
+    ).current;
+
+  const heatIn =
+    useRef(
+      new Animated.Value(0),
+    ).current;
+
+  useEffect(() => {
+    // If Reduce Motion is on, I show the finished design
+    // immediately instead of making the player sit through
+    // the stamp / slide / scale sequence.
+    if (reduceMotion) {
+      stampIn.setValue(1);
+      headingIn.setValue(1);
+      pickIn.setValue(1);
+      heatIn.setValue(1);
+
+      return;
+    }
+
+    stampIn.setValue(0);
+    headingIn.setValue(0);
+    pickIn.setValue(0);
+    heatIn.setValue(0);
+
+    Animated.sequence([
+      Animated.spring(
+        stampIn,
+        {
+          toValue: 1,
+          speed: 22,
+          bounciness: 8,
+          useNativeDriver: true,
+        },
+      ),
+
+      Animated.parallel([
+        Animated.spring(
+          headingIn,
+          {
+            toValue: 1,
+            speed: 20,
+            bounciness: 5,
+            useNativeDriver: true,
+          },
+        ),
+
+        Animated.timing(
+          pickIn,
+          {
+            toValue: 1,
+            duration: 260,
+            delay: 560,
+            easing:
+              Easing.out(
+                Easing.cubic,
+              ),
+            useNativeDriver: true,
+          },
+        ),
+
+        Animated.spring(
+          heatIn,
+          {
+            toValue: 1,
+            delay: 720,
+            speed: 18,
+            bounciness: 7,
+            useNativeDriver: true,
+          },
+        ),
+      ]),
+    ]).start();
+  }, [
+    heatIn,
+    headingIn,
+    pickIn,
+    reduceMotion,
+    stampIn,
+    moment.id,
+  ]);
+
+  // I announce the finished verdict after the visual reveal.
+  // This keeps VoiceOver users from having to hunt through
+  // the screen just to learn the crowd result.
+  useEffect(() => {
+    const delay =
+      reduceMotion
+        ? 80
+        : 1150;
+
+    const timer =
+      setTimeout(() => {
+        AccessibilityInfo
+          .announceForAccessibility(
+            `The people have spoken. Roast ${moment.roastPercentage} percent. Toast ${moment.toastPercentage} percent. You picked ${selectedVote}. ${matchedMajority ? "You called it." : "You had your own take."} You earned ${heatEarned} Heat.`,
+          );
+      }, delay);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [
+    heatEarned,
+    matchedMajority,
+    moment.id,
+    moment.roastPercentage,
+    moment.toastPercentage,
+    reduceMotion,
+    selectedVote,
+  ]);
+
   return (
     <Animated.View
       style={[
-        styles.resultsContainer,
-
+        styles.container,
         {
           opacity,
 
@@ -100,88 +239,270 @@ export default function ResultsCard({
       ]}
     >
       {/* =================================================
-          Heading
+          Verdict Header
       ================================================= */}
 
-      <View
-        style={
-          styles.headingRow
-        }
-      >
-        <Text
-          style={
-            styles.resultsEyebrow
-          }
-        >
-          THE VERDICT
-        </Text>
+      <View style={styles.headingArea}>
+        <Animated.View
+          style={[
+            styles.peopleBrush,
+            {
+              opacity:
+                stampIn,
 
-        <Text
-          style={
-            styles.resultsHeading
-          }
+              transform: [
+                {
+                  scale:
+                    stampIn.interpolate({
+                      inputRange:
+                        [0, 1],
+
+                      outputRange:
+                        [1.28, 1],
+                    }),
+                },
+
+                {
+                  rotate:
+                    stampIn.interpolate({
+                      inputRange:
+                        [0, 1],
+
+                      outputRange:
+                        ["-8deg", "-3deg"],
+                    }),
+                },
+              ],
+            },
+          ]}
         >
-          The People{"\n"}
-          Have Spoken
-        </Text>
+          <Text style={styles.peopleBrushText}>
+            THE PEOPLE
+          </Text>
+        </Animated.View>
+
+        <Animated.Text
+          style={[
+            styles.heading,
+            {
+              opacity:
+                headingIn,
+
+              transform: [
+                {
+                  translateY:
+                    headingIn.interpolate({
+                      inputRange:
+                        [0, 1],
+
+                      outputRange:
+                        [18, 0],
+                    }),
+                },
+              ],
+            },
+          ]}
+        >
+          HAVE SPOKEN!
+        </Animated.Text>
+
+        <Animated.View
+          style={[
+            styles.headingScratch,
+            {
+              transform: [
+                {
+                  scaleX:
+                    headingIn,
+                },
+                {
+                  rotate:
+                    "-5deg",
+                },
+              ],
+            },
+          ]}
+        />
       </View>
 
-      {/* Player's choice */}
-      <View
-        style={[
-          styles.playerVoteCard,
+      {/* =================================================
+          Signature Crowd Reveal
 
-          selectedVote ===
-          "roast"
-            ? styles.playerVoteRoast
-            : styles.playerVoteToast,
+          This starts visually at 50 / 50.
+
+          I do not let a 95 / 5 result literally make one
+          side only 5% wide because the artwork would become
+          unreadable. The seam moves toward the real result
+          while keeping both marks visible.
+      ================================================= */}
+
+      <BattleResult
+        roastPercentage={
+          moment.roastPercentage
+        }
+        toastPercentage={
+          moment.toastPercentage
+        }
+        reduceMotion={
+          reduceMotion
+        }
+      />
+
+      {/* =================================================
+          Player Pick
+      ================================================= */}
+
+      <Animated.View
+        accessible
+        accessibilityLabel={`You picked ${selectedVote}. ${matchedMajority ? "You called it." : "You had your own take."}`}
+        style={[
+          styles.playerResponse,
+          {
+            opacity:
+              pickIn,
+
+            transform: [
+              {
+                translateY:
+                  pickIn.interpolate({
+                    inputRange:
+                      [0, 1],
+
+                    outputRange:
+                      [16, 0],
+                  }),
+              },
+            ],
+          },
         ]}
       >
-        <VoteMark
-          type={selectedVote}
-          size="small"
-        />
-
-        <View
-          style={
-            styles.playerVoteText
-          }
-        >
-          <Text
-            style={
-              styles.playerVoteLabel
-            }
-          >
+        <View style={styles.pickRow}>
+          <Text style={styles.pickLead}>
             YOU PICKED
           </Text>
 
-          <Text
+          <Animated.View
             style={[
-              styles.playerVoteValue,
+              styles.pickStamp,
+              {
+                borderColor:
+                  selectedVote === "roast"
+                    ? Colors.roast
+                    : Colors.toast,
 
-              selectedVote ===
-              "roast"
-                ? styles.roastText
-                : styles.toastText,
+                transform: [
+                  {
+                    scale:
+                      pickIn.interpolate({
+                        inputRange:
+                          [0, 1],
+
+                        outputRange:
+                          [1.18, 1],
+                      }),
+                  },
+
+                  {
+                    rotate:
+                      selectedVote === "roast"
+                        ? "-2deg"
+                        : "2deg",
+                  },
+                ],
+              },
             ]}
           >
-            {selectedVote ===
-            "roast"
-              ? "ROAST"
-              : "TOAST"}
+            <VoteMark
+              type={selectedVote}
+              size="small"
+            />
+
+            <Text
+              style={[
+                styles.pickText,
+                {
+                  color:
+                    selectedVote === "roast"
+                      ? Colors.roastDark
+                      : Colors.toastDark,
+                },
+              ]}
+            >
+              {selectedVote === "roast"
+                ? "ROAST"
+                : "TOAST"}
+            </Text>
+          </Animated.View>
+        </View>
+
+        <Text style={styles.reactionLine}>
+          {matchedMajority
+            ? "You called it."
+            : "You had your own take."}
+        </Text>
+      </Animated.View>
+
+      {/* =================================================
+          Heat
+      ================================================= */}
+
+      <Animated.View
+        accessible
+        accessibilityLabel={`Heat earned, ${heatEarned}. ${matchedMajority ? "With the crowd." : "Own take."}`}
+        style={[
+          styles.heatTicket,
+          {
+            opacity:
+              heatIn,
+
+            transform: [
+              {
+                scale:
+                  heatIn.interpolate({
+                    inputRange:
+                      [0, 1],
+
+                    outputRange:
+                      [1.12, 1],
+                  }),
+              },
+
+              {
+                rotate:
+                  heatIn.interpolate({
+                    inputRange:
+                      [0, 1],
+
+                    outputRange:
+                      ["3deg", "0.5deg"],
+                  }),
+              },
+            ],
+          },
+        ]}
+      >
+        <View style={styles.heatStampLabel}>
+          <Text style={styles.heatStampLabelText}>
+            HEAT EARNED
           </Text>
         </View>
-      </View>
 
-      {/* Heat reward stays separate from Roast */}
-      <FloatingHeat
-        heatEarned={
-          heatEarned
-        }
-        matchedMajority={
-          matchedMajority
-        }
-      />
+        <HeatMark
+          size="medium"
+        />
+
+        <View style={styles.heatCopy}>
+          <Text style={styles.heatAmount}>
+            +{heatEarned} HEAT
+          </Text>
+
+          <Text style={styles.heatSubtext}>
+            {matchedMajority
+              ? "WITH THE CROWD"
+              : "OWN TAKE"}
+          </Text>
+        </View>
+      </Animated.View>
 
       {leveledUp && (
         <LevelUpCard
@@ -192,170 +513,73 @@ export default function ResultsCard({
       )}
 
       {/* =================================================
-          Roast vs Toast
+          Top Take
       ================================================= */}
 
       <View
-        style={
-          styles.battleCard
-        }
+        accessible
+        accessibilityLabel={`Top take. ${moment.topComment}`}
+        style={styles.topTake}
       >
-        <Text
-          style={
-            styles.battleLabel
-          }
-        >
-          CROWD SPLIT
-        </Text>
-
         <View
-          style={
-            styles.battleHeader
-          }
-        >
-          <View
-            style={
-              styles.battleSide
-            }
-          >
-            <VoteMark
-              type="roast"
-              size="small"
-            />
-
-            <Text
-              style={
-                styles.roastBattleText
-              }
-            >
-              ROAST
-            </Text>
-          </View>
-
-          <Text
-            style={
-              styles.versusText
-            }
-          >
-            VS
-          </Text>
-
-          <View
-            style={[
-              styles.battleSide,
-              styles.toastBattleSide,
-            ]}
-          >
-            <Text
-              style={
-                styles.toastBattleText
-              }
-            >
-              TOAST
-            </Text>
-
-            <VoteMark
-              type="toast"
-              size="small"
-            />
-          </View>
-        </View>
-
-        <BattleResult
-          roastPercentage={
-            moment.roastPercentage
-          }
-          toastPercentage={
-            moment.toastPercentage
-          }
-        />
-      </View>
-
-      {/* =================================================
-          Top Comment
-      ================================================= */}
-
-      <View
-        style={[
-          styles.commentCard,
-
-          {
-            borderColor:
-              categoryAccent,
-          },
-        ]}
-      >
-        <Text
           style={[
-            styles.commentLabel,
-
+            styles.topTakeTape,
             {
-              color:
+              backgroundColor:
                 categoryAccent,
             },
           ]}
         >
-          TOP TAKE
-        </Text>
+          <Text style={styles.topTakeTapeText}>
+            TOP TAKE
+          </Text>
+        </View>
 
-        <Text
-          style={
-            styles.commentText
-          }
-        >
+        <Text style={styles.topTakeText}>
           “{moment.topComment}”
         </Text>
+
+        <View style={styles.topTakeRule} />
       </View>
 
-      {/* Next Moment */}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Show next moment"
-        onPress={
-          onNextPress
-        }
-        style={({
-          pressed,
-        }) => [
-          styles.nextButton,
-
+        accessibilityHint="Moves to the next Roast or Toast Moment."
+        onPress={onNextPress}
+        style={({ pressed }) => [
+          styles.nextAction,
           pressed &&
-            styles.buttonPressed,
+            styles.pressed,
         ]}
       >
-        <Text
-          style={
-            styles.nextButtonText
-          }
-        >
-          Next Moment
-        </Text>
+        <View style={styles.nextButton}>
+          <Text style={styles.nextText}>
+            NEXT MOMENT
+          </Text>
 
-        <Text
-          style={
-            styles.nextButtonArrow
-          }
-        >
-          →
-        </Text>
+          <Text style={styles.nextArrow}>
+            →
+          </Text>
+        </View>
       </Pressable>
     </Animated.View>
   );
 }
 
 // =====================================================
-// Battle Result
+// Crowd Result
 // =====================================================
-
-type BattleResultProps = {
-  roastPercentage: number;
-  toastPercentage: number;
-};
 
 function BattleResult({
   roastPercentage,
   toastPercentage,
-}: BattleResultProps) {
+  reduceMotion,
+}: {
+  roastPercentage: number;
+  toastPercentage: number;
+  reduceMotion: boolean;
+}) {
   const safeRoast =
     Math.min(
       Math.max(
@@ -374,91 +598,94 @@ function BattleResult({
       100,
     );
 
-  const roastProgress =
-    useRef(
-      new Animated.Value(0),
-    ).current;
+  // I let the seam move, but keep each side usable.
+  const visualRoast =
+    50 +
+    (safeRoast - 50) *
+      0.5;
 
-  const toastProgress =
+  const visualToast =
+    100 -
+    visualRoast;
+
+  const reveal =
     useRef(
       new Animated.Value(0),
     ).current;
 
   const [
-    displayedRoast,
-    setDisplayedRoast,
+    shownRoast,
+    setShownRoast,
   ] =
-    useState(0);
+    useState(50);
 
   const [
-    displayedToast,
-    setDisplayedToast,
+    shownToast,
+    setShownToast,
   ] =
-    useState(0);
+    useState(50);
 
   useEffect(() => {
-    roastProgress.setValue(0);
-    toastProgress.setValue(0);
+    // I keep the same final crowd split with Reduce Motion,
+    // I just skip the moving seam and count-up.
+    if (reduceMotion) {
+      reveal.setValue(1);
+      setShownRoast(
+        safeRoast,
+      );
+      setShownToast(
+        safeToast,
+      );
 
-    setDisplayedRoast(0);
-    setDisplayedToast(0);
+      return;
+    }
 
-    const roastListener =
-      roastProgress.addListener(
+    reveal.setValue(0);
+
+    setShownRoast(50);
+    setShownToast(50);
+
+    const listener =
+      reveal.addListener(
         ({
           value,
         }) => {
-          setDisplayedRoast(
+          setShownRoast(
             Math.round(
-              value *
-                safeRoast,
+              50 +
+                (
+                  safeRoast -
+                  50
+                ) *
+                  value,
+            ),
+          );
+
+          setShownToast(
+            Math.round(
+              50 +
+                (
+                  safeToast -
+                  50
+                ) *
+                  value,
             ),
           );
         },
       );
 
-    const toastListener =
-      toastProgress.addListener(
-        ({
-          value,
-        }) => {
-          setDisplayedToast(
-            Math.round(
-              value *
-                safeToast,
-            ),
-          );
-        },
-      );
+    Animated.sequence([
+      Animated.delay(180),
 
-    Animated.parallel([
       Animated.timing(
-        roastProgress,
+        reveal,
         {
           toValue: 1,
-          duration: 720,
-          delay: 100,
+          duration: 900,
 
           easing:
             Easing.out(
-              Easing.cubic,
-            ),
-
-          useNativeDriver:
-            false,
-        },
-      ),
-
-      Animated.timing(
-        toastProgress,
-        {
-          toValue: 1,
-          duration: 720,
-          delay: 180,
-
-          easing:
-            Easing.out(
-              Easing.cubic,
+              Easing.back(1.15),
             ),
 
           useNativeDriver:
@@ -468,413 +695,533 @@ function BattleResult({
     ]).start();
 
     return () => {
-      roastProgress.removeListener(
-        roastListener,
-      );
-
-      toastProgress.removeListener(
-        toastListener,
+      reveal.removeListener(
+        listener,
       );
     };
   }, [
-    roastProgress,
+    reduceMotion,
+    reveal,
     safeRoast,
     safeToast,
-    toastProgress,
   ]);
 
   const roastWidth =
-    roastProgress.interpolate({
-      inputRange: [
-        0,
-        1,
-      ],
+    reveal.interpolate({
+      inputRange:
+        [0, 1],
 
       outputRange: [
-        "0%",
-        `${safeRoast}%`,
+        "50%",
+        `${visualRoast}%`,
       ],
     });
 
   const toastWidth =
-    toastProgress.interpolate({
-      inputRange: [
-        0,
-        1,
-      ],
+    reveal.interpolate({
+      inputRange:
+        [0, 1],
 
       outputRange: [
-        "0%",
-        `${safeToast}%`,
+        "50%",
+        `${visualToast}%`,
       ],
     });
 
   return (
-    <View>
-      {/* Large percentages */}
-      <View
-        style={
-          styles.percentageRow
-        }
+    <View
+      accessible
+      accessibilityLabel={`Crowd result. Roast ${safeRoast} percent. Toast ${safeToast} percent.`}
+      style={styles.battle}
+    >
+      <Animated.View
+        style={[
+          styles.roastHalf,
+          {
+            width:
+              roastWidth,
+          },
+        ]}
       >
-        <Text
-          style={
-            styles.roastPercentage
-          }
-        >
-          {displayedRoast}%
+        <View style={styles.resultSeal}>
+          <VoteMark
+            type="roast"
+            size="medium"
+          />
+        </View>
+
+        <Text style={styles.percent}>
+          {shownRoast}%
         </Text>
 
-        <Text
-          style={
-            styles.toastPercentage
-          }
-        >
-          {displayedToast}%
+        <Text style={styles.battleLabel}>
+          ROAST
         </Text>
-      </View>
+      </Animated.View>
 
-      {/* Competing color bar */}
-      <View
-        style={
-          styles.splitTrack
-        }
+      <Animated.View
+        style={[
+          styles.toastHalf,
+          {
+            width:
+              toastWidth,
+          },
+        ]}
       >
-        <Animated.View
-          style={[
-            styles.roastSplit,
+        <View style={styles.resultSeal}>
+          <VoteMark
+            type="toast"
+            size="medium"
+          />
+        </View>
 
-            {
-              width:
-                roastWidth,
-            },
-          ]}
-        />
+        <Text style={styles.percent}>
+          {shownToast}%
+        </Text>
 
-        <Animated.View
-          style={[
-            styles.toastSplit,
+        <Text style={styles.battleLabel}>
+          TOAST
+        </Text>
+      </Animated.View>
 
-            {
-              width:
-                toastWidth,
-            },
-          ]}
-        />
-      </View>
+      <View style={styles.centerLine} />
+
+      <Animated.View
+        style={[
+          styles.vsPuck,
+          {
+            transform: [
+              {
+                scale:
+                  reveal.interpolate({
+                    inputRange:
+                      [0, 0.75, 1],
+
+                    outputRange:
+                      [0.7, 1.12, 1],
+                  }),
+              },
+            ],
+          },
+        ]}
+      >
+        <Text style={styles.vsText}>
+          VS
+        </Text>
+      </Animated.View>
     </View>
   );
 }
 
-// =====================================================
-// Styles
-// =====================================================
-
 const styles =
   StyleSheet.create({
-    resultsContainer: {
+    container: {
       paddingBottom: 28,
     },
 
-    headingRow: {
-      marginBottom: 18,
+    headingArea: {
+      alignItems: "center",
+
+      paddingTop: 14,
+      marginBottom: 16,
     },
 
-    resultsEyebrow: {
+    peopleBrush: {
+      backgroundColor:
+        Colors.textPrimary,
+
+      paddingVertical: 7,
+      paddingHorizontal: 18,
+
+      marginBottom: 4,
+    },
+
+    peopleBrushText: {
       color:
-        Colors.textMuted,
+        Colors.white,
 
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: "900",
-      letterSpacing: 2.2,
-
-      marginBottom: 5,
+      letterSpacing: 1.8,
     },
 
-    resultsHeading: {
+    heading: {
       color:
         Colors.textPrimary,
 
-      fontSize: 35,
+      fontSize: 38,
+      lineHeight: 40,
       fontWeight: "900",
-      letterSpacing: -1.6,
-      lineHeight: 39,
-    },
-
-    playerVoteCard: {
-      flexDirection: "row",
-      alignItems: "center",
-
-      borderWidth: 1.5,
-      borderRadius:
-        Radius.lg,
-
-      paddingVertical: 13,
-      paddingHorizontal: 15,
-
-      marginBottom: 15,
-    },
-
-    playerVoteRoast: {
-      backgroundColor:
-        Colors.roastWash,
-
-      borderColor:
-        Colors.roastSoft,
-    },
-
-    playerVoteToast: {
-      backgroundColor:
-        Colors.toastWash,
-
-      borderColor:
-        Colors.toastSoft,
-    },
-
-    playerVoteText: {
-      marginLeft: 12,
-    },
-
-    playerVoteLabel: {
-      color:
-        Colors.textMuted,
-
-      fontSize: 9,
-      fontWeight: "900",
-      letterSpacing: 1.5,
-    },
-
-    playerVoteValue: {
-      fontSize: 18,
-      fontWeight: "900",
-      letterSpacing: 1,
-      marginTop: 1,
-    },
-
-    roastText: {
-      color:
-        Colors.roastDark,
-    },
-
-    toastText: {
-      color:
-        Colors.toastDark,
-    },
-
-    battleCard: {
-      backgroundColor:
-        Colors.surfaceWarm,
-
-      borderColor:
-        Colors.borderStrong,
-
-      borderWidth: 1.5,
-
-      borderRadius:
-        Radius.xl,
-
-      padding: 18,
-
-      marginTop: 4,
-      marginBottom: 18,
-
-      transform: [
-        {
-          rotate:
-            "-0.4deg",
-        },
-      ],
-    },
-
-    battleLabel: {
-      color:
-        Colors.textMuted,
-
-      fontSize: 9,
-      fontWeight: "900",
-      letterSpacing: 2,
+      letterSpacing: -1.8,
 
       textAlign: "center",
-
-      marginBottom: 13,
     },
 
-    battleHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent:
-        "space-between",
-
-      marginBottom: 15,
-    },
-
-    battleSide: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
-
-    toastBattleSide: {
-      justifyContent:
-        "flex-end",
-    },
-
-    roastBattleText: {
-      color:
-        Colors.roastDark,
-
-      fontSize: 17,
-      fontWeight: "900",
-      letterSpacing: 1,
-    },
-
-    toastBattleText: {
-      color:
-        Colors.toastDark,
-
-      fontSize: 17,
-      fontWeight: "900",
-      letterSpacing: 1,
-    },
-
-    versusText: {
-      color:
-        Colors.textMuted,
-
-      fontSize: 10,
-      fontWeight: "900",
-      letterSpacing: 1.5,
-    },
-
-    percentageRow: {
-      flexDirection: "row",
-      justifyContent:
-        "space-between",
-
-      marginBottom: 9,
-    },
-
-    roastPercentage: {
-      color:
-        Colors.roastDark,
-
-      fontSize: 29,
-      fontWeight: "900",
-    },
-
-    toastPercentage: {
-      color:
-        Colors.toastDark,
-
-      fontSize: 29,
-      fontWeight: "900",
-    },
-
-    splitTrack: {
-      height: 14,
-
-      flexDirection: "row",
+    headingScratch: {
+      width: 64,
+      height: 4,
 
       backgroundColor:
-        Colors.surfaceAlt,
+        Colors.roast,
 
-      borderRadius:
-        Radius.pill,
+      marginTop: 8,
+    },
+
+    battle: {
+      position: "relative",
+
+      height: 235,
+
+      flexDirection: "row",
+
+      marginHorizontal: -18,
+      marginBottom: 17,
 
       overflow: "hidden",
     },
 
-    roastSplit: {
+    roastHalf: {
       height: "100%",
 
       backgroundColor:
         Colors.roast,
+
+      alignItems: "center",
+      justifyContent: "center",
+
+      paddingHorizontal: 8,
     },
 
-    toastSplit: {
+    toastHalf: {
       height: "100%",
 
       backgroundColor:
         Colors.toast,
+
+      alignItems: "center",
+      justifyContent: "center",
+
+      paddingHorizontal: 8,
     },
 
-    commentCard: {
+    resultSeal: {
+      width: 68,
+      height: 68,
+
+      borderRadius: 34,
+
       backgroundColor:
-        Colors.surface,
+        "rgba(255,247,239,0.9)",
 
-      borderWidth: 1.5,
-      borderRadius:
-        Radius.lg,
+      alignItems: "center",
+      justifyContent: "center",
 
-      padding: 18,
+      marginBottom: 5,
+    },
 
-      marginBottom: 20,
+    percent: {
+      color:
+        Colors.white,
+
+      fontSize: 44,
+      lineHeight: 48,
+      fontWeight: "900",
+      letterSpacing: -1.6,
+    },
+
+    battleLabel: {
+      color:
+        Colors.white,
+
+      fontSize: 10,
+      fontWeight: "900",
+      letterSpacing: 1.6,
+    },
+
+    centerLine: {
+      position: "absolute",
+
+      left: "50%",
+      top: 0,
+      bottom: 0,
+
+      width: 4,
+      marginLeft: -2,
+
+      backgroundColor:
+        Colors.textPrimary,
+    },
+
+    vsPuck: {
+      position: "absolute",
+
+      left: "50%",
+      top: "50%",
+
+      width: 54,
+      height: 54,
+
+      marginLeft: -27,
+      marginTop: -27,
+
+      borderRadius: 27,
+
+      backgroundColor:
+        Colors.textPrimary,
+
+      borderColor:
+        Colors.background,
+      borderWidth: 4,
+
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    vsText: {
+      color:
+        Colors.white,
+
+      fontSize: 9,
+      fontWeight: "900",
+      letterSpacing: 1,
+    },
+
+    playerResponse: {
+      alignItems: "center",
+
+      marginBottom: 15,
+    },
+
+    pickRow: {
+      flexDirection: "row",
+      alignItems: "center",
+
+      gap: 10,
+
+      marginBottom: 8,
+    },
+
+    pickLead: {
+      color:
+        Colors.textMuted,
+
+      fontSize: 8,
+      fontWeight: "900",
+      letterSpacing: 1.4,
+    },
+
+    pickStamp: {
+      minWidth: 145,
+
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+
+      borderWidth: 1.6,
+
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+    },
+
+    pickText: {
+      fontSize: 12,
+      fontWeight: "900",
+      letterSpacing: 1.2,
+
+      marginLeft: 8,
+    },
+
+    reactionLine: {
+      color:
+        Colors.textPrimary,
+
+      fontSize: 22,
+      lineHeight: 27,
+      fontWeight: "900",
+      letterSpacing: -0.7,
+
+      textAlign: "center",
+    },
+
+    heatTicket: {
+      position: "relative",
+
+      width: "78%",
+      minHeight: 96,
+
+      alignSelf: "center",
+
+      backgroundColor:
+        Colors.heatSoft,
+
+      borderColor:
+        "#E6B66F",
+      borderWidth: 1.4,
+
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+
+      paddingVertical: 15,
+      paddingHorizontal: 18,
+
+      marginBottom: 21,
+    },
+
+    heatStampLabel: {
+      position: "absolute",
+
+      left: 14,
+      top: -11,
+
+      backgroundColor:
+        Colors.textPrimary,
+
+      paddingVertical: 6,
+      paddingHorizontal: 12,
 
       transform: [
         {
-          rotate:
-            "0.4deg",
+          rotate: "-2deg",
         },
       ],
     },
 
-    commentLabel: {
-      fontSize: 10,
+    heatStampLabelText: {
+      color:
+        Colors.white,
+
+      fontSize: 7.5,
       fontWeight: "900",
       letterSpacing: 1.5,
-      marginBottom: 8,
     },
 
-    commentText: {
+    heatCopy: {
+      marginLeft: 11,
+    },
+
+    heatAmount: {
+      color:
+        Colors.heatDark,
+
+      fontSize: 23,
+      fontWeight: "900",
+      letterSpacing: -0.5,
+    },
+
+    heatSubtext: {
+      color:
+        Colors.textMuted,
+
+      fontSize: 7.5,
+      fontWeight: "900",
+      letterSpacing: 1.2,
+
+      marginTop: 1,
+    },
+
+    topTake: {
+      paddingHorizontal: 8,
+
+      marginTop: 2,
+      marginBottom: 20,
+    },
+
+    topTakeTape: {
+      alignSelf: "flex-start",
+
+      paddingVertical: 5,
+      paddingHorizontal: 12,
+
+      marginBottom: 12,
+
+      transform: [
+        {
+          rotate: "-2deg",
+        },
+      ],
+    },
+
+    topTakeTapeText: {
+      color:
+        Colors.white,
+
+      fontSize: 8,
+      fontWeight: "900",
+      letterSpacing: 1.4,
+    },
+
+    topTakeText: {
       color:
         Colors.textPrimary,
 
-      fontSize: 16,
-      fontWeight: "700",
-      lineHeight: 23,
+      fontSize: 19,
+      lineHeight: 27,
+      fontWeight: "500",
+
+      paddingHorizontal: 5,
+    },
+
+    topTakeRule: {
+      height: 1.2,
+
+      backgroundColor:
+        Colors.borderStrong,
+
+      marginTop: 15,
+    },
+
+    nextAction: {
+      marginHorizontal: 7,
     },
 
     nextButton: {
+      minHeight: 68,
+
       backgroundColor:
         Colors.textPrimary,
 
-      borderRadius:
-        Radius.pill,
-
-      paddingVertical: 17,
-      paddingHorizontal: 25,
-
       flexDirection: "row",
       alignItems: "center",
-      justifyContent:
-        "space-between",
+      justifyContent: "space-between",
 
-      marginBottom: 18,
+      paddingHorizontal: 22,
+
+      borderBottomColor:
+        Colors.toast,
+      borderBottomWidth: 5,
+
+      transform: [
+        {
+          rotate: "-0.8deg",
+        },
+      ],
     },
 
-    buttonPressed: {
-      opacity: 0.78,
+    nextText: {
+      color:
+        Colors.white,
+
+      fontSize: 11,
+      fontWeight: "900",
+      letterSpacing: 1.5,
+    },
+
+    nextArrow: {
+      color:
+        Colors.white,
+
+      fontSize: 26,
+      fontWeight: "700",
+    },
+
+    pressed: {
+      opacity: 0.72,
 
       transform: [
         {
           scale: 0.985,
         },
       ],
-    },
-
-    nextButtonText: {
-      color:
-        Colors.white,
-
-      fontSize: 18,
-      fontWeight: "900",
-    },
-
-    nextButtonArrow: {
-      color:
-        Colors.white,
-
-      fontSize: 23,
-      fontWeight: "700",
     },
   });

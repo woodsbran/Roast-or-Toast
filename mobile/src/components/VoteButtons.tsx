@@ -2,28 +2,29 @@
 // File: VoteButtons.tsx
 //
 // Purpose:
-// Displays the main Roast and Toast voting choices.
+// Displays the Roast / Toast choices.
 //
-// Version 1.1 moves away from two generic white cards
-// and makes Roast and Toast feel like two opposing
-// sides of the game.
+// Version 1.1 — Composition C3
 //
-// Roast:
-// • Coral panel
-// • Charred R mark
+// I am fixing the part that still felt squeezed in C2.
 //
-// Toast:
-// • Teal panel
-// • Clinking-glasses mark
+// What I am changing:
+// • Roast and Toast are much taller
+// • The symbols sit deeper in the middle of each choice
+// • The label sits directly under the symbol
+// • The phrase gets its own readable area underneath
+// • I am removing the chopped brush-image footer
+// • The footer is now a clean black game strip that I know
+//   will actually stay visible on every phone
 //
-// The flame is no longer used for Roast. It is reserved
-// for Heat and progression.
+// I am keeping the same tap logic and vote animation.
 //
 // Project: Roast or Toast
 // =====================================================
 
 import {
   Animated,
+  ImageBackground,
   Pressable,
   StyleSheet,
   Text,
@@ -32,12 +33,10 @@ import {
 
 import {
   Colors,
-  Radius,
 } from "../theme";
 
 import VoteMark from "./VoteMark";
 
-// A vote can be Roast, Toast, or not selected yet.
 export type VoteChoice =
   | "roast"
   | "toast"
@@ -61,29 +60,33 @@ export default function VoteButtons({
   onToastPress,
 }: VoteButtonsProps) {
   return (
-    <View>
-      {/* Short prompt that leads into the vote */}
-      <Text style={styles.votePrompt}>
-        Pick a side.
-      </Text>
+    <View style={styles.container}>
+      {/* I keep Pick a Side connected to the Moment instead
+          of letting it float far above the choices. */}
+      <View style={styles.pickStamp}>
+        <Text style={styles.pickStampText}>
+          PICK A SIDE
+        </Text>
+      </View>
 
-      <View style={styles.buttonContainer}>
-        {/* =================================================
-            Roast
-        ================================================= */}
+      {/* =================================================
+          Tall Vote Pieces
 
+          These are intentionally longer now. The symbol,
+          label, and phrase each get their own space instead
+          of being compressed into one small block.
+      ================================================= */}
+
+      <View style={styles.voteRow}>
         <Animated.View
           style={[
-            styles.animatedButton,
+            styles.choiceWrapper,
+            styles.roastWrapper,
             {
               transform: [
                 {
                   scale:
                     roastScale,
-                },
-                {
-                  rotate:
-                    "-1deg",
                 },
               ],
             },
@@ -94,114 +97,52 @@ export default function VoteButtons({
             accessibilityLabel="Vote Roast"
             onPress={onRoastPress}
             style={({ pressed }) => [
-              styles.votePanel,
-              styles.roastPanel,
-
+              styles.choicePressable,
               pressed &&
-                styles.roastPressed,
+                styles.pressed,
             ]}
           >
-            {/* Decorative stamped text */}
-            <Text
-              style={
-                styles.roastBackdrop
-              }
+            <ImageBackground
+              source={require("../../assets/game/vote/roast-block.png")}
+              resizeMode="stretch"
+              style={styles.choiceArt}
             >
-              ROAST
-            </Text>
+              <View style={styles.choiceContent}>
+                {/* I place the symbol around the middle of the
+                    card instead of crowding it at the top. */}
+                <View style={styles.seal}>
+                  <VoteMark
+                    type="roast"
+                    size="medium"
+                  />
+                </View>
 
-            <View
-              style={
-                styles.panelContent
-              }
-            >
-              <VoteMark
-                type="roast"
-                size="large"
-              />
-
-              <View
-                style={
-                  styles.voteTextContainer
-                }
-              >
-                <Text
-                  style={[
-                    styles.voteLabel,
-                    styles.roastLabel,
-                  ]}
-                >
+                <Text style={styles.choiceLabel}>
                   ROAST
                 </Text>
 
                 <Text
-                  style={[
-                    styles.votePhrase,
-                    styles.roastPhrase,
-                  ]}
+                  style={styles.choicePhrase}
+                  numberOfLines={3}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.82}
                 >
                   {roastPhrase}
                 </Text>
               </View>
-
-              <Text
-                style={[
-                  styles.arrow,
-                  styles.roastArrow,
-                ]}
-              >
-                →
-              </Text>
-            </View>
+            </ImageBackground>
           </Pressable>
         </Animated.View>
 
-        {/* =================================================
-            Divider
-        ================================================= */}
-
-        <View
-          style={
-            styles.orDivider
-          }
-        >
-          <View
-            style={
-              styles.dividerLine
-            }
-          />
-
-          <Text
-            style={
-              styles.orText
-            }
-          >
-            OR
-          </Text>
-
-          <View
-            style={
-              styles.dividerLine
-            }
-          />
-        </View>
-
-        {/* =================================================
-            Toast
-        ================================================= */}
-
         <Animated.View
           style={[
-            styles.animatedButton,
+            styles.choiceWrapper,
+            styles.toastWrapper,
             {
               transform: [
                 {
                   scale:
                     toastScale,
-                },
-                {
-                  rotate:
-                    "1deg",
                 },
               ],
             },
@@ -212,293 +153,280 @@ export default function VoteButtons({
             accessibilityLabel="Vote Toast"
             onPress={onToastPress}
             style={({ pressed }) => [
-              styles.votePanel,
-              styles.toastPanel,
-
+              styles.choicePressable,
               pressed &&
-                styles.toastPressed,
+                styles.pressed,
             ]}
           >
-            {/* Decorative stamped text */}
-            <Text
-              style={
-                styles.toastBackdrop
-              }
+            <ImageBackground
+              source={require("../../assets/game/vote/toast-block.png")}
+              resizeMode="stretch"
+              style={styles.choiceArt}
             >
-              TOAST
-            </Text>
+              <View style={styles.choiceContent}>
+                <View style={styles.seal}>
+                  <VoteMark
+                    type="toast"
+                    size="medium"
+                  />
+                </View>
 
-            <View
-              style={
-                styles.panelContent
-              }
-            >
-              <VoteMark
-                type="toast"
-                size="large"
-              />
-
-              <View
-                style={
-                  styles.voteTextContainer
-                }
-              >
-                <Text
-                  style={[
-                    styles.voteLabel,
-                    styles.toastLabel,
-                  ]}
-                >
+                <Text style={styles.choiceLabel}>
                   TOAST
                 </Text>
 
                 <Text
-                  style={[
-                    styles.votePhrase,
-                    styles.toastPhrase,
-                  ]}
+                  style={styles.choicePhrase}
+                  numberOfLines={3}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.82}
                 >
                   {toastPhrase}
                 </Text>
               </View>
-
-              <Text
-                style={[
-                  styles.arrow,
-                  styles.toastArrow,
-                ]}
-              >
-                →
-              </Text>
-            </View>
+            </ImageBackground>
           </Pressable>
         </Animated.View>
+
+        {/* OR stays centered between the two choices but I
+            keep it small enough that it does not cover copy. */}
+        <View style={styles.orPuck}>
+          <Text style={styles.orText}>
+            OR
+          </Text>
+        </View>
+      </View>
+
+      {/* =================================================
+          Bottom Game Strip
+
+          I am deliberately not using the brush PNG here.
+          The asset was getting chopped and made the wording
+          look broken. This solid strip is still bold and
+          graphic, but the label is guaranteed to be readable.
+      ================================================= */}
+
+      <View style={styles.footerStrip}>
+        <Text style={styles.footerStripText}>
+          TAP YOUR CHOICE
+        </Text>
       </View>
     </View>
   );
 }
 
-// =====================================================
-// Styles
-// =====================================================
-
 const styles =
   StyleSheet.create({
-    votePrompt: {
+    container: {
+      width: "100%",
+
+      marginTop: -19,
+
+      zIndex: 5,
+    },
+
+    pickStamp: {
+      alignSelf: "center",
+
+      backgroundColor:
+        Colors.toast,
+
+      paddingVertical: 5,
+      paddingHorizontal: 14,
+
+      marginBottom: -7,
+
+      transform: [
+        {
+          rotate: "-2deg",
+        },
+      ],
+
+      zIndex: 12,
+    },
+
+    pickStampText: {
       color:
         Colors.textPrimary,
-      fontSize: 19,
+
+      fontSize: 8,
       fontWeight: "900",
-      letterSpacing: -0.3,
-      marginBottom: 16,
+
+      letterSpacing: 1.35,
     },
 
-    buttonContainer: {
-      gap: 10,
-    },
+    voteRow: {
+      position: "relative",
 
-    animatedButton: {
-      width: "100%",
-    },
-
-    votePanel: {
-      minHeight: 126,
-
-      borderRadius:
-        Radius.xl,
-
-      paddingVertical: 19,
-      paddingHorizontal: 19,
-
-      justifyContent:
-        "center",
-
-      overflow: "hidden",
-
-      shadowColor:
-        Colors.black,
-
-      shadowOffset: {
-        width: 0,
-        height: 8,
-      },
-
-      shadowOpacity: 0.1,
-      shadowRadius: 18,
-
-      elevation: 4,
-    },
-
-    roastPanel: {
-      backgroundColor:
-        Colors.roastSoft,
-
-      borderColor:
-        Colors.roast,
-
-      borderWidth: 2,
-    },
-
-    toastPanel: {
-      backgroundColor:
-        Colors.toastSoft,
-
-      borderColor:
-        Colors.toast,
-
-      borderWidth: 2,
-    },
-
-    roastPressed: {
-      backgroundColor:
-        Colors.roast,
-
-      transform: [
-        {
-          scale: 0.985,
-        },
-      ],
-    },
-
-    toastPressed: {
-      backgroundColor:
-        Colors.toast,
-
-      transform: [
-        {
-          scale: 0.985,
-        },
-      ],
-    },
-
-    panelContent: {
       flexDirection: "row",
-      alignItems: "center",
-      zIndex: 2,
+
+      height: 250,
+
+      marginHorizontal: -9,
     },
 
-    voteTextContainer: {
+    choiceWrapper: {
       flex: 1,
-      marginLeft: 18,
-      marginRight: 10,
+
+      height: "100%",
     },
 
-    voteLabel: {
-      fontSize: 27,
-      fontWeight: "900",
-      letterSpacing: 1.6,
+    // The block assets have torn outside edges but are fuller
+    // through the middle, which gives me more usable room for
+    // the symbols and phrases than the wedge assets did.
+    roastWrapper: {
+      marginRight: -2,
     },
 
-    roastLabel: {
-      color:
-        Colors.roastDark,
+    toastWrapper: {
+      marginLeft: -2,
     },
 
-    toastLabel: {
-      color:
-        Colors.toastDark,
+    choicePressable: {
+      flex: 1,
     },
 
-    votePhrase: {
-      fontSize: 14,
-      fontWeight: "700",
-      lineHeight: 19,
-      marginTop: 3,
-    },
+    choiceArt: {
+      flex: 1,
 
-    roastPhrase: {
-      color:
-        Colors.roastDark,
-    },
-
-    toastPhrase: {
-      color:
-        Colors.toastDark,
-    },
-
-    arrow: {
-      fontSize: 25,
-      fontWeight: "900",
-    },
-
-    roastArrow: {
-      color:
-        Colors.roastDark,
-    },
-
-    toastArrow: {
-      color:
-        Colors.toastDark,
-    },
-
-    // Large faded words add personality without
-    // competing with the main button content.
-    roastBackdrop: {
-      position: "absolute",
-      right: -8,
-      bottom: -22,
-
-      color:
-        Colors.roast,
-
-      fontSize: 67,
-      fontWeight: "900",
-      letterSpacing: -3,
-
-      opacity: 0.08,
-
-      transform: [
-        {
-          rotate: "5deg",
-        },
-      ],
-    },
-
-    toastBackdrop: {
-      position: "absolute",
-      right: -5,
-      bottom: -21,
-
-      color:
-        Colors.toast,
-
-      fontSize: 64,
-      fontWeight: "900",
-      letterSpacing: -3,
-
-      opacity: 0.09,
-
-      transform: [
-        {
-          rotate: "-4deg",
-        },
-      ],
-    },
-
-    // Small OR divider keeps both sides connected
-    // without bringing back another card.
-    orDivider: {
-      flexDirection: "row",
       alignItems: "center",
-      gap: 10,
+      justifyContent: "center",
 
       paddingHorizontal: 14,
     },
 
-    dividerLine: {
-      flex: 1,
-      height: 1,
+    choiceContent: {
+      width: "100%",
+
+      alignItems: "center",
+      justifyContent: "center",
+
+      paddingTop: 28,
+      paddingBottom: 26,
+    },
+
+    seal: {
+      width: 62,
+      height: 62,
+
+      borderRadius: 31,
 
       backgroundColor:
-        Colors.borderStrong,
+        "rgba(255,247,239,0.90)",
+
+      borderColor:
+        Colors.textPrimary,
+      borderWidth: 1.3,
+
+      alignItems: "center",
+      justifyContent: "center",
+
+      marginBottom: 8,
+    },
+
+    choiceLabel: {
+      color:
+        Colors.textPrimary,
+
+      fontSize: 24,
+      fontWeight: "900",
+
+      letterSpacing: 0.85,
+    },
+
+    choicePhrase: {
+      width: "90%",
+
+      minHeight: 42,
+
+      color:
+        Colors.textPrimary,
+
+      fontSize: 11,
+      fontWeight: "700",
+
+      lineHeight: 15,
+
+      textAlign: "center",
+
+      marginTop: 7,
+    },
+
+    orPuck: {
+      position: "absolute",
+
+      width: 40,
+      height: 40,
+
+      borderRadius: 20,
+
+      left: "50%",
+      top: 104,
+
+      marginLeft: -20,
+
+      backgroundColor:
+        Colors.textPrimary,
+
+      borderColor:
+        Colors.background,
+      borderWidth: 3,
+
+      alignItems: "center",
+      justifyContent: "center",
+
+      zIndex: 20,
     },
 
     orText: {
       color:
-        Colors.textMuted,
+        Colors.white,
 
-      fontSize: 10,
+      fontSize: 8,
       fontWeight: "900",
-      letterSpacing: 1.6,
+
+      letterSpacing: 0.7,
+    },
+
+    footerStrip: {
+      alignSelf: "center",
+
+      width: "70%",
+
+      minHeight: 36,
+
+      backgroundColor:
+        Colors.textPrimary,
+
+      alignItems: "center",
+      justifyContent: "center",
+
+      marginTop: -8,
+
+      transform: [
+        {
+          rotate: "-1deg",
+        },
+      ],
+    },
+
+    footerStripText: {
+      color:
+        Colors.white,
+
+      fontSize: 8,
+      fontWeight: "900",
+
+      letterSpacing: 1.4,
+    },
+
+    pressed: {
+      opacity: 0.72,
+
+      transform: [
+        {
+          scale: 0.985,
+        },
+      ],
     },
   });

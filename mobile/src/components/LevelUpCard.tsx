@@ -2,21 +2,14 @@
 // File: LevelUpCard.tsx
 //
 // Purpose:
-// Celebrates a player reaching a new level.
+// Celebrates a new level.
 //
-// Version 1.1:
-// • Uses the custom Ember Spark mark
-// • Heat has its own progression identity
-// • Roast coral is no longer used for leveling
+// Version 1.1 — Core Identity Application
 //
-// Celebration Types:
-// • Normal Level
-// • New Title Unlock
+// I am removing the old rounded black card completely.
 //
-// Animation:
-// • Card fades and rises into view
-// • Heat mark pops
-// • Main message scales into place
+// Level Up should feel like something got stamped across the
+// game, not like a modal from a dashboard.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -39,10 +32,10 @@ import {
 
 import {
   Colors,
-  Radius,
 } from "../theme";
 
-import HeatMark from "./HeatMark";
+import InkUnderline from "./InkUnderline";
+import StampLabel from "./StampLabel";
 
 type LevelUpCardProps = {
   level: number;
@@ -65,81 +58,51 @@ export default function LevelUpCard({
     currentTitle !==
     previousTitle;
 
-  const cardOpacity =
+  const opacity =
     useRef(
       new Animated.Value(0),
     ).current;
 
-  const cardTranslateY =
+  const scale =
     useRef(
-      new Animated.Value(18),
+      new Animated.Value(0.94),
     ).current;
 
-  const iconScale =
+  const rotate =
     useRef(
-      new Animated.Value(0.45),
-    ).current;
-
-  const messageScale =
-    useRef(
-      new Animated.Value(0.92),
+      new Animated.Value(-2),
     ).current;
 
   useEffect(() => {
-    cardOpacity.setValue(0);
-    cardTranslateY.setValue(18);
-    iconScale.setValue(0.45);
-    messageScale.setValue(0.92);
+    opacity.setValue(0);
+    scale.setValue(0.94);
+    rotate.setValue(-2);
 
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(
-          cardOpacity,
-          {
-            toValue: 1,
-            duration: 220,
-            useNativeDriver: true,
-          },
-        ),
-
-        Animated.spring(
-          cardTranslateY,
-          {
-            toValue: 0,
-            speed: 18,
-            bounciness: 5,
-            useNativeDriver: true,
-          },
-        ),
-      ]),
-
-      Animated.parallel([
-        Animated.spring(
-          iconScale,
-          {
-            toValue: 1.18,
-            speed: 24,
-            bounciness: 9,
-            useNativeDriver: true,
-          },
-        ),
-
-        Animated.spring(
-          messageScale,
-          {
-            toValue: 1,
-            speed: 20,
-            bounciness: 6,
-            useNativeDriver: true,
-          },
-        ),
-      ]),
-
-      Animated.spring(
-        iconScale,
+    Animated.parallel([
+      Animated.timing(
+        opacity,
         {
           toValue: 1,
-          speed: 22,
+          duration: 180,
+          useNativeDriver: true,
+        },
+      ),
+
+      Animated.spring(
+        scale,
+        {
+          toValue: 1,
+          speed: 18,
+          bounciness: 5,
+          useNativeDriver: true,
+        },
+      ),
+
+      Animated.spring(
+        rotate,
+        {
+          toValue: -0.6,
+          speed: 18,
           bounciness: 4,
           useNativeDriver: true,
         },
@@ -147,255 +110,136 @@ export default function LevelUpCard({
     ]).start();
   }, [
     level,
-    cardOpacity,
-    cardTranslateY,
-    iconScale,
-    messageScale,
+    opacity,
+    rotate,
+    scale,
   ]);
+
+  const animatedRotation =
+    rotate.interpolate({
+      inputRange: [
+        -2,
+        0,
+      ],
+
+      outputRange: [
+        "-2deg",
+        "0deg",
+      ],
+    });
 
   return (
     <Animated.View
       style={[
         styles.container,
-
         {
-          opacity:
-            cardOpacity,
+          opacity,
 
           transform: [
             {
-              translateY:
-                cardTranslateY,
+              scale,
+            },
+            {
+              rotate:
+                animatedRotation,
             },
           ],
         },
       ]}
     >
-      <View
-        style={
-          styles.glowCircle
+      <StampLabel
+        text={
+          unlockedNewTitle
+            ? "NEW TITLE UNLOCKED"
+            : "YOU HEATED UP"
         }
+        color={
+          Colors.roast
+        }
+        rotate={-2}
       />
 
-      <Animated.View
-        style={[
-          styles.iconContainer,
+      <Text style={styles.level}>
+        LEVEL {level}
+      </Text>
 
-          {
-            transform: [
-              {
-                scale:
-                  iconScale,
-              },
-            ],
-          },
-        ]}
-      >
-        <HeatMark
-          size="medium"
-        />
-      </Animated.View>
+      <Text style={styles.title}>
+        {unlockedNewTitle
+          ? currentTitle
+          : "KEEP BRINGING THE HEAT."}
+      </Text>
 
-      <Animated.View
-        style={[
-          styles.content,
+      <InkUnderline
+        color={
+          unlockedNewTitle
+            ? Colors.toast
+            : Colors.roast
+        }
+        width={68}
+      />
 
-          {
-            transform: [
-              {
-                scale:
-                  messageScale,
-              },
-            ],
-          },
-        ]}
-      >
-        <Text
-          style={
-            styles.eyebrow
-          }
-        >
-          {unlockedNewTitle
-            ? "NEW TITLE UNLOCKED"
-            : "YOU HEATED UP"}
-        </Text>
-
-        <Text
-          style={
-            styles.level
-          }
-        >
-          Level {level}
-        </Text>
-
-        {unlockedNewTitle ? (
-          <>
-            <Text
-              style={
-                styles.title
-              }
-            >
-              {currentTitle}
-            </Text>
-
-            <Text
-              style={
-                styles.supportingText
-              }
-            >
-              Okay, now you&apos;re becoming a problem.
-            </Text>
-          </>
-        ) : (
-          <>
-            <Text
-              style={
-                styles.message
-              }
-            >
-              Keep bringing the Heat.
-            </Text>
-
-            <Text
-              style={
-                styles.supportingText
-              }
-            >
-              The next title is getting closer.
-            </Text>
-          </>
-        )}
-      </Animated.View>
+      <Text style={styles.supporting}>
+        {unlockedNewTitle
+          ? "Okay, now you're becoming a problem."
+          : "The next title is getting closer."}
+      </Text>
     </Animated.View>
   );
 }
 
-// =====================================================
-// Styles
-// =====================================================
+const styles = StyleSheet.create({
+  container: {
+    borderTopColor:
+      Colors.textPrimary,
+    borderBottomColor:
+      Colors.textPrimary,
 
-const styles =
-  StyleSheet.create({
-    container: {
-      position: "relative",
+    borderTopWidth: 1.4,
+    borderBottomWidth: 1.4,
 
-      backgroundColor:
-        Colors.textPrimary,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
 
-      borderRadius:
-        Radius.lg,
+    marginBottom: 18,
 
-      paddingVertical: 18,
-      paddingHorizontal: 18,
+    backgroundColor:
+      Colors.background,
+  },
 
-      marginBottom: 18,
+  level: {
+    color:
+      Colors.textMuted,
 
-      flexDirection: "row",
-      alignItems: "center",
+    fontSize: 8,
+    fontWeight: "900",
 
-      overflow: "hidden",
+    letterSpacing: 1.2,
 
-      shadowColor:
-        Colors.black,
+    marginTop: 9,
+  },
 
-      shadowOffset: {
-        width: 0,
-        height: 8,
-      },
+  title: {
+    color:
+      Colors.textPrimary,
 
-      shadowOpacity: 0.14,
-      shadowRadius: 14,
+    fontSize: 24,
+    fontWeight: "900",
 
-      elevation: 5,
-    },
+    lineHeight: 28,
+    letterSpacing: -0.9,
 
-    glowCircle: {
-      position: "absolute",
+    marginTop: 2,
+  },
 
-      width: 130,
-      height: 130,
+  supporting: {
+    color:
+      Colors.textSecondary,
 
-      borderRadius: 65,
+    fontSize: 11,
+    fontWeight: "700",
 
-      right: -45,
-      top: -52,
+    lineHeight: 16,
 
-      backgroundColor:
-        Colors.heat,
-
-      opacity: 0.18,
-    },
-
-    iconContainer: {
-      width: 58,
-      height: 58,
-
-      borderRadius: 29,
-
-      backgroundColor:
-        "#35291F",
-
-      alignItems: "center",
-      justifyContent: "center",
-
-      marginRight: 15,
-    },
-
-    content: {
-      flex: 1,
-    },
-
-    eyebrow: {
-      color:
-        Colors.heat,
-
-      fontSize: 10,
-      fontWeight: "900",
-
-      letterSpacing: 1.5,
-
-      marginBottom: 5,
-    },
-
-    level: {
-      color:
-        "#D7D7D7",
-
-      fontSize: 13,
-      fontWeight: "800",
-    },
-
-    title: {
-      color:
-        Colors.white,
-
-      fontSize: 22,
-      fontWeight: "900",
-
-      lineHeight: 27,
-
-      marginTop: 2,
-    },
-
-    message: {
-      color:
-        Colors.white,
-
-      fontSize: 19,
-      fontWeight: "900",
-
-      marginTop: 2,
-    },
-
-    supportingText: {
-      color:
-        "#CFCFCF",
-
-      fontSize: 11,
-      fontWeight: "600",
-
-      lineHeight: 16,
-
-      marginTop: 5,
-    },
-  });
+    marginTop: 8,
+  },
+});

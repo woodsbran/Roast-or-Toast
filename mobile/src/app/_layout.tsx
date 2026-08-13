@@ -2,10 +2,10 @@
 // File: _layout.tsx
 //
 // Purpose:
-// Controls the main navigation stack for the app.
+// Controls app navigation and startup splash.
 //
-// The native splash screen stays visible briefly so the
-// Roast or Toast branding does not disappear too fast.
+// Shows the Roast or Toast splash artwork briefly
+// before displaying the main app.
 //
 // Project: Roast or Toast
 // =====================================================
@@ -18,63 +18,60 @@ import {
   useState,
 } from "react";
 
-// Keep the native splash screen visible until we
-// explicitly hide it.
-//
-// This must run outside the component so it begins as
-// early as possible during app startup.
+import {
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
+
+// =====================================================
+// Native Splash
+// =====================================================
+
+// Keep the native splash visible while React starts.
 void SplashScreen.preventAutoHideAsync();
 
-// Adds a smooth fade when the splash disappears.
 SplashScreen.setOptions({
-  duration: 500,
+  duration: 300,
   fade: true,
 });
 
-// Minimum amount of time the splash remains visible.
-//
-// 3000 milliseconds = 3 seconds.
-const MINIMUM_SPLASH_TIME = 3000;
-
 export default function RootLayout() {
-  const [
-    isAppReady,
-    setIsAppReady,
-  ] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   // =====================================================
-  // Prepare App
+  // Startup
   // =====================================================
 
   useEffect(() => {
     let isActive = true;
 
-    const prepareApp =
-      async () => {
-        try {
-          // Keeps the branded splash visible long enough
-          // to be seen during a fast native launch.
-          await new Promise<void>(
-            (resolve) => {
-              setTimeout(
-                resolve,
-                MINIMUM_SPLASH_TIME,
-              );
-            },
-          );
-        } catch (error) {
-          console.warn(
-            "Unable to prepare app:",
-            error,
-          );
-        } finally {
-          if (isActive) {
-            setIsAppReady(true);
-          }
-        }
-      };
+    const startApp = async () => {
+      try {
+        // React is ready to display our splash artwork,
+        // so we can hide the native launch screen.
+        await SplashScreen.hideAsync();
 
-    void prepareApp();
+        // Leave our branded splash visible long enough
+        // for the player to actually see it.
+        setTimeout(() => {
+          if (isActive) {
+            setShowSplash(false);
+          }
+        }, 1800);
+      } catch (error) {
+        console.warn(
+          "Unable to finish splash:",
+          error,
+        );
+
+        if (isActive) {
+          setShowSplash(false);
+        }
+      }
+    };
+
+    void startApp();
 
     return () => {
       isActive = false;
@@ -82,22 +79,24 @@ export default function RootLayout() {
   }, []);
 
   // =====================================================
-  // Hide Native Splash
+  // Branded Splash
   // =====================================================
 
-  useEffect(() => {
-    if (!isAppReady) {
-      return;
-    }
-
-    void SplashScreen.hideAsync();
-  }, [isAppReady]);
-
-  // Do not render the navigation stack behind the splash
-  // until startup preparation is complete.
-  if (!isAppReady) {
-    return null;
+  if (showSplash) {
+    return (
+      <View style={styles.splashContainer}>
+        <Image
+          source={require("../../assets/images/splash-icon.png")}
+          style={styles.splashImage}
+          resizeMode="cover"
+        />
+      </View>
+    );
   }
+
+  // =====================================================
+  // Navigation
+  // =====================================================
 
   return (
     <Stack
@@ -105,20 +104,27 @@ export default function RootLayout() {
         headerShown: false,
       }}
     >
-      {/* Home */}
       <Stack.Screen name="index" />
-
-      {/* Player profile and lifetime statistics */}
       <Stack.Screen name="profile" />
-
-      {/* Local app preferences and reset controls */}
       <Stack.Screen name="settings" />
-
-      {/* Round-mode selection */}
       <Stack.Screen name="mode-select" />
-
-      {/* Main gameplay */}
       <Stack.Screen name="scenario" />
     </Stack>
   );
 }
+
+// =====================================================
+// Styles
+// =====================================================
+
+const styles = StyleSheet.create({
+  splashContainer: {
+    flex: 1,
+    backgroundColor: "#000000",
+  },
+
+  splashImage: {
+    width: "100%",
+    height: "100%",
+  },
+});

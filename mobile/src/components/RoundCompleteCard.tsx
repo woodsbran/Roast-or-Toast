@@ -2,16 +2,23 @@
 // File: RoundCompleteCard.tsx
 //
 // Purpose:
-// Displays the final results after completing a Quick 10
-// or Standard 20 round.
+// End-of-round payoff.
 //
-// The screen shows round-specific statistics rather than
-// only lifetime totals.
+// Version 1.1 — Full Visual Cohesion Pass
+//
+// This is the dark poster at the end of the same physical
+// game kit. It should feel celebratory without becoming a
+// dashboard.
 //
 // Project: Roast or Toast
 // =====================================================
 
 import {
+  Ionicons,
+} from "@expo/vector-icons";
+
+import {
+  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,7 +26,9 @@ import {
   View,
 } from "react-native";
 
-import type { PlayerProgress } from "../game/progressTypes";
+import type {
+  PlayerProgress,
+} from "../game/progressTypes";
 
 import {
   getRoundModeConfig,
@@ -28,27 +37,23 @@ import {
 
 import {
   Colors,
-  Radius,
   Spacing,
 } from "../theme";
 
-import ScenarioHeader from "./ScenarioHeader";
+import HeatMark from "./HeatMark";
+import InkUnderline from "./InkUnderline";
+import StampLabel from "./StampLabel";
+import VoteMark from "./VoteMark";
 
 type RoundCompleteCardProps = {
   roundMode: RoundMode;
   progress: PlayerProgress;
-
   completedMoments: number;
-
   roundStartHeat: number;
   roundStartRoasts: number;
   roundStartToasts: number;
   roundStartMajorityMatches: number;
-
-  // Opens mode selection for another round.
   onPlayAgain: () => void;
-
-  // Returns directly Home.
   onHomePress: () => void;
 };
 
@@ -64,247 +69,253 @@ export default function RoundCompleteCard({
   onHomePress,
 }: RoundCompleteCardProps) {
   const config =
-    getRoundModeConfig(roundMode);
+    getRoundModeConfig(
+      roundMode,
+    );
 
-  // Calculate only what happened during this round.
-  const roundHeat = Math.max(
-    progress.totalHeat - roundStartHeat,
-    0,
-  );
+  const roundHeat =
+    Math.max(
+      progress.totalHeat -
+        roundStartHeat,
+      0,
+    );
 
-  const roundRoasts = Math.max(
-    progress.roastCount - roundStartRoasts,
-    0,
-  );
+  const roundRoasts =
+    Math.max(
+      progress.roastCount -
+        roundStartRoasts,
+      0,
+    );
 
-  const roundToasts = Math.max(
-    progress.toastCount - roundStartToasts,
-    0,
-  );
+  const roundToasts =
+    Math.max(
+      progress.toastCount -
+        roundStartToasts,
+      0,
+    );
 
-  const roundMajorityMatches = Math.max(
-    progress.majorityMatches -
-      roundStartMajorityMatches,
-    0,
-  );
+  const roundMajorityMatches =
+    Math.max(
+      progress.majorityMatches -
+        roundStartMajorityMatches,
+      0,
+    );
 
   const crowdMatchPercentage =
     completedMoments > 0
       ? Math.round(
-          (roundMajorityMatches /
-            completedMoments) *
-            100,
+          (
+            roundMajorityMatches /
+            completedMoments
+          ) * 100,
         )
       : 0;
 
-  const recapMessage = getRoundMessage(
-    roundRoasts,
-    roundToasts,
-    crowdMatchPercentage,
-  );
+  const recapMessage =
+    getRoundMessage(
+      roundRoasts,
+      roundToasts,
+      crowdMatchPercentage,
+    );
 
   return (
-    <View style={styles.container}>
-      {/* Decorative background */}
-      <Text style={styles.roastBackdrop}>
-        ROAST
-      </Text>
-
-      <Text style={styles.toastBackdrop}>
-        TOAST
-      </Text>
-
-      {/* Home remains available.
-          Back also returns Home because this round is done. */}
-      <ScenarioHeader
-        accentColor={Colors.roast}
-        onBackPress={onHomePress}
-        onHomePress={onHomePress}
-      />
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.scrollView}
-        contentContainerStyle={
-          styles.scrollContent
-        }
-      >
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            ROUND COMPLETE
-          </Text>
-        </View>
-
-        <Text style={styles.heading}>
-          {config.title}?
-        </Text>
-
-        <Text style={styles.subheading}>
-          Handled.
-        </Text>
-
-        <Text style={styles.personalityMessage}>
-          {recapMessage}
-        </Text>
-
-        {/* Main Heat reward */}
-        <View style={styles.heatCard}>
-          <Text style={styles.heatEyebrow}>
-            HEAT EARNED THIS ROUND
-          </Text>
-
-          <Text style={styles.heatValue}>
-            🔥 {roundHeat}
-          </Text>
-        </View>
-
-        {/* Round statistics */}
-        <View style={styles.statsGrid}>
-          <StatCard
-            emoji="🔥"
-            value={roundRoasts}
-            label="Roasts"
-          />
-
-          <StatCard
-            emoji="♥"
-            value={roundToasts}
-            label="Toasts"
-          />
-
-          <StatCard
-            emoji="🎯"
-            value={`${crowdMatchPercentage}%`}
-            label="With the crowd"
-          />
-
-          <StatCard
-            emoji="⚡"
-            value={progress.bestStreak}
-            label="Best streak"
-          />
-        </View>
-
-        {/* Play another round */}
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Choose another round"
-          onPress={onPlayAgain}
-          style={({ pressed }) => [
-            styles.primaryButton,
-            pressed &&
-              styles.buttonPressed,
-          ]}
-        >
-          <View>
-            <Text
-              style={
-                styles.primaryButtonText
-              }
-            >
-              One More?
-            </Text>
-
-            <Text
-              style={
-                styles.primaryButtonSubtext
-              }
-            >
-              Pick another round and keep the Heat going.
-            </Text>
-          </View>
-
-          <Text style={styles.buttonArrow}>
-            →
-          </Text>
-        </Pressable>
-
-        {/* Finish for now */}
+    <ImageBackground
+      source={require("../../assets/game/backgrounds/round-complete-dark.png")}
+      resizeMode="cover"
+      style={styles.container}
+    >
+      <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Return Home"
           onPress={onHomePress}
           style={({ pressed }) => [
-            styles.secondaryButton,
+            styles.closeButton,
             pressed &&
-              styles.buttonPressed,
+              styles.pressed,
           ]}
         >
-          <Text
-            style={
-              styles.secondaryButtonText
+          <Ionicons
+            name="close"
+            size={24}
+            color={Colors.white}
+          />
+        </Pressable>
+
+        <Text style={styles.topBrand}>
+          ROAST OR TOAST
+        </Text>
+
+        <View style={styles.topSpacer} />
+      </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+        contentContainerStyle={
+          styles.scrollContent
+        }
+      >
+        <StampLabel
+          text="ROUND"
+          color={
+            Colors.textPrimary
+          }
+          filled
+          rotate={-3}
+          size="medium"
+        />
+
+        <Text style={styles.completeHeading}>
+          COMPLETE!
+        </Text>
+
+        <Text style={styles.roundName}>
+          {config.title.toUpperCase()}
+        </Text>
+
+        <InkUnderline
+          color={Colors.roast}
+          width={72}
+          rotate={-5}
+          align="center"
+        />
+
+        <View style={styles.paperMedallion}>
+          <View style={styles.medallionMarks}>
+            <VoteMark
+              type="roast"
+              size="large"
+            />
+
+            <Text style={styles.medallionVs}>
+              VS
+            </Text>
+
+            <VoteMark
+              type="toast"
+              size="large"
+            />
+          </View>
+
+          <View style={styles.voteReceipt}>
+            <Text style={styles.voteReceiptValue}>
+              {roundRoasts}
+            </Text>
+
+            <Text style={styles.voteReceiptLabel}>
+              ROAST
+            </Text>
+
+            <Text style={styles.voteReceiptDot}>
+              •
+            </Text>
+
+            <Text style={styles.voteReceiptValue}>
+              {roundToasts}
+            </Text>
+
+            <Text style={styles.voteReceiptLabel}>
+              TOAST
+            </Text>
+          </View>
+        </View>
+
+        <Text style={styles.message}>
+          {recapMessage}
+        </Text>
+
+        <Text style={styles.earned}>
+          YOU EARNED
+        </Text>
+
+        <View style={styles.heatHero}>
+          <HeatMark
+            size="large"
+          />
+
+          <Text style={styles.heatValue}>
+            +{roundHeat}
+          </Text>
+        </View>
+
+        <Text style={styles.heatLabel}>
+          HEAT
+        </Text>
+
+        <View style={styles.statsReceipt}>
+          <Stat
+            value={`${crowdMatchPercentage}%`}
+            label="WITH CROWD"
+          />
+
+          <View style={styles.statRule} />
+
+          <Stat
+            value={
+              progress.bestStreak
             }
-          >
-            I&apos;m Done for Now
+            label="BEST STREAK"
+          />
+
+          <View style={styles.statRule} />
+
+          <Stat
+            value={
+              completedMoments
+            }
+            label="JUDGED"
+          />
+        </View>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Choose another round"
+          onPress={onPlayAgain}
+          style={({ pressed }) => [
+            styles.nextRound,
+            pressed &&
+              styles.pressed,
+          ]}
+        >
+          <Text style={styles.nextRoundText}>
+            NEXT ROUND
+          </Text>
+
+          <Text style={styles.nextArrow}>
+            →
+          </Text>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Return Home"
+          onPress={onHomePress}
+          style={({ pressed }) => [
+            styles.homeAction,
+            pressed &&
+              styles.pressed,
+          ]}
+        >
+          <Text style={styles.homeActionText}>
+            VIEW HOME
           </Text>
         </Pressable>
       </ScrollView>
-    </View>
+    </ImageBackground>
   );
 }
 
-// =====================================================
-// Round Message
-// =====================================================
-
-function getRoundMessage(
-  roastCount: number,
-  toastCount: number,
-  crowdMatchPercentage: number,
-): string {
-  const totalVotes =
-    roastCount + toastCount;
-
-  const roastPercentage =
-    totalVotes > 0
-      ? roastCount / totalVotes
-      : 0;
-
-  const toastPercentage =
-    totalVotes > 0
-      ? toastCount / totalVotes
-      : 0;
-
-  if (roastPercentage >= 0.75) {
-    return "You came here to judge, and honestly, you delivered.";
-  }
-
-  if (toastPercentage >= 0.75) {
-    return "Everybody got grace today. We are a little suspicious.";
-  }
-
-  if (crowdMatchPercentage >= 80) {
-    return "You and the crowd were basically sharing one brain.";
-  }
-
-  if (crowdMatchPercentage <= 35) {
-    return "The crowd disagreed. You remained deeply unbothered.";
-  }
-
-  return "A little judgment. A little mercy. Very unpredictable.";
-}
-
-// =====================================================
-// Statistic Card
-// =====================================================
-
-type StatCardProps = {
-  emoji: string;
-  value: string | number;
-  label: string;
-};
-
-function StatCard({
-  emoji,
+function Stat({
   value,
   label,
-}: StatCardProps) {
+}: {
+  value: string | number;
+  label: string;
+}) {
   return (
-    <View style={styles.statCard}>
-      <Text style={styles.statEmoji}>
-        {emoji}
-      </Text>
-
+    <View style={styles.stat}>
       <Text style={styles.statValue}>
         {value}
       </Text>
@@ -316,250 +327,365 @@ function StatCard({
   );
 }
 
-// =====================================================
-// Styles
-// =====================================================
+function getRoundMessage(
+  roastCount: number,
+  toastCount: number,
+  crowdMatchPercentage: number,
+): string {
+  const total =
+    roastCount +
+    toastCount;
+
+  const roastShare =
+    total > 0
+      ? roastCount / total
+      : 0;
+
+  const toastShare =
+    total > 0
+      ? toastCount / total
+      : 0;
+
+  if (
+    roastShare >= 0.75
+  ) {
+    return "You came here to judge, and honestly, you delivered.";
+  }
+
+  if (
+    toastShare >= 0.75
+  ) {
+    return "Everybody got grace today. We are a little suspicious.";
+  }
+
+  if (
+    crowdMatchPercentage >= 80
+  ) {
+    return "You and the crowd were basically sharing one brain.";
+  }
+
+  if (
+    crowdMatchPercentage <= 35
+  ) {
+    return "The crowd disagreed. You remained deeply unbothered.";
+  }
+
+  return "A little judgment. A little mercy. Very unpredictable.";
+}
+
+const styles =
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor:
+        "#171717",
+    },
+
+    topBar: {
+      minHeight: 76,
+
+      paddingTop: 18,
+      paddingHorizontal:
+        Spacing.lg,
+
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent:
+        "space-between",
+    },
+
+    closeButton: {
+      width: 40,
+      height: 40,
+
+      borderColor:
+        "#55555A",
+      borderWidth: 1,
+
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    topBrand: {
+      color:
+        "#A7A7AA",
+
+      fontSize: 8,
+      fontWeight: "900",
+      letterSpacing: 1.4,
+    },
+
+    topSpacer: {
+      width: 40,
+    },
+
+    scrollContent: {
+      alignItems: "center",
+
+      paddingHorizontal:
+        Spacing.lg,
+      paddingTop: 14,
+      paddingBottom: 45,
+    },
+
+    completeHeading: {
+      color:
+        Colors.white,
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+      fontSize: 48,
+      fontWeight: "900",
+      letterSpacing: -2.1,
 
-    backgroundColor: Colors.background,
+      marginTop: 3,
+    },
 
-    overflow: "hidden",
-  },
+    roundName: {
+      color:
+        Colors.toast,
 
-  scrollView: {
-    flex: 1,
-    zIndex: 2,
-  },
+      fontSize: 9,
+      fontWeight: "900",
+      letterSpacing: 1.6,
 
-  scrollContent: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: 18,
-    paddingBottom: 48,
-  },
+      marginTop: 2,
+    },
 
-  badge: {
-    alignSelf: "flex-start",
+    paperMedallion: {
+      width: "88%",
+      minHeight: 200,
 
-    borderColor: Colors.roast,
-    borderWidth: 1.5,
-    borderRadius: Radius.pill,
+      backgroundColor:
+        Colors.background,
 
-    paddingVertical: 7,
-    paddingHorizontal: 15,
+      borderTopLeftRadius: 120,
+      borderTopRightRadius: 100,
+      borderBottomLeftRadius: 110,
+      borderBottomRightRadius: 135,
 
-    marginBottom: 23,
+      alignItems: "center",
+      justifyContent: "center",
 
-    transform: [{ rotate: "-2deg" }],
-  },
+      marginTop: 22,
+      paddingVertical: 25,
 
-  badgeText: {
-    color: Colors.roast,
+      transform: [
+        {
+          rotate: "-1deg",
+        },
+      ],
+    },
 
-    fontSize: 11,
-    fontWeight: "900",
+    medallionMarks: {
+      flexDirection: "row",
+      alignItems: "center",
 
-    letterSpacing: 1.6,
-  },
+      gap: 16,
+    },
 
-  heading: {
-    color: Colors.textPrimary,
+    medallionVs: {
+      color:
+        Colors.textPrimary,
 
-    fontSize: 45,
-    fontWeight: "900",
+      fontSize: 11,
+      fontWeight: "900",
+    },
 
-    letterSpacing: -2,
-    lineHeight: 48,
-  },
+    voteReceipt: {
+      flexDirection: "row",
+      alignItems: "baseline",
 
-  subheading: {
-    color: Colors.roast,
+      marginTop: 16,
+    },
 
-    fontSize: 32,
-    fontWeight: "900",
+    voteReceiptValue: {
+      color:
+        Colors.textPrimary,
 
-    marginBottom: 10,
-  },
+      fontSize: 18,
+      fontWeight: "900",
+    },
 
-  personalityMessage: {
-    color: Colors.textSecondary,
+    voteReceiptLabel: {
+      color:
+        Colors.textMuted,
 
-    fontSize: 15,
-    fontWeight: "700",
+      fontSize: 7,
+      fontWeight: "900",
+      letterSpacing: 0.9,
 
-    lineHeight: 22,
+      marginLeft: 4,
+    },
 
-    marginBottom: 25,
-  },
+    voteReceiptDot: {
+      color:
+        Colors.textMuted,
 
-  heatCard: {
-    backgroundColor: Colors.textPrimary,
+      marginHorizontal: 9,
+    },
 
-    borderRadius: Radius.lg,
+    message: {
+      color:
+        "#D3D3D6",
 
-    padding: 20,
-    marginBottom: 18,
+      fontSize: 13,
+      fontWeight: "700",
+      lineHeight: 19,
 
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
+      textAlign: "center",
 
-  heatEyebrow: {
-    color: Colors.roast,
+      maxWidth: 300,
 
-    fontSize: 10,
-    fontWeight: "900",
+      marginTop: 17,
+    },
 
-    letterSpacing: 1.2,
-  },
+    earned: {
+      color:
+        "#9C9C9F",
 
-  heatValue: {
-    color: Colors.white,
+      fontSize: 8,
+      fontWeight: "900",
+      letterSpacing: 1.4,
 
-    fontSize: 25,
-    fontWeight: "900",
-  },
+      marginTop: 21,
+    },
 
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    heatHero: {
+      flexDirection: "row",
+      alignItems: "center",
 
-    gap: 12,
+      marginTop: 2,
+    },
 
-    marginBottom: 20,
-  },
+    heatValue: {
+      color:
+        Colors.heat,
 
-  statCard: {
-    width: "48%",
+      fontSize: 57,
+      fontWeight: "900",
+      letterSpacing: -2.2,
 
-    backgroundColor: Colors.surface,
+      marginLeft: 7,
+    },
 
-    borderColor: Colors.border,
-    borderWidth: 1,
-    borderRadius: Radius.lg,
+    heatLabel: {
+      color:
+        Colors.white,
 
-    padding: 16,
-  },
+      fontSize: 11,
+      fontWeight: "900",
+      letterSpacing: 1.5,
 
-  statEmoji: {
-    fontSize: 20,
+      marginTop: -7,
+    },
 
-    marginBottom: 7,
-  },
+    statsReceipt: {
+      width: "100%",
 
-  statValue: {
-    color: Colors.textPrimary,
+      flexDirection: "row",
+      alignItems: "center",
 
-    fontSize: 24,
-    fontWeight: "900",
-  },
+      borderTopColor:
+        "#444448",
+      borderBottomColor:
+        "#444448",
 
-  statLabel: {
-    color: Colors.textSecondary,
+      borderTopWidth: 1,
+      borderBottomWidth: 1,
 
-    fontSize: 11,
-    fontWeight: "700",
+      paddingVertical: 14,
 
-    marginTop: 3,
-  },
+      marginTop: 20,
+      marginBottom: 22,
+    },
 
-  primaryButton: {
-    backgroundColor: Colors.textPrimary,
+    stat: {
+      flex: 1,
+      alignItems: "center",
+    },
 
-    borderRadius: Radius.lg,
+    statValue: {
+      color:
+        Colors.white,
 
-    paddingVertical: 17,
-    paddingHorizontal: 21,
+      fontSize: 18,
+      fontWeight: "900",
+    },
 
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    statLabel: {
+      color:
+        "#8F8F92",
 
-    marginBottom: 12,
-  },
+      fontSize: 7,
+      fontWeight: "900",
+      letterSpacing: 0.8,
 
-  primaryButtonText: {
-    color: Colors.white,
+      marginTop: 3,
+    },
 
-    fontSize: 18,
-    fontWeight: "900",
-  },
+    statRule: {
+      width: 1,
+      height: 32,
 
-  primaryButtonSubtext: {
-    color: "#CFCFCF",
+      backgroundColor:
+        "#444448",
+    },
 
-    fontSize: 11,
-    fontWeight: "600",
+    nextRound: {
+      width: "100%",
+      minHeight: 66,
 
-    marginTop: 3,
-  },
+      backgroundColor:
+        Colors.roast,
 
-  buttonArrow: {
-    color: Colors.white,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent:
+        "space-between",
 
-    fontSize: 23,
-    fontWeight: "700",
+      paddingHorizontal: 22,
 
-    marginLeft: 14,
-  },
+      transform: [
+        {
+          rotate: "-0.6deg",
+        },
+      ],
+    },
 
-  secondaryButton: {
-    borderColor: Colors.border,
-    borderWidth: 1.5,
-    borderRadius: Radius.lg,
+    nextRoundText: {
+      color:
+        Colors.white,
 
-    paddingVertical: 15,
+      fontSize: 12,
+      fontWeight: "900",
+      letterSpacing: 1.3,
+    },
 
-    alignItems: "center",
+    nextArrow: {
+      color:
+        Colors.white,
 
-    marginBottom: 18,
-  },
+      fontSize: 26,
+      fontWeight: "700",
+    },
 
-  secondaryButtonText: {
-    color: Colors.textPrimary,
+    homeAction: {
+      minHeight: 50,
 
-    fontSize: 15,
-    fontWeight: "900",
-  },
+      justifyContent: "center",
 
-  buttonPressed: {
-    opacity: 0.72,
+      marginTop: 11,
+    },
 
-    transform: [{ scale: 0.985 }],
-  },
+    homeActionText: {
+      color:
+        "#A7A7AA",
 
-  roastBackdrop: {
-    position: "absolute",
+      fontSize: 8,
+      fontWeight: "900",
+      letterSpacing: 1.2,
+    },
 
-    top: 145,
-    right: -50,
-
-    color: Colors.roast,
-
-    fontSize: 94,
-    fontWeight: "900",
-
-    opacity: 0.06,
-
-    transform: [{ rotate: "8deg" }],
-  },
-
-  toastBackdrop: {
-    position: "absolute",
-
-    bottom: 50,
-    left: -45,
-
-    color: Colors.toast,
-
-    fontSize: 91,
-    fontWeight: "900",
-
-    opacity: 0.06,
-
-    transform: [{ rotate: "-8deg" }],
-  },
-});
+    pressed: {
+      opacity: 0.72,
+    },
+  });
