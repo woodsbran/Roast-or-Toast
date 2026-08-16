@@ -59,6 +59,10 @@ import {
 } from "../game/profileStorage";
 
 import {
+  clearIntermissionHistory,
+} from "../game/intermissionStorage";
+
+import {
   clearSavedPlayerProgress,
 } from "../game/progressStorage";
 
@@ -241,6 +245,7 @@ export default function SettingsScreen() {
                     clearSavedPlayerProgress(),
                     clearPlayerProfile(),
                     clearRecentMomentHistory(),
+                    clearIntermissionHistory(),
                     clearDailyStreak(),
                   ]);
 

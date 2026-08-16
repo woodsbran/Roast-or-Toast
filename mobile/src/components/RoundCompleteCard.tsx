@@ -2,23 +2,30 @@
 // File: RoundCompleteCard.tsx
 //
 // Purpose:
-// End-of-round payoff.
+// Final finite-round celebration.
 //
-// Version 1.1 — Full Visual Cohesion Pass
+// Version 1.1 — Celebration Polish Batch
 //
-// This is the dark poster at the end of the same physical
-// game kit. It should feel celebratory without becoming a
-// dashboard.
+// I am keeping the round calculations and navigation exactly
+// the same. This pass only makes the payoff feel more alive.
+//
+// What I am adding:
+// • staged entrance motion
+// • one restrained confetti reveal
+// • a Heat reward pop
+// • a round-specific personality line
+// • clearer BEST STREAK wording
+// • one VoiceOver-friendly summary
+// • full Reduce Motion support
 //
 // Project: Roast or Toast
 // =====================================================
 
+import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useRef } from "react";
 import {
-  Ionicons,
-} from "@expo/vector-icons";
-
-import {
-  ImageBackground,
+  Animated,
+  Easing,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -26,23 +33,14 @@ import {
   View,
 } from "react-native";
 
-import type {
-  PlayerProgress,
-} from "../game/progressTypes";
-
+import type { PlayerProgress } from "../game/progressTypes";
 import {
   getRoundModeConfig,
   type RoundMode,
 } from "../game/roundTypes";
-
-import {
-  Colors,
-  Spacing,
-} from "../theme";
-
+import useReducedMotion from "../hooks/useReducedMotion";
+import { Colors, Spacing } from "../theme";
 import HeatMark from "./HeatMark";
-import InkUnderline from "./InkUnderline";
-import StampLabel from "./StampLabel";
 import VoteMark from "./VoteMark";
 
 type RoundCompleteCardProps = {
@@ -68,246 +66,426 @@ export default function RoundCompleteCard({
   onPlayAgain,
   onHomePress,
 }: RoundCompleteCardProps) {
-  const config =
-    getRoundModeConfig(
-      roundMode,
-    );
+  const reduceMotion = useReducedMotion();
+  const config = getRoundModeConfig(roundMode);
 
-  const roundHeat =
-    Math.max(
-      progress.totalHeat -
-        roundStartHeat,
-      0,
-    );
+  // I only count what happened during this round here.
+  const roundHeat = Math.max(
+    progress.totalHeat - roundStartHeat,
+    0,
+  );
 
-  const roundRoasts =
-    Math.max(
-      progress.roastCount -
-        roundStartRoasts,
-      0,
-    );
+  const roundRoasts = Math.max(
+    progress.roastCount - roundStartRoasts,
+    0,
+  );
 
-  const roundToasts =
-    Math.max(
-      progress.toastCount -
-        roundStartToasts,
-      0,
-    );
+  const roundToasts = Math.max(
+    progress.toastCount - roundStartToasts,
+    0,
+  );
 
-  const roundMajorityMatches =
-    Math.max(
-      progress.majorityMatches -
-        roundStartMajorityMatches,
-      0,
-    );
+  const roundMajorityMatches = Math.max(
+    progress.majorityMatches - roundStartMajorityMatches,
+    0,
+  );
 
   const crowdMatchPercentage =
     completedMoments > 0
       ? Math.round(
-          (
-            roundMajorityMatches /
-            completedMoments
-          ) * 100,
+          (roundMajorityMatches / completedMoments) * 100,
         )
       : 0;
 
-  const recapMessage =
-    getRoundMessage(
-      roundRoasts,
-      roundToasts,
-      crowdMatchPercentage,
-    );
+  const recapMessage = getRoundMessage(
+    roundRoasts,
+    roundToasts,
+    crowdMatchPercentage,
+  );
+
+  // =====================================================
+  // Celebration Motion
+  // =====================================================
+  // I keep this animation entirely inside Round Complete.
+  // It does not touch gameplay state or session persistence.
+
+  const headlineOpacity = useRef(
+    new Animated.Value(reduceMotion ? 1 : 0),
+  ).current;
+
+  const headlineY = useRef(
+    new Animated.Value(reduceMotion ? 0 : 18),
+  ).current;
+
+  const medallionScale = useRef(
+    new Animated.Value(reduceMotion ? 1 : 0.86),
+  ).current;
+
+  const heatScale = useRef(
+    new Animated.Value(reduceMotion ? 1 : 0.78),
+  ).current;
+
+  const lowerOpacity = useRef(
+    new Animated.Value(reduceMotion ? 1 : 0),
+  ).current;
+
+  const lowerY = useRef(
+    new Animated.Value(reduceMotion ? 0 : 16),
+  ).current;
+
+  const confettiProgress = useRef(
+    new Animated.Value(reduceMotion ? 1 : 0),
+  ).current;
+
+  useEffect(() => {
+    if (reduceMotion) {
+      headlineOpacity.setValue(1);
+      headlineY.setValue(0);
+      medallionScale.setValue(1);
+      heatScale.setValue(1);
+      lowerOpacity.setValue(1);
+      lowerY.setValue(0);
+      confettiProgress.setValue(1);
+      return;
+    }
+
+    headlineOpacity.setValue(0);
+    headlineY.setValue(18);
+    medallionScale.setValue(0.86);
+    heatScale.setValue(0.78);
+    lowerOpacity.setValue(0);
+    lowerY.setValue(16);
+    confettiProgress.setValue(0);
+
+    const celebration = Animated.sequence([
+      Animated.parallel([
+        Animated.timing(headlineOpacity, {
+          toValue: 1,
+          duration: 220,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(headlineY, {
+          toValue: 0,
+          duration: 240,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.spring(medallionScale, {
+          toValue: 1,
+          speed: 17,
+          bounciness: 7,
+          useNativeDriver: true,
+        }),
+        Animated.timing(confettiProgress, {
+          toValue: 1,
+          duration: 360,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.spring(heatScale, {
+        toValue: 1,
+        speed: 15,
+        bounciness: 10,
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.timing(lowerOpacity, {
+          toValue: 1,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+        Animated.timing(lowerY, {
+          toValue: 0,
+          duration: 240,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]),
+    ]);
+
+    celebration.start();
+
+    return () => {
+      celebration.stop();
+    };
+  }, [
+    confettiProgress,
+    headlineOpacity,
+    headlineY,
+    heatScale,
+    lowerOpacity,
+    lowerY,
+    medallionScale,
+    reduceMotion,
+  ]);
+
+  const accessibilitySummary =
+    `Round complete. ${config.title}. ` +
+    `You earned ${roundHeat} Heat. ` +
+    `${roundRoasts} Roasts and ${roundToasts} Toasts. ` +
+    `${crowdMatchPercentage} percent with the crowd. ` +
+    `Best streak ${progress.bestStreak}.`;
 
   return (
-    <ImageBackground
-      source={require("../../assets/game/backgrounds/round-complete-dark.png")}
-      resizeMode="cover"
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Return Home"
           onPress={onHomePress}
+          hitSlop={8}
           style={({ pressed }) => [
             styles.closeButton,
-            pressed &&
-              styles.pressed,
+            pressed && styles.pressed,
           ]}
         >
           <Ionicons
             name="close"
-            size={24}
+            size={25}
             color={Colors.white}
           />
         </Pressable>
-
-        <Text style={styles.topBrand}>
-          ROAST OR TOAST
-        </Text>
 
         <View style={styles.topSpacer} />
       </View>
 
       <ScrollView
-        showsVerticalScrollIndicator={
-          false
-        }
-        contentContainerStyle={
-          styles.scrollContent
-        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
-        <StampLabel
-          text="ROUND"
-          color={
-            Colors.textPrimary
-          }
-          filled
-          rotate={-3}
-          size="medium"
-        />
+        <View
+          accessible
+          accessibilityLabel={accessibilitySummary}
+          style={styles.summaryGroup}
+        >
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.confettiLayer,
+              {
+                opacity: confettiProgress,
+                transform: [
+                  {
+                    translateY: confettiProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-18, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <Confetti style={styles.confettiOne} color={Colors.heat} />
+            <Confetti style={styles.confettiTwo} color={Colors.toast} />
+            <Confetti style={styles.confettiThree} color={Colors.roast} />
+            <Confetti style={styles.confettiFour} color={Colors.heat} />
+            <Confetti style={styles.confettiFive} color={Colors.toast} />
+            <Confetti style={styles.confettiSix} color={Colors.roast} />
+          </Animated.View>
 
-        <Text style={styles.completeHeading}>
-          COMPLETE!
-        </Text>
+          <Animated.View
+            style={[
+              styles.headlineArea,
+              {
+                opacity: headlineOpacity,
+                transform: [{ translateY: headlineY }],
+              },
+            ]}
+          >
+            <View style={styles.roundBrush}>
+              <Text style={styles.roundBrushText}>ROUND</Text>
+            </View>
 
-        <Text style={styles.roundName}>
-          {config.title.toUpperCase()}
-        </Text>
+            <Text style={styles.heading}>COMPLETE!</Text>
 
-        <InkUnderline
-          color={Colors.roast}
-          width={72}
-          rotate={-5}
-          align="center"
-        />
+            <Text style={styles.roundName}>
+              {config.title.toUpperCase()}
+            </Text>
+          </Animated.View>
 
-        <View style={styles.paperMedallion}>
-          <View style={styles.medallionMarks}>
-            <VoteMark
-              type="roast"
-              size="large"
-            />
+          <Animated.View
+            style={[
+              styles.medallionWrap,
+              { transform: [{ scale: medallionScale }] },
+            ]}
+          >
+            <View style={styles.medallion}>
+              <VoteMark type="roast" size="large" />
 
-            <Text style={styles.medallionVs}>
-              VS
+              <View style={styles.medallionVs}>
+                <Text style={styles.medallionVsText}>VS</Text>
+              </View>
+
+              <VoteMark type="toast" size="large" />
+            </View>
+
+            <Text style={styles.voteSplit}>
+              {roundRoasts} ROAST
+              {"  •  "}
+              {roundToasts} TOAST
+            </Text>
+          </Animated.View>
+
+          <Animated.View
+            style={[
+              styles.heatArea,
+              { transform: [{ scale: heatScale }] },
+            ]}
+          >
+            <Text style={styles.earnedLabel}>YOU EARNED</Text>
+
+            <View style={styles.heatHero}>
+              <HeatMark size="medium" />
+              <Text style={styles.heatValue}>+{roundHeat}</Text>
+            </View>
+
+            <Text style={styles.heatLabel}>HEAT</Text>
+          </Animated.View>
+
+          <Animated.View
+            style={[
+              styles.lowerResults,
+              {
+                opacity: lowerOpacity,
+                transform: [{ translateY: lowerY }],
+              },
+            ]}
+          >
+            <Text style={styles.recapMessage}>{recapMessage}</Text>
+
+            <View style={styles.streakStrip}>
+              <HeatDot active={progress.bestStreak >= 1} />
+              <HeatDot active={progress.bestStreak >= 2} />
+              <HeatDot active={progress.bestStreak >= 3} />
+              <HeatDot active={progress.bestStreak >= 4} />
+              <HeatDot active={progress.bestStreak >= 5} />
+            </View>
+
+            <Text style={styles.streakText}>
+              BEST STREAK {progress.bestStreak}
             </Text>
 
-            <VoteMark
-              type="toast"
-              size="large"
-            />
-          </View>
-
-          <View style={styles.voteReceipt}>
-            <Text style={styles.voteReceiptValue}>
-              {roundRoasts}
-            </Text>
-
-            <Text style={styles.voteReceiptLabel}>
-              ROAST
-            </Text>
-
-            <Text style={styles.voteReceiptDot}>
-              •
-            </Text>
-
-            <Text style={styles.voteReceiptValue}>
-              {roundToasts}
-            </Text>
-
-            <Text style={styles.voteReceiptLabel}>
-              TOAST
-            </Text>
-          </View>
+            <View style={styles.statsStrip}>
+              <StatItem
+                value={`${crowdMatchPercentage}%`}
+                label="WITH CROWD"
+              />
+              <View style={styles.statDivider} />
+              <StatItem value={completedMoments} label="JUDGED" />
+              <View style={styles.statDivider} />
+              <StatItem value={roundHeat} label="HEAT" />
+            </View>
+          </Animated.View>
         </View>
 
-        <Text style={styles.message}>
-          {recapMessage}
-        </Text>
-
-        <Text style={styles.earned}>
-          YOU EARNED
-        </Text>
-
-        <View style={styles.heatHero}>
-          <HeatMark
-            size="large"
-          />
-
-          <Text style={styles.heatValue}>
-            +{roundHeat}
-          </Text>
-        </View>
-
-        <Text style={styles.heatLabel}>
-          HEAT
-        </Text>
-
-        <View style={styles.statsReceipt}>
-          <Stat
-            value={`${crowdMatchPercentage}%`}
-            label="WITH CROWD"
-          />
-
-          <View style={styles.statRule} />
-
-          <Stat
-            value={
-              progress.bestStreak
-            }
-            label="BEST STREAK"
-          />
-
-          <View style={styles.statRule} />
-
-          <Stat
-            value={
-              completedMoments
-            }
-            label="JUDGED"
-          />
-        </View>
-
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Choose another round"
-          onPress={onPlayAgain}
-          style={({ pressed }) => [
-            styles.nextRound,
-            pressed &&
-              styles.pressed,
+        <Animated.View
+          style={[
+            styles.actions,
+            {
+              opacity: lowerOpacity,
+              transform: [{ translateY: lowerY }],
+            },
           ]}
         >
-          <Text style={styles.nextRoundText}>
-            NEXT ROUND
-          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Choose another round"
+            onPress={onPlayAgain}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <View style={styles.buttonSlash} />
+            <Text style={styles.primaryButtonText}>NEXT ROUND</Text>
+            <Text style={styles.primaryButtonArrow}>→</Text>
+          </Pressable>
 
-          <Text style={styles.nextArrow}>
-            →
-          </Text>
-        </Pressable>
-
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Return Home"
-          onPress={onHomePress}
-          style={({ pressed }) => [
-            styles.homeAction,
-            pressed &&
-              styles.pressed,
-          ]}
-        >
-          <Text style={styles.homeActionText}>
-            VIEW HOME
-          </Text>
-        </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Return Home"
+            onPress={onHomePress}
+            style={({ pressed }) => [
+              styles.secondaryButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.secondaryButtonText}>VIEW HOME</Text>
+          </Pressable>
+        </Animated.View>
       </ScrollView>
-    </ImageBackground>
+    </View>
   );
 }
 
-function Stat({
+// =====================================================
+// Round Personality
+// =====================================================
+
+function getRoundMessage(
+  roastCount: number,
+  toastCount: number,
+  crowdMatchPercentage: number,
+): string {
+  const totalVotes = roastCount + toastCount;
+  const roastPercentage = totalVotes > 0 ? roastCount / totalVotes : 0;
+  const toastPercentage = totalVotes > 0 ? toastCount / totalVotes : 0;
+
+  if (roastPercentage >= 0.75) {
+    return "You came here to judge, and honestly, you delivered.";
+  }
+
+  if (toastPercentage >= 0.75) {
+    return "Everybody got grace today. We are a little suspicious.";
+  }
+
+  if (crowdMatchPercentage >= 80) {
+    return "You and the crowd were basically sharing one brain.";
+  }
+
+  if (crowdMatchPercentage <= 35) {
+    return "The crowd disagreed. You remained deeply unbothered.";
+  }
+
+  return "A little judgment. A little mercy. Very unpredictable.";
+}
+
+function Confetti({
+  style,
+  color,
+}: {
+  style: object;
+  color: string;
+}) {
+  return (
+    <View
+      style={[
+        styles.confetti,
+        style,
+        { backgroundColor: color },
+      ]}
+    />
+  );
+}
+
+function HeatDot({ active }: { active: boolean }) {
+  return (
+    <View
+      style={[
+        styles.heatDot,
+        !active && styles.heatDotInactive,
+      ]}
+    >
+      {active && <HeatMark size="small" />}
+    </View>
+  );
+}
+
+function StatItem({
   value,
   label,
 }: {
@@ -315,377 +493,305 @@ function Stat({
   label: string;
 }) {
   return (
-    <View style={styles.stat}>
-      <Text style={styles.statValue}>
-        {value}
-      </Text>
-
-      <Text style={styles.statLabel}>
-        {label}
-      </Text>
+    <View style={styles.statItem}>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
 }
 
-function getRoundMessage(
-  roastCount: number,
-  toastCount: number,
-  crowdMatchPercentage: number,
-): string {
-  const total =
-    roastCount +
-    toastCount;
-
-  const roastShare =
-    total > 0
-      ? roastCount / total
-      : 0;
-
-  const toastShare =
-    total > 0
-      ? toastCount / total
-      : 0;
-
-  if (
-    roastShare >= 0.75
-  ) {
-    return "You came here to judge, and honestly, you delivered.";
-  }
-
-  if (
-    toastShare >= 0.75
-  ) {
-    return "Everybody got grace today. We are a little suspicious.";
-  }
-
-  if (
-    crowdMatchPercentage >= 80
-  ) {
-    return "You and the crowd were basically sharing one brain.";
-  }
-
-  if (
-    crowdMatchPercentage <= 35
-  ) {
-    return "The crowd disagreed. You remained deeply unbothered.";
-  }
-
-  return "A little judgment. A little mercy. Very unpredictable.";
-}
-
-const styles =
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor:
-        "#171717",
-    },
-
-    topBar: {
-      minHeight: 76,
-
-      paddingTop: 18,
-      paddingHorizontal:
-        Spacing.lg,
-
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent:
-        "space-between",
-    },
-
-    closeButton: {
-      width: 40,
-      height: 40,
-
-      borderColor:
-        "#55555A",
-      borderWidth: 1,
-
-      alignItems: "center",
-      justifyContent: "center",
-    },
-
-    topBrand: {
-      color:
-        "#A7A7AA",
-
-      fontSize: 8,
-      fontWeight: "900",
-      letterSpacing: 1.4,
-    },
-
-    topSpacer: {
-      width: 40,
-    },
-
-    scrollContent: {
-      alignItems: "center",
-
-      paddingHorizontal:
-        Spacing.lg,
-      paddingTop: 14,
-      paddingBottom: 45,
-    },
-
-    completeHeading: {
-      color:
-        Colors.white,
-
-      fontSize: 48,
-      fontWeight: "900",
-      letterSpacing: -2.1,
-
-      marginTop: 3,
-    },
-
-    roundName: {
-      color:
-        Colors.toast,
-
-      fontSize: 9,
-      fontWeight: "900",
-      letterSpacing: 1.6,
-
-      marginTop: 2,
-    },
-
-    paperMedallion: {
-      width: "88%",
-      minHeight: 200,
-
-      backgroundColor:
-        Colors.background,
-
-      borderTopLeftRadius: 120,
-      borderTopRightRadius: 100,
-      borderBottomLeftRadius: 110,
-      borderBottomRightRadius: 135,
-
-      alignItems: "center",
-      justifyContent: "center",
-
-      marginTop: 22,
-      paddingVertical: 25,
-
-      transform: [
-        {
-          rotate: "-1deg",
-        },
-      ],
-    },
-
-    medallionMarks: {
-      flexDirection: "row",
-      alignItems: "center",
-
-      gap: 16,
-    },
-
-    medallionVs: {
-      color:
-        Colors.textPrimary,
-
-      fontSize: 11,
-      fontWeight: "900",
-    },
-
-    voteReceipt: {
-      flexDirection: "row",
-      alignItems: "baseline",
-
-      marginTop: 16,
-    },
-
-    voteReceiptValue: {
-      color:
-        Colors.textPrimary,
-
-      fontSize: 18,
-      fontWeight: "900",
-    },
-
-    voteReceiptLabel: {
-      color:
-        Colors.textMuted,
-
-      fontSize: 7,
-      fontWeight: "900",
-      letterSpacing: 0.9,
-
-      marginLeft: 4,
-    },
-
-    voteReceiptDot: {
-      color:
-        Colors.textMuted,
-
-      marginHorizontal: 9,
-    },
-
-    message: {
-      color:
-        "#D3D3D6",
-
-      fontSize: 13,
-      fontWeight: "700",
-      lineHeight: 19,
-
-      textAlign: "center",
-
-      maxWidth: 300,
-
-      marginTop: 17,
-    },
-
-    earned: {
-      color:
-        "#9C9C9F",
-
-      fontSize: 8,
-      fontWeight: "900",
-      letterSpacing: 1.4,
-
-      marginTop: 21,
-    },
-
-    heatHero: {
-      flexDirection: "row",
-      alignItems: "center",
-
-      marginTop: 2,
-    },
-
-    heatValue: {
-      color:
-        Colors.heat,
-
-      fontSize: 57,
-      fontWeight: "900",
-      letterSpacing: -2.2,
-
-      marginLeft: 7,
-    },
-
-    heatLabel: {
-      color:
-        Colors.white,
-
-      fontSize: 11,
-      fontWeight: "900",
-      letterSpacing: 1.5,
-
-      marginTop: -7,
-    },
-
-    statsReceipt: {
-      width: "100%",
-
-      flexDirection: "row",
-      alignItems: "center",
-
-      borderTopColor:
-        "#444448",
-      borderBottomColor:
-        "#444448",
-
-      borderTopWidth: 1,
-      borderBottomWidth: 1,
-
-      paddingVertical: 14,
-
-      marginTop: 20,
-      marginBottom: 22,
-    },
-
-    stat: {
-      flex: 1,
-      alignItems: "center",
-    },
-
-    statValue: {
-      color:
-        Colors.white,
-
-      fontSize: 18,
-      fontWeight: "900",
-    },
-
-    statLabel: {
-      color:
-        "#8F8F92",
-
-      fontSize: 7,
-      fontWeight: "900",
-      letterSpacing: 0.8,
-
-      marginTop: 3,
-    },
-
-    statRule: {
-      width: 1,
-      height: 32,
-
-      backgroundColor:
-        "#444448",
-    },
-
-    nextRound: {
-      width: "100%",
-      minHeight: 66,
-
-      backgroundColor:
-        Colors.roast,
-
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent:
-        "space-between",
-
-      paddingHorizontal: 22,
-
-      transform: [
-        {
-          rotate: "-0.6deg",
-        },
-      ],
-    },
-
-    nextRoundText: {
-      color:
-        Colors.white,
-
-      fontSize: 12,
-      fontWeight: "900",
-      letterSpacing: 1.3,
-    },
-
-    nextArrow: {
-      color:
-        Colors.white,
-
-      fontSize: 26,
-      fontWeight: "700",
-    },
-
-    homeAction: {
-      minHeight: 50,
-
-      justifyContent: "center",
-
-      marginTop: 11,
-    },
-
-    homeActionText: {
-      color:
-        "#A7A7AA",
-
-      fontSize: 8,
-      fontWeight: "900",
-      letterSpacing: 1.2,
-    },
-
-    pressed: {
-      opacity: 0.72,
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#171717",
+  },
+  topBar: {
+    minHeight: 68,
+    paddingTop: 18,
+    paddingHorizontal: Spacing.lg,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  closeButton: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  topSpacer: {
+    width: 44,
+  },
+  scrollContent: {
+    position: "relative",
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 1,
+    paddingBottom: 44,
+    alignItems: "center",
+  },
+  summaryGroup: {
+    width: "100%",
+    alignItems: "center",
+  },
+  headlineArea: {
+    alignItems: "center",
+  },
+  confettiLayer: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  confetti: {
+    position: "absolute",
+    width: 3,
+    height: 13,
+    borderRadius: 2,
+  },
+  confettiOne: {
+    left: 14,
+    top: 180,
+    transform: [{ rotate: "-28deg" }],
+  },
+  confettiTwo: {
+    right: 18,
+    top: 205,
+    transform: [{ rotate: "31deg" }],
+  },
+  confettiThree: {
+    left: 36,
+    top: 335,
+    transform: [{ rotate: "20deg" }],
+  },
+  confettiFour: {
+    right: 39,
+    top: 395,
+    transform: [{ rotate: "-38deg" }],
+  },
+  confettiFive: {
+    left: 28,
+    top: 530,
+    transform: [{ rotate: "42deg" }],
+  },
+  confettiSix: {
+    right: 22,
+    top: 565,
+    transform: [{ rotate: "13deg" }],
+  },
+  roundBrush: {
+    backgroundColor: Colors.background,
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+    transform: [{ rotate: "-3deg" }],
+  },
+  roundBrushText: {
+    color: Colors.textPrimary,
+    fontSize: 13,
+    fontWeight: "900",
+    letterSpacing: 1.7,
+  },
+  heading: {
+    color: Colors.white,
+    fontSize: 50,
+    fontWeight: "900",
+    letterSpacing: -2.2,
+    marginTop: 3,
+  },
+  roundName: {
+    color: "#9B9B9B",
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 1.5,
+    marginTop: 3,
+    marginBottom: 17,
+  },
+  medallionWrap: {
+    alignItems: "center",
+  },
+  medallion: {
+    width: 252,
+    height: 190,
+    borderRadius: 126,
+    backgroundColor: Colors.background,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    marginBottom: 8,
+  },
+  medallionVs: {
+    width: 34,
+    height: 34,
+    backgroundColor: Colors.textPrimary,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    transform: [{ rotate: "-4deg" }],
+  },
+  medallionVsText: {
+    color: Colors.white,
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 0.8,
+  },
+  voteSplit: {
+    color: "#A0A0A0",
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 0.8,
+    marginBottom: 18,
+  },
+  heatArea: {
+    alignItems: "center",
+  },
+  earnedLabel: {
+    color: Colors.white,
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 1.2,
+    marginBottom: 2,
+  },
+  heatHero: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  heatValue: {
+    color: Colors.heat,
+    fontSize: 58,
+    fontWeight: "900",
+    letterSpacing: -2.1,
+  },
+  heatLabel: {
+    color: Colors.white,
+    fontSize: 13,
+    fontWeight: "900",
+    letterSpacing: 1.6,
+    marginTop: -5,
+    marginBottom: 12,
+  },
+  lowerResults: {
+    width: "100%",
+    alignItems: "center",
+  },
+  recapMessage: {
+    maxWidth: 310,
+    color: "#E4E0DA",
+    fontSize: 14,
+    fontWeight: "800",
+    lineHeight: 20,
+    textAlign: "center",
+    marginBottom: 15,
+  },
+  streakStrip: {
+    flexDirection: "row",
+    gap: 7,
+    borderTopColor: "#3A3A3A",
+    borderBottomColor: "#3A3A3A",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    paddingVertical: 7,
+    paddingHorizontal: 13,
+    marginBottom: 5,
+  },
+  heatDot: {
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heatDotInactive: {
+    borderColor: Colors.heatDark,
+    borderWidth: 1.4,
+    borderRadius: 16,
+    opacity: 0.42,
+  },
+  streakText: {
+    color: Colors.white,
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 1.1,
+    marginBottom: 13,
+  },
+  statsStrip: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    borderTopColor: "#333333",
+    borderBottomColor: "#333333",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    paddingVertical: 13,
+    marginBottom: 21,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  statValue: {
+    color: Colors.white,
+    fontSize: 18,
+    fontWeight: "900",
+  },
+  statLabel: {
+    color: "#8F8F8F",
+    fontSize: 8,
+    fontWeight: "900",
+    letterSpacing: 0.8,
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: "#363636",
+  },
+  actions: {
+    width: "100%",
+  },
+  primaryButton: {
+    position: "relative",
+    width: "100%",
+    minHeight: 54,
+    backgroundColor: Colors.roast,
+    paddingVertical: 16,
+    paddingHorizontal: 22,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    overflow: "hidden",
+    marginBottom: 10,
+  },
+  buttonSlash: {
+    position: "absolute",
+    left: -16,
+    top: -22,
+    width: 52,
+    height: 100,
+    backgroundColor: "rgba(255,255,255,0.10)",
+    transform: [{ rotate: "17deg" }],
+  },
+  primaryButtonText: {
+    color: Colors.white,
+    fontSize: 13,
+    fontWeight: "900",
+    letterSpacing: 1.1,
+  },
+  primaryButtonArrow: {
+    color: Colors.white,
+    fontSize: 23,
+    fontWeight: "700",
+  },
+  secondaryButton: {
+    minHeight: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 11,
+    paddingHorizontal: 16,
+  },
+  secondaryButtonText: {
+    color: "#BEBEBE",
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 1,
+  },
+  pressed: {
+    opacity: 0.72,
+  },
+});

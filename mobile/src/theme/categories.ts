@@ -77,6 +77,23 @@ export const CategoryThemes = {
   },
 
   // =====================================================
+  // School / College
+  //
+  // I wanted School / College to feel like its own part
+  // of the game instead of borrowing Everyday Life.
+  //
+  // The muted academic blue works with the notebook /
+  // campus feel without competing with the permanent
+  // coral Roast and teal Toast colors.
+  // =====================================================
+
+  "School / College": {
+    accent: "#527A92",
+    soft: "#E7EFF3",
+    label: "SCHOOL / COLLEGE",
+  },
+
+  // =====================================================
   // New Category
   //
   // Moral Dilemmas focuses on difficult decisions,
